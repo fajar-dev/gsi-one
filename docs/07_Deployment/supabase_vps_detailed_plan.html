@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>supabase vps detailed plan - GSI One Dokumentasi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+  <style>
+    :root {
+      --bg-primary: #0b1329;
+      --bg-card: #111c44;
+      --border: #1e295d;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent: #e8722a;
+    }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    h1, h2, h3, h4 { color: #fff; margin-top: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    h1 { border-bottom: 2px solid var(--accent); }
+    a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    a:hover { text-decoration: underline; }
+    p { margin-bottom: 1.25rem; }
+    code {
+      font-family: monospace;
+      background: rgba(232, 114, 42, 0.1);
+      color: var(--accent);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: #070d19;
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+    pre code {
+      background: none;
+      color: var(--text-primary);
+      padding: 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      text-align: left;
+    }
+    th {
+      background-color: rgba(30, 41, 93, 0.5);
+      color: #fff;
+    }
+    blockquote {
+      border-left: 4px solid var(--accent);
+      background: rgba(232, 114, 42, 0.05);
+      margin: 1.5rem 0;
+      padding: 1rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .alert-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+    .alert-note { background: #3b82f6; color: #fff; }
+    .alert-tip { background: #10b981; color: #fff; }
+    .alert-warning { background: #f59e0b; color: #fff; }
+    .alert-important { background: #8b5cf6; color: #fff; }
+    .alert-caution { background: #ef4444; color: #fff; }
+    .diagram-img-container {
+      margin-top: 1rem;
+      padding: 1.5rem;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+    }
+    .diagram-img { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Rencana Detail Migrasi dan Infrastruktur: Supabase Self-Hosted di VPS</h1>
+<p>Dokumen ini berisi rencana detail infrastruktur untuk menjalankan Supabase secara mandiri (self-hosted) pada Virtual Private Server (VPS) untuk melayani 40 hingga 80 proyek/klien dengan perkiraan ukuran database 1-2 GB per proyek.</p>
+<hr />
+<h2>1. Desain Arsitektur Layanan (Services Detail)</h2>
+<p>Supabase self-hosted dijalankan menggunakan Docker Compose yang mengemas beberapa layanan mikro yang saling terintegrasi. Berikut adalah detail dari setiap layanan utama yang akan dijalankan:</p>
+<h3>A. Kong (API Gateway)</h3>
+<ul>
+  <li><strong>Fungsi:</strong> Gerbang masuk utama untuk seluruh request API dari aplikasi React Native. Kong meneruskan request ke layanan yang sesuai berdasarkan path URL (misalnya, <code>/auth/v1</code> ke GoTrue, <code>/rest/v1</code> ke PostgREST).</li>
+  <li><strong>Konfigurasi Keamanan:</strong> Mengatur limit rate request dan validasi header.</li>
+</ul>
+<h3>B. GoTrue (Auth API)</h3>
+<ul>
+  <li><strong>Fungsi:</strong> Menangani otentikasi user (login, register, reset password, refresh token).</li>
+  <li><strong>Penyimpanan Kunci:</strong> Menggunakan JWT (JSON Web Token) dengan HS256 secret key.</li>
+</ul>
+<h3>C. PostgREST (Auto-REST API)</h3>
+<ul>
+  <li><strong>Fungsi:</strong> Mengonversi schema database PostgreSQL secara instan menjadi RESTful API yang aman.</li>
+  <li><strong>Integrasi:</strong> Mematuhi hak akses Row-Level Security (RLS) di database.</li>
+</ul>
+<h3>E. Supabase Storage (File Storage)</h3>
+<ul>
+  <li><strong>Fungsi:</strong> Mengelola bucket file, gambar, dan dokumen.</li>
+  <li><strong>Storage Backend:</strong> Dapat dikonfigurasi menggunakan penyimpanan lokal VPS atau langsung dihubungkan ke S3-Compatible Object Storage (Cloudflare R2 atau Backblaze B2).</li>
+</ul>
+<h3>F. PostgreSQL &amp; pg_graphql (Database Core)</h3>
+<ul>
+  <li><strong>Fungsi:</strong> Core database PostgreSQL dengan extension pendukung Supabase.</li>
+  <li><strong>pg_graphql:</strong> Menyediakan endpoint GraphQL otomatis di atas schema Postgres.</li>
+</ul>
+<h3>G. Supabase Studio (Dashboard Web)</h3>
+<ul>
+  <li><strong>Fungsi:</strong> GUI berbasis web mirip admin panel untuk melihat isi database, mengatur table, dan memantau API logs. Hanya diakses secara internal atau lewat proteksi password/VPN.</li>
+</ul>
+<hr />
+<h2>2. Struktur Database (Database Setup)</h2>
+<p>Untuk menangani 40 - 80 klien (masing-masing 1 - 2 GB), kita menggunakan satu instance PostgreSQL utama dengan pemisahan menggunakan <strong>PostgreSQL Schemas</strong> atau <strong>Multi-Database</strong>.</p>
+<h3>Opsi Desain Database:</h3>
+<ul>
+  <li><strong>Pilihan Terbaik (Multi-Schema):</strong> </li>
+  <li>Membuat schema terpisah untuk setiap proyek/klien di dalam satu database utama (misal: <code>client<em>01</code>, <code>client</em>02</code>, dst.).</li>
+  <li>Setiap schema memiliki struktur tabel yang sama tetapi terisolasi satu sama lain.</li>
+  <li>User database khusus dibuat untuk setiap klien agar mereka hanya bisa mengakses schema mereka sendiri.</li>
+  <li><strong>Alasan:</strong> Menjalankan 80 instance PostgreSQL terpisah dalam container Docker membutuhkan minimal 40 GB RAM hanya untuk beban idle PostgreSQL. Dengan multi-schema, beban idle hanya menggunakan satu instance PostgreSQL (~1-2 GB RAM idle).</li>
+</ul>
+<h3>Konfigurasi Database:</h3>
+<ul>
+  <li><strong>Connection Pooling:</strong> Menggunakan Supavisor (atau PgBouncer) bawaan Supabase untuk mengelola ribuan koneksi konkuren dari aplikasi mobile.</li>
+  <li><strong>Limitasi Memori:</strong> Mengoptimalkan parameter PostgreSQL seperti <code>shared<em>buffers</code> (25% dari total RAM VPS), <code>work</em>mem</code>, dan <code>effective<em>cache</em>size</code>.</li>
+</ul>
+<hr />
+<h2>3. Strategi Penyimpanan &amp; Backup (Storage for Backup)</h2>
+<p>Kehilangan data klien adalah risiko terbesar dalam self-hosting. Oleh karena itu, setup backup otomatis 3-lapis wajib dikonfigurasi sejak awal.</p>
+<h3>A. Lokasi Penyimpanan Backup (Object Storage)</h3>
+<p>Backup tidak boleh disimpan di VPS yang sama dengan database utama. Kita akan menggunakan Object Storage eksternal yang kompatibel dengan protokol S3:</p>
+<ul>
+  <li><strong>Penyedia Pilihan:</strong> Cloudflare R2 (Tanpa biaya egress/transfer data keluar) atau Backblaze B2 (Sangat murah, ~$6 per TB per bulan).</li>
+  <li><strong>Kebutuhan Storage Backup:</strong> 160 GB (ukuran database maksimal) x 30 salinan harian = ~4.8 TB (estimasi biaya bulanan di Backblaze B2: ~$29).</li>
+</ul>
+<h3>B. Mekanisme Backup Otomatis (Cronjob &amp; pg_dump)</h3>
+<ol>
+  <li><strong>Daily Logical Backup (Setiap Malam Jam 02:00):</strong></li>
+</ol>
+<ul>
+  <li>Script backup otomatis akan menjalankan perintah <code>pg<em>dumpall</code> atau <code>pg</em>dump</code> per schema klien.</li>
+  <li>File dump dikompresi menjadi format <code>.sql.gz</code>.</li>
+  <li>Dikirim langsung ke Cloudflare R2 menggunakan CLI Tool <code>rclone</code> atau <code>aws-cli</code>.</li>
+</ul>
+<ol>
+  <li><strong>Skema Retensi Backup:</strong></li>
+</ol>
+<ul>
+  <li>Harian: Disimpan selama 30 hari terakhir.</li>
+  <li>Bulanan: Disimpan selama 12 bulan terakhir.</li>
+  <li>Penghapusan otomatis file backup lama menggunakan Lifecycle Rule di R2/B2.</li>
+</ul>
+<h3>C. Backup File Storage</h3>
+<p>Untuk file media yang diunggah oleh klien ke Supabase Storage, jika file tersebut disimpan secara lokal di VPS, folder <code>/docker/volumes/supabase_storage</code> akan di-sync secara harian ke bucket R2/B2 menggunakan perintah <code>rclone sync</code>.</p>
+<hr />
+<h2>4. Analisis Perbandingan Harga (Pricing Comparison)</h2>
+<p>Tabel berikut menunjukkan perbandingan harga dan performa deployment antara opsi Cloud Managed Service (Supabase) dengan VPS Self-Hosted (luar dan lokal Indonesia seperti Biznet Gio) untuk skenario 40-80 klien:</p>
+<table>
+  <thead>
+    <tr>
+      <th>Penyedia &amp; Model Deployment</th>
+      <th>Spesifikasi Teknis (CPU/RAM/Storage)</th>
+      <th>40 Klien (Total ~60 GB DB)</th>
+      <th>80 Klien (Total ~120 GB DB)</th>
+      <th>Kelebihan &amp; Kekurangan</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Supabase Cloud (Multi-Tenant)</strong></td>
+      <td>Shared Compute, 8 GB DB limit + Overage $0.125/GB</td>
+      <td>~$31.50/bulan (~Rp 510.000)</td>
+      <td>~$39.00/bulan (~Rp 630.000)</td>
+      <td>[Kelebihan] Zero maintenance, uptime tinggi.&lt;br&gt;[Kekurangan] Data klien tergabung dalam satu DB.</td>
+    </tr>
+    <tr>
+      <td><strong>VPS Hetzner (Multi-Tenant/Schema)</strong></td>
+      <td>4-8 vCPU, 8-16 GB RAM, 160-240 GB SSD (Dedicated Resource)</td>
+      <td>~$22.00/bulan (~Rp 350.000)</td>
+      <td>~$40.50/bulan (~Rp 650.000)</td>
+      <td>[Kelebihan] Sangat murah, performa dedicated, kapasitas disk besar.&lt;br&gt;[Kekurangan] Butuh maintenance &amp; setup backup mandiri.</td>
+    </tr>
+    <tr>
+      <td><strong>Biznet Gio NEO Lite (Standard VPS)</strong></td>
+      <td>4-8 vCPU, 8-16 GB RAM, 160-240 GB SSD (Lokal Indonesia)</td>
+      <td>~Rp 469.000/bulan (Promo + Vol 100 GB)</td>
+      <td>~Rp 1.299.000/bulan (Normal + Vol 150 GB)</td>
+      <td>[Kelebihan] Latency sangat rendah, bandwidth gratis 10 Gbps, server di Indonesia.&lt;br&gt;[Kekurangan] Butuh setup backup &amp; OS maintenance.</td>
+    </tr>
+    <tr>
+      <td><strong>Biznet Gio NEO Lite Pro (High Perf.)</strong></td>
+      <td>4-8 vCPU, 8-16 GB RAM, 180-240 GB NVMe SSD (AMD EPYC)</td>
+      <td>~Rp 1.199.000/bulan (Normal + Vol 100 GB)</td>
+      <td>~Rp 2.099.000/bulan (Normal + Vol 150 GB)</td>
+      <td>[Kelebihan] Performa database sangat tinggi (High IOPS NVMe AMD EPYC).&lt;br&gt;[Kekurangan] Harga relatif lebih mahal dibanding VPS luar.</td>
+    </tr>
+    <tr>
+      <td><strong>VPS DigitalOcean (Premium SSD)</strong></td>
+      <td>4-8 vCPU, 8-16 GB RAM, 210-320 GB Premium SSD</td>
+      <td>~$61.00/bulan (~Rp 980.000)</td>
+      <td>~$112.00/bulan (~Rp 1.800.000)</td>
+      <td>[Kelebihan] Infrastruktur cloud global stabil &amp; mudah digunakan.&lt;br&gt;[Kekurangan] Biaya cukup tinggi untuk database besar.</td>
+    </tr>
+    <tr>
+      <td><strong>Supabase Cloud (Single-Tenant)</strong></td>
+      <td>Terisolasi penuh (1 proyek/klien), Compute Micro $10/proyek</td>
+      <td>~$415.00/bulan (~Rp 6.700.000)</td>
+      <td>~$815.00/bulan (~Rp 13.200.000)</td>
+      <td>[Kelebihan] Isolasi data total antar klien, sangat aman.&lt;br&gt;[Kekurangan] Biaya sangat mahal karena dikalikan jumlah klien.</td>
+    </tr>
+  </tbody>
+</table>
+<h3>Rekomendasi Utama Pemilihan Infrastruktur:</h3>
+<ul>
+  <li><strong>Untuk Kepatuhan Regulasi &amp; Latensi Rendah (Server Lokal):</strong> Menggunakan <strong>Biznet Gio NEO Lite (Standard)</strong> adalah opsi terbaik (~Rp 469.000/bulan) karena data disimpan di Indonesia dan memiliki latensi minimal.</li>
+  <li><strong>Untuk Efisiensi Biaya Terbesar (Global):</strong> Menggunakan <strong>VPS Hetzner</strong> dengan skema multi-tenant memberikan spesifikasi tertinggi dengan harga termurah (~Rp 350.000/bulan).</li>
+  <li><strong>Untuk Tanpa Maintenance Server:</strong> Menggunakan <strong>Supabase Cloud (Multi-Tenant)</strong> dengan pemisahan database menggunakan PostgreSQL schema terpisah (~Rp 510.000/bulan).</li>
+</ul>
+<hr />
+<h2>5. Langkah Implementasi (Implementation Steps)</h2>
+<p>Langkah-langkah berikut akan direncanakan secara matang sebelum eksekusi infrastruktur:</p>
+<ol>
+  <li><strong>Setup Server VPS:</strong> Install OS Ubuntu LTS terbaru, pasang Docker &amp; Docker Compose.</li>
+  <li><strong>Konfigurasi Domain &amp; SSL:</strong> Setup Reverse Proxy (Nginx atau Caddy) untuk meneruskan port SSL 443 ke port Kong API Gateway.</li>
+  <li><strong>Inisialisasi Supabase:</strong> Edit file <code>.env</code> Supabase, ubah kunci JWT secret default, atur password DB master yang kuat.</li>
+  <li><strong>Setup Multi-Tenant Schema:</strong> Buat script SQL untuk otomatisasi pembuatan schema baru dan setup role user PostgreSQL ketika ada klien/proyek baru.</li>
+  <li><strong>Setup Backup System:</strong> Install rclone, konfigurasi kredensial R2/B2, pasang script backup pada crontab sistem.</li>
+  <li><strong>Uji Coba Pemulihan (Disaster Recovery Test):</strong> Mencoba memulihkan database dari backup R2 ke server lokal untuk memastikan data backup tidak korup.</li>
+</ol>
+
+  </div>
+</body>
+</html>

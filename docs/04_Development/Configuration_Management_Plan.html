@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuration Management Plan - GSI One Dokumentasi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+  <style>
+    :root {
+      --bg-primary: #0b1329;
+      --bg-card: #111c44;
+      --border: #1e295d;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent: #e8722a;
+    }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    h1, h2, h3, h4 { color: #fff; margin-top: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    h1 { border-bottom: 2px solid var(--accent); }
+    a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    a:hover { text-decoration: underline; }
+    p { margin-bottom: 1.25rem; }
+    code {
+      font-family: monospace;
+      background: rgba(232, 114, 42, 0.1);
+      color: var(--accent);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: #070d19;
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+    pre code {
+      background: none;
+      color: var(--text-primary);
+      padding: 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      text-align: left;
+    }
+    th {
+      background-color: rgba(30, 41, 93, 0.5);
+      color: #fff;
+    }
+    blockquote {
+      border-left: 4px solid var(--accent);
+      background: rgba(232, 114, 42, 0.05);
+      margin: 1.5rem 0;
+      padding: 1rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .alert-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+    .alert-note { background: #3b82f6; color: #fff; }
+    .alert-tip { background: #10b981; color: #fff; }
+    .alert-warning { background: #f59e0b; color: #fff; }
+    .alert-important { background: #8b5cf6; color: #fff; }
+    .alert-caution { background: #ef4444; color: #fff; }
+    .diagram-img-container {
+      margin-top: 1rem;
+      padding: 1.5rem;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+    }
+    .diagram-img { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Configuration Management Plan</h1>
+<h2>Proyek: GSI One Mobile Application</h2>
+<h2>Standar: IEEE 828</h2>
+<hr />
+<h2>1. Tujuan</h2>
+<p>Mendefinisikan bagaimana konfigurasi, versi, dan perubahan sistem dikelola selama siklus pengembangan GSI One untuk memastikan konsistensi dan keterlacakan.</p>
+<hr />
+<h2>2. Item Konfigurasi (Configuration Items)</h2>
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Item Konfigurasi</th>
+      <th>Lokasi</th>
+      <th>Versi Saat Ini</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>CI-01</td>
+      <td>Source Code Aplikasi</td>
+      <td>Git Repository (main branch)</td>
+      <td>v1.0.0</td>
+    </tr>
+    <tr>
+      <td>CI-02</td>
+      <td>Konfigurasi API URL</td>
+      <td><code>src/config/api.ts</code></td>
+      <td>v1.0.0</td>
+    </tr>
+    <tr>
+      <td>CI-03</td>
+      <td>Android Build Config</td>
+      <td><code>android/app/build.gradle</code></td>
+      <td>v1.0.0</td>
+    </tr>
+    <tr>
+      <td>CI-04</td>
+      <td>iOS Build Config</td>
+      <td><code>ios/gsione.xcodeproj</code></td>
+      <td>v1.0.0</td>
+    </tr>
+    <tr>
+      <td>CI-05</td>
+      <td>Package Dependencies</td>
+      <td><code>package.json</code> + <code>package-lock.json</code></td>
+      <td>v1.0.0</td>
+    </tr>
+    <tr>
+      <td>CI-06</td>
+      <td>TypeScript Config</td>
+      <td><code>tsconfig.json</code></td>
+      <td>v1.0.0</td>
+    </tr>
+    <tr>
+      <td>CI-07</td>
+      <td>ESLint Config</td>
+      <td><code>.eslintrc.js</code></td>
+      <td>v1.0.0</td>
+    </tr>
+    <tr>
+      <td>CI-08</td>
+      <td>Dokumentasi Teknis</td>
+      <td><code>docs/</code></td>
+      <td>v1.0.0</td>
+    </tr>
+    <tr>
+      <td>CI-09</td>
+      <td>Environment Variables Frontend</td>
+      <td><code>.env</code> (<strong>tidak di-commit ke Git</strong>)</td>
+      <td>v1.0.0</td>
+    </tr>
+    <tr>
+      <td>CI-10</td>
+      <td>Environment Variables Backend</td>
+      <td><code>backend/.env</code> (<strong>tidak di-commit ke Git</strong>)</td>
+      <td>v1.0.0</td>
+    </tr>
+    <tr>
+      <td>CI-11</td>
+      <td>Template Env Frontend</td>
+      <td><code>.env.example</code> (di-commit ke Git)</td>
+      <td>v1.0.0</td>
+    </tr>
+    <tr>
+      <td>CI-12</td>
+      <td>Template Env Backend</td>
+      <td><code>backend/.env.example</code> (di-commit ke Git)</td>
+      <td>v1.0.0</td>
+    </tr>
+    <tr>
+      <td>CI-13</td>
+      <td>Babel Config (plugin dotenv)</td>
+      <td><code>babel.config.js</code></td>
+      <td>v1.0.0</td>
+    </tr>
+    <tr>
+      <td>CI-14</td>
+      <td>TypeScript Env Type Decl.</td>
+      <td><code>src/types/env.d.ts</code></td>
+      <td>v1.0.0</td>
+    </tr>
+  </tbody>
+</table>
+<hr />
+<h2>3. Manajemen Versi</h2>
+<p>Proyek menggunakan <strong>Semantic Versioning (SemVer)</strong>:</p>
+<ul>
+  <li><code>MAJOR.MINOR.PATCH</code> (contoh: <code>1.2.3</code>)</li>
+  <li><strong>MAJOR</strong>: Perubahan yang tidak kompatibel dengan versi sebelumnya (breaking change).</li>
+  <li><strong>MINOR</strong>: Penambahan fitur baru yang kompatibel.</li>
+  <li><strong>PATCH</strong>: Perbaikan bug yang kompatibel.</li>
+</ul>
+<hr />
+<h2>4. Prosedur Perubahan Konfigurasi</h2>
+<p>Setiap perubahan pada item konfigurasi kritis (terutama CI-02 hingga CI-07) harus melalui:</p>
+<ol>
+  <li>Pengajuan Change Request (CR) oleh developer.</li>
+  <li>Review dampak oleh Lead Developer.</li>
+  <li>Persetujuan PM untuk perubahan yang memengaruhi jadwal atau scope.</li>
+  <li>Update pada <code>Version_History.md</code> setelah perubahan diterapkan.</li>
+</ol>
+<p>Khusus untuk CI-09 dan CI-10 (file <code>.env</code>):</p>
+<ul>
+  <li>Nilai aktual <strong>tidak boleh</strong> dibagikan melalui Git commit.</li>
+  <li>Distribusi nilai dilakukan secara aman melalui password manager tim atau saluran komunikasi terenkripsi.</li>
+  <li>Setiap penambahan variabel baru wajib didokumentasikan di CI-11/CI-12 (<code>.env.example</code>) dan CI-14 (<code>env.d.ts</code> untuk frontend).</li>
+</ul>
+<hr />
+<h2>5. Pengelolaan Environment</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Environment</th>
+      <th>Branch Git</th>
+      <th>API Base URL</th>
+      <th>Tujuan</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Development</td>
+      <td><code>feature/*</code></td>
+      <td><code>http://10.0.2.2:3000</code> (Android emulator)</td>
+      <td>Pengembangan aktif</td>
+    </tr>
+    <tr>
+      <td>Development</td>
+      <td><code>feature/*</code></td>
+      <td><code>http://localhost:3000</code> (iOS/Web)</td>
+      <td>Pengembangan aktif</td>
+    </tr>
+    <tr>
+      <td>Staging</td>
+      <td><code>develop</code></td>
+      <td>URL staging (jika ada)</td>
+      <td>Testing integrasi</td>
+    </tr>
+    <tr>
+      <td>Production</td>
+      <td><code>main</code></td>
+      <td><code>https://grahasurvei.com</code></td>
+      <td>Rilis ke pengguna akhir</td>
+    </tr>
+  </tbody>
+</table>
+<p>Perpindahan environment dilakukan dengan mengubah nilai <code>API<em>BASE</em>URL</code> aktif di <code>src/config/api.ts</code> (un-comment baris yang sesuai).</p>
+<hr />
+<h2>6. Aturan Keamanan Konfigurasi</h2>
+<ul>
+  <li>File <code>.env</code> dan <code>backend/.env</code> <strong>wajib ada</strong> di <code>.gitignore</code> dan tidak boleh ter-commit ke repositori Git.</li>
+  <li>Tidak boleh ada nilai API key, secret, atau password yang ditulis langsung (hardcode) di source code (<code>.ts</code>, <code>.tsx</code>, <code>.js</code>).</li>
+  <li>Backend <code>server.js</code> wajib memuat <code>require('dotenv').config()</code> di baris pertama sebelum mengakses <code>process.env</code>.</li>
+  <li>Variabel <code>JWT_SECRET</code> di backend <strong>wajib</strong> diisi di file <code>backend/.env</code> — server akan gagal start dengan pesan error jika kosong.</li>
+  <li>Untuk variabel environment frontend (Supabase, dll.), konfigurasikan di <code>src/config/supabase.ts</code> langsung mereferensikan nilai dari <code>src/config/api.ts</code> atau <code>supabase.ts</code>.</li>
+</ul>
+
+  </div>
+</body>
+</html>

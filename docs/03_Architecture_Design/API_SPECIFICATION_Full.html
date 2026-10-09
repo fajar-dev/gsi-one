@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API SPECIFICATION Full - GSI One Dokumentasi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+  <style>
+    :root {
+      --bg-primary: #0b1329;
+      --bg-card: #111c44;
+      --border: #1e295d;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent: #e8722a;
+    }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    h1, h2, h3, h4 { color: #fff; margin-top: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    h1 { border-bottom: 2px solid var(--accent); }
+    a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    a:hover { text-decoration: underline; }
+    p { margin-bottom: 1.25rem; }
+    code {
+      font-family: monospace;
+      background: rgba(232, 114, 42, 0.1);
+      color: var(--accent);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: #070d19;
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+    pre code {
+      background: none;
+      color: var(--text-primary);
+      padding: 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      text-align: left;
+    }
+    th {
+      background-color: rgba(30, 41, 93, 0.5);
+      color: #fff;
+    }
+    blockquote {
+      border-left: 4px solid var(--accent);
+      background: rgba(232, 114, 42, 0.05);
+      margin: 1.5rem 0;
+      padding: 1rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .alert-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+    .alert-note { background: #3b82f6; color: #fff; }
+    .alert-tip { background: #10b981; color: #fff; }
+    .alert-warning { background: #f59e0b; color: #fff; }
+    .alert-important { background: #8b5cf6; color: #fff; }
+    .alert-caution { background: #ef4444; color: #fff; }
+    .diagram-img-container {
+      margin-top: 1rem;
+      padding: 1.5rem;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+    }
+    .diagram-img { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>API &amp; Repository Specification</h1>
+<h2>Proyek: GSI One Mobile Application</h2>
+<h3>Versi Dokumentasi: 1.4.0 (Terbaru per 30 Juli 2026)</h3>
+<p>Dokumen ini mencatat secara menyeluruh kontrak API, repositori, dan layanan data yang berlaku untuk aplikasi GSI One Mobile &amp; Web. Aplikasi menggunakan dua skema komunikasi data utama:</p>
+<ol>
+  <li><strong>Direct Supabase SDK (Client-side)</strong>: Untuk operasi pembacaan &amp; mutasi yang telah dilindungi oleh <strong>Row Level Security (RLS)</strong> PostgreSQL (<code>src/services/repositories/</code>).</li>
+  <li><strong>Express Modular REST API (Server-side)</strong>: Untuk operasi server-side tepercaya, bypass RLS aman via <em>Service Role</em>, upload file multipart, rate limiting, dan audit security (<code>backend/routes/</code>).</li>
+</ol>
+<hr />
+<h2>1. Kontrak Repository Proyek (<code>IProjectRepository</code>)</h2>
+<p><code>IProjectRepository</code> diimplementasikan secara modular menggunakan <strong>Facade Pattern</strong> oleh <code>SupabaseProjectRepository</code> yang mendelegasikan tanggung jawab ke 4 sub-repository aggregate domain di <code>src/services/repositories/sub/</code>. Transformasi row database ke entitas aplikasi dilakukan secara eksplisit oleh <code>src/services/mappers/projectMapper.ts</code>.</p>
+<h3>Sub-Repository Breakdown</h3>
+<ul>
+  <li><strong><code>ProjectQueryRepository</code></strong>: <code>getProjects</code>, <code>getProjectDetail</code></li>
+  <li><strong><code>ProjectStageRepository</code></strong>: <code>updateStageStatus</code>, <code>addStageUpdate</code>, <code>createProjectStage</code>, <code>updateProjectStage</code>, <code>deleteProjectStage</code></li>
+  <li><strong><code>ProjectFileRepository</code></strong>: <code>uploadFile</code>, <code>getMimeType</code></li>
+  <li><strong><code>ProjectCommandRepository</code></strong>: <code>createProject</code>, <code>updateProject</code>, <code>deleteProject</code>, <code>getUsersByRole</code></li>
+</ul>
+<h3>Interface Signature</h3>
+<pre><code class="language-typescript">getProjects(userId?: string, role?: string, options?: PaginationOptions): Promise&lt;Project[]&gt;
+getProjectDetail(projectId: string, role?: string): Promise&lt;ProjectDetail&gt;
+updateStageStatus(stageId: string, status: ProjectStageStatus, userId: string): Promise&lt;void&gt;
+addStageUpdate(stageId: string, description: string, progress: number, userId: string): Promise&lt;void&gt;
+uploadFile(projectId: string, stageId: string | null, fileName: string, fileType: ProjectFileType, userId: string, fileUri?: string): Promise&lt;void&gt;
+createProject(project: Omit&lt;Project, 'id' | 'created_at' | 'status'&gt;, userId: string): Promise&lt;void&gt;
+createProjectStage(projectId: string, title: string, description: string, userId: string): Promise&lt;void&gt;
+updateProject(projectId: string, updates: Partial&lt;Project&gt;): Promise&lt;void&gt;
+updateProjectStage(stageId: string, updates: { title: string; description: string }): Promise&lt;void&gt;
+deleteProject(projectId: string): Promise&lt;void&gt;
+deleteProjectStage(stageId: string): Promise&lt;void&gt;
+getUsersByRole(role: string): Promise&lt;UserOptionDto[]&gt;</code></pre>
+<ul>
+  <li><strong>Pola Query &amp; Filtering</strong>: Daftar proyek selalu diurutkan berdasarkan <code>created<em>at DESC</code>. Jika <code>options.limit</code> diberikan, query menerapkan <code>.range(offset, offset + limit - 1)</code>. Filter otorisasi peran menggunakan ID relasional: <code>client</code> menyaring <code>client</em>id</code> atau <code>created<em>by</code>, <code>marketing</code> menyaring <code>marketing</em>id</code> atau <code>created<em>by</code>, dan <code>engineer</code> menyaring <code>engineer</em>id</code> atau <code>created_by</code>.</li>
+</ul>
+<hr />
+<h2>2. Kontrak Layanan Notifikasi &amp; Storage</h2>
+<h3>2.1 Notification Service (<code>notificationService.ts</code>)</h3>
+<ul>
+  <li><code>getNotifications(userId?, role?, limit = 20, offset = 0)</code>: Memuat notifikasi terpaginasi dari database Supabase PostgreSQL.</li>
+  <li><code>markAsRead(notificationId)</code> &amp; <code>deleteNotification(notificationId)</code>: Melakukan mutasi dengan klausa <code>.select('id')</code> untuk memastikan baris yang terdampak valid; <code>notificationStore</code> menerapkan <em>optimistic update</em> dengan rollback otomatis jika mutasi gagal/ditolak RLS.</li>
+  <li><strong>Pemberitahuan Server-Side</strong>: Pembuatan notifikasi langsung dari klien disegal oleh RLS Policy. Pembuatan notifikasi wajib dilakukan via trigger database <code>SECURITY DEFINER</code> atau REST API <code>POST /api/notifications</code>.</li>
+</ul>
+<h3>2.2 Storage Service (<code>storageService.ts</code>)</h3>
+<ul>
+  <li><code>getSignedUrl(path, expiresInSeconds = 3600, bucket = 'projects')</code>: Menghasilkan <em>Signed URL</em> berbatas waktu untuk mengakses/mengunduh berkas privat dari Supabase Storage Bucket <code>projects</code>.</li>
+</ul>
+<hr />
+<h2>3. Spesifikasi Express REST API Backend (<code>backend/routes/</code>)</h2>
+<p>Seluruh endpoint backend lokal/produksi dilindungi oleh middleware keamanan terpusat:</p>
+<h3>3.1 Authentication &amp; User Management Routes (<code>backend/routes/authRoutes.js</code>)</h3>
+<h4>1. <code>POST /api/login</code> &amp; <code>POST /api/login.php</code></h4>
+<ul>
+  <li><strong>Tujuan</strong>: Login pengguna lokal JWT.</li>
+  <li><strong>Header</strong>: <code>Content-Type: application/json</code></li>
+  <li><strong>Security</strong>: Rate limited via <code>authLimiter</code> (maksimal 10 percobaan/15 menit per IP, localhost dikecualikan).</li>
+  <li><strong>Request Body</strong>:</li>
+<pre><code class="language-json">  { "email": "user@example.com", "password": "securepassword123" }</code></pre>
+  <li><strong>Response Success (200 OK)</strong>:</li>
+<pre><code class="language-json">  {
+    "success": true,
+    "message": "Login berhasil",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6...",
+    "user": { "id": "uuid", "email": "user@example.com", "full_name": "Nama User", "role": "client" }
+  }</code></pre>
+</ul>
+<h4>2. <code>POST /api/auth/lookup-ticket</code></h4>
+<ul>
+  <li><strong>Tujuan</strong>: Resolusi nomor tiket Klien menjadi email untuk login tanpa password Klien (Guest Login).</li>
+  <li><strong>Security</strong>: Access Publik. Memiliki fitur <strong>Auto-Repair</strong>: Jika <code>ticket<em>number</code> belum tersimpam di <code>public.users</code>, backend otomatis mencari di <code>auth.users.user</em>metadata</code> dan memperbaiki record <code>public.users</code>.</li>
+  <li><strong>Request Body</strong>:</li>
+<pre><code class="language-json">  { "ticket_number": "GSI-2026-477566" }</code></pre>
+  <li><strong>Response Success (200 OK)</strong>: <code>{ "success": true, "email": "client@example.com" }</code></li>
+  <li><strong>Response Error (444 Ticket Not Found)</strong>: <code>{ "success": false, "message": "Nomor Tiket Klien (GSI-2026-477566) tidak ditemukan" }</code></li>
+</ul>
+<h4>3. <code>POST /api/admin/create-user</code></h4>
+<ul>
+  <li><strong>Tujuan</strong>: Registrasi akun pengguna baru (<code>client</code>, <code>marketing</code>, <code>engineer</code>) oleh Admin.</li>
+  <li><strong>Security</strong>: Mandatory <code>Authorization: Bearer &lt;token&gt;</code> (Admin Role Only).</li>
+  <li><strong>Request Body</strong>:</li>
+<pre><code class="language-json">  {
+    "name": "Budi Santoso",
+    "email": "budi@example.com",
+    "password": "password123",
+    "role": "client",
+    "ticket_number": "GSI-2026-477566"
+  }</code></pre>
+  <li><strong>Response Success (201 Created)</strong>: <code>{ "success": true, "message": "Pengguna baru berhasil didaftarkan", "user": { ... } }</code></li>
+</ul>
+<h4>4. <code>GET /api/users/role/:role</code></h4>
+<ul>
+  <li><strong>Tujuan</strong>: Mengambil daftar pengguna berdasarkan peran (<code>client</code>, <code>marketing</code>, <code>engineer</code>).</li>
+  <li><strong>Security</strong>: Mandatory <code>Authorization: Bearer &lt;token&gt;</code>.</li>
+  <li><strong>Response (200 OK)</strong>: <code>{ "success": true, "users": [ { "id": "uuid", "name": "Budi", "email": "budi@example.com" } ] }</code></li>
+</ul>
+<h4>5. <code>POST /api/register</code> &amp; <code>POST /api/register.php</code></h4>
+<ul>
+  <li><strong>Tujuan</strong>: Endpoint registrasi publik lama.</li>
+  <li><strong>Response (403 Forbidden)</strong>: <code>{ "success": false, "message": "Pendaftaran mandiri sementara dinonaktifkan." }</code></li>
+</ul>
+<hr />
+<h3>3.2 Project Management Routes (<code>backend/routes/projectRoutes.js</code>)</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Method</th>
+      <th>Endpoint</th>
+      <th>Auth Required</th>
+      <th>Ringkasan Respons / Fungsi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>GET</code></td>
+      <td><code>/api/dashboard/stats</code></td>
+      <td>JWT Authenticated</td>
+      <td><code>{ success: true, stats: { total, pending, on<em>progress, done, on</em>hold } }</code></td>
+    </tr>
+    <tr>
+      <td><code>GET</code></td>
+      <td><code>/api/projects</code></td>
+      <td>JWT Authenticated</td>
+      <td>Menampilkan daftar proyek yang difilter berdasarkan peran ID pengguna.</td>
+    </tr>
+    <tr>
+      <td><code>GET</code></td>
+      <td><code>/api/projects/:id</code></td>
+      <td>JWT Authenticated</td>
+      <td>Menampilkan detail proyek. Bidang <code>budget</code> &amp; <code>project_code</code> dihapus otomatis untuk <code>role = 'client'</code>.</td>
+    </tr>
+    <tr>
+      <td><code>PUT</code></td>
+      <td><code>/api/stages/:id</code></td>
+      <td>JWT Staff</td>
+      <td>Memperbarui status tahapan (<code>pending</code>, <code>in_progress</code>, <code>done</code>), menghitung ulang status proyek, dan memicu notifikasi.</td>
+    </tr>
+    <tr>
+      <td><code>PUT</code></td>
+      <td><code>/api/stages/:id/details</code></td>
+      <td>JWT Staff</td>
+      <td>Memperbarui judul dan deskripsi tahapan proyek.</td>
+    </tr>
+    <tr>
+      <td><code>POST</code></td>
+      <td><code>/api/stages/:id/updates</code></td>
+      <td>JWT Staff</td>
+      <td>Menambahkan catatan harian progres pekerjaan (<code>description</code>, <code>progress</code>).</td>
+    </tr>
+    <tr>
+      <td><code>PUT</code></td>
+      <td><code>/api/projects/:id</code></td>
+      <td>JWT Staff</td>
+      <td>Memperbarui rincian data induk proyek.</td>
+    </tr>
+    <tr>
+      <td><code>DELETE</code></td>
+      <td><code>/api/projects/:id</code></td>
+      <td>JWT Staff</td>
+      <td>Menghapus proyek beserta seluruh tahapannya secara cascade.</td>
+    </tr>
+    <tr>
+      <td><code>DELETE</code></td>
+      <td><code>/api/stages/:id</code></td>
+      <td>JWT Staff</td>
+      <td>Menghapus tahapan linimasa proyek tertentu.</td>
+    </tr>
+  </tbody>
+</table>
+<hr />
+<h3>3.3 Booking &amp; File Upload Routes (<code>backend/routes/bookingRoutes.js</code> &amp; <code>fileRoutes.js</code>)</h3>
+<h4>1. <code>POST /api/booking</code> &amp; <code>POST /api/booking.php</code></h4>
+<ul>
+  <li><strong>Tujuan</strong>: Pengajuan permohonan survei lokasi baru.</li>
+  <li><strong>Security</strong>: Mandatory JWT Token.</li>
+  <li><strong>Request Body</strong>: <code>{ full<em>name, company</em>name?, email, phone, service<em>type, location, preferred</em>date, message? }</code></li>
+  <li><strong>Response Success (201 Created)</strong>: <code>{ "success": true, "message": "Booking survey berhasil diajukan" }</code></li>
+</ul>
+<h4>2. <code>POST /api/projects/:id/files</code></h4>
+<ul>
+  <li><strong>Tujuan</strong>: Unggah berkas foto/dokumen teknis proyek (Multipart Form-Data).</li>
+  <li><strong>Security</strong>: Staff Only (Admin/Marketing/Engineer). Client yang mencoba mengunggah akan ditolak (403) dan file otomatis dibersihkan dari storage server.</li>
+  <li><strong>Batasan</strong>: Ukuran file maksimum <strong>20 MB</strong>. Ekstensi &amp; MIME Type di-whitelist ketat (<code>.jpg</code>, <code>.jpeg</code>, <code>.png</code>, <code>.webp</code>, <code>.pdf</code>, <code>.doc</code>, <code>.docx</code>, <code>.xls</code>, <code>.xlsx</code>, <code>.mp4</code>).</li>
+</ul>
+<hr />
+<h3>3.4 Notification Server Route (<code>backend/routes/notificationRoutes.js</code>)</h3>
+<h4>1. <code>POST /api/notifications</code></h4>
+<ul>
+  <li><strong>Tujuan</strong>: Pembuatan notifikasi terpercaya melalui server backend.</li>
+  <li><strong>Security</strong>: Mandatory JWT Token. Klien tidak diizinkan melakukan INSERT langsung ke Supabase <code>notifications</code> table (RLS Policy menyegel INSERT publik).</li>
+  <li><strong>Request Body</strong>: <code>{ userId?, targetRole?, title, message, type, referenceId? }</code></li>
+  <li><strong>Response Success (201 Created)</strong>: <code>{ "success": true, "message": "Notifikasi berhasil dibuat" }</code></li>
+</ul>
+<hr />
+<h2>4. Keamanan Row Level Security (RLS) &amp; Storage</h2>
+<ul>
+  <li><strong>Policy Notifications</strong>: Hanya mengizinkan <code>SELECT</code>, <code>UPDATE</code>, dan <code>DELETE</code> jika <code>user<em>id = auth.uid()</code> atau <code>target</em>role</code> sesuai dengan peran pengguna yang terautentikasi. Tidak ada policy <code>INSERT</code> publik/klien.</li>
+  <li><strong>Policy Projects &amp; Relasi</strong>: Membaca proyek, stages, updates, dan files berdasarkan UUID relasional (<code>client<em>id</code>, <code>created</em>by</code>, <code>engineer<em>id</code>, <code>marketing</em>id</code>), bukan berbasis pencocokan string nama.</li>
+  <li><strong>Storage Bucket <code>projects</code></strong>: Privat (<code>public = false</code>). RLS Storage Objects memastikan hanya pengguna yang memiliki akses ke proyek tersebut yang dapat memperoleh Signed URL.</li>
+</ul>
+<hr />
+<h2>5. Ringkasan Status Code HTTP</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Status Code</th>
+      <th>Arti</th>
+      <th>Keterangan</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>200 OK</strong></td>
+      <td>Permintaan Berhasil</td>
+      <td>Query data proyek, lookup ticket, update status</td>
+    </tr>
+    <tr>
+      <td><strong>201 Created</strong></td>
+      <td>Entitas Berhasil Dibuat</td>
+      <td>Registrasi user baru, upload file, kirim booking, tambah notifikasi</td>
+    </tr>
+    <tr>
+      <td><strong>400 Bad Request</strong></td>
+      <td>Validasi Input Gagal</td>
+      <td>Field mandatory kosong, password &lt; 8 karakter, MIME type dilarang</td>
+    </tr>
+    <tr>
+      <td><strong>401 Unauthorized</strong></td>
+      <td>Tidak Terautentikasi</td>
+      <td>Header token Bearer kosong atau kedaluwarsa</td>
+    </tr>
+    <tr>
+      <td><strong>403 Forbidden</strong></td>
+      <td>Akses Ditolak RLS / Role</td>
+      <td>Klien mencoba upload file, pendaftaran mandiri</td>
+    </tr>
+    <tr>
+      <td><strong>404 Not Found</strong></td>
+      <td>Resource Tidak Ada</td>
+      <td>Proyek ID / Stage ID tidak ditemukan</td>
+    </tr>
+    <tr>
+      <td><strong>444 Ticket Not Found</strong></td>
+      <td>Nomor Tiket Tidak Ada</td>
+      <td>Nomor tiket login Klien tidak ditemukan</td>
+    </tr>
+    <tr>
+      <td><strong>500 Internal Error</strong></td>
+      <td>Server Error</td>
+      <td>Failure database atau Supabase Auth</td>
+    </tr>
+  </tbody>
+</table>
+
+  </div>
+</body>
+</html>

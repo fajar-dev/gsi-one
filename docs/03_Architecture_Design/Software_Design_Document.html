@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Software Design Document - GSI One Dokumentasi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+  <style>
+    :root {
+      --bg-primary: #0b1329;
+      --bg-card: #111c44;
+      --border: #1e295d;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent: #e8722a;
+    }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    h1, h2, h3, h4 { color: #fff; margin-top: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    h1 { border-bottom: 2px solid var(--accent); }
+    a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    a:hover { text-decoration: underline; }
+    p { margin-bottom: 1.25rem; }
+    code {
+      font-family: monospace;
+      background: rgba(232, 114, 42, 0.1);
+      color: var(--accent);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: #070d19;
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+    pre code {
+      background: none;
+      color: var(--text-primary);
+      padding: 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      text-align: left;
+    }
+    th {
+      background-color: rgba(30, 41, 93, 0.5);
+      color: #fff;
+    }
+    blockquote {
+      border-left: 4px solid var(--accent);
+      background: rgba(232, 114, 42, 0.05);
+      margin: 1.5rem 0;
+      padding: 1rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .alert-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+    .alert-note { background: #3b82f6; color: #fff; }
+    .alert-tip { background: #10b981; color: #fff; }
+    .alert-warning { background: #f59e0b; color: #fff; }
+    .alert-important { background: #8b5cf6; color: #fff; }
+    .alert-caution { background: #ef4444; color: #fff; }
+    .diagram-img-container {
+      margin-top: 1rem;
+      padding: 1.5rem;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+    }
+    .diagram-img { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Software Design Document (SDD)</h1>
+<h2>Proyek: GSI One Mobile Application</h2>
+<h2>Standar: IEEE 1016 (adaptasi)</h2>
+<hr />
+<h2>1. Desain Modul Autentikasi &amp; Akun</h2>
+<h3>1.1 Layar Login (<code>src/screens/Login/index.tsx</code>)</h3>
+<ul>
+  <li>Menampilkan form input Nomor Tiket / Email dan Kata Sandi.</li>
+  <li>Memanggil <code>useAuthStore().login(ticketOrEmail, password)</code> saat tombol Login ditekan.</li>
+  <li>Menggunakan <code>errorHelpers.ts</code> untuk pengolahan pesan kesalahan yang informatif.</li>
+  <li>Mengalihkan pengguna ke Authenticated Area (<code>AuthenticatedTabs</code>) setelah login berhasil.</li>
+</ul>
+<h3>1.2 Modal Pendaftaran Akun Admin (<code>src/screens/Dashboard/components/AdminRegisterModal.tsx</code>)</h3>
+<ul>
+  <li>Digunakan khusus oleh System Administrator untuk mendaftarkan akun baru (Klien, Marketing, Engineer).</li>
+  <li>Menampilkan form input Nama Lengkap, Email, Kata Sandi (min 8 karakter), dan Pilihan Role (<code>client</code>, <code>marketing</code>, <code>engineer</code>).</li>
+  <li>Memanggil <code>useAuthStore().adminCreateUser(name, email, password, role)</code>.</li>
+</ul>
+<h3>1.3 <code>authStore.ts</code> &amp; Layanan Autentikasi</h3>
+<ul>
+  <li>State: <code>{ user, token, isLoading, isInitialized, error }</code>.</li>
+  <li>Actions: <code>initialize()</code>, <code>login()</code>, <code>adminCreateUser()</code>, <code>logout()</code>, <code>clearError()</code>.</li>
+  <li>Persistensi sesi tersimpan otomatis di <code>AsyncStorage</code>.</li>
+</ul>
+<hr />
+<h2>2. Desain Modul Layanan Publik &amp; Book Survey</h2>
+<h3>2.1 Katalog Layanan &amp; Detail (<code>src/screens/Services/</code>)</h3>
+<ul>
+  <li><code>LayananKamiScreen.tsx</code>: Menampilkan grid/katalog 6 layanan resmi GSI (Structural Forensic, Risk Asset Integrity, Structural Repair Design, Natural Hazard Risk Assessment, SHMS, EEWS).</li>
+  <li><code>LayananDetailScreen.tsx</code>: Menampilkan detail layanan, kartu peringatan risiko, solusi GSI, output client, dan CTA "Pesan Survei".</li>
+  <li><code>Services/index.tsx</code>: Katalog studi kasus asesmen per kategori struktur (Gedung, Jembatan, Dermaga/Jetty, Industri).</li>
+  <li><code>StructureDetailScreen.tsx</code>: Informasi asesmen struktur spesifik &amp; simulasi stream telemetri sensor SHMS.</li>
+</ul>
+<h3>2.2 Form Pengajuan Survei (<code>src/screens/BookSurvey/index.tsx</code>)</h3>
+<ul>
+  <li>Menggunakan <code>useSurveyRequests()</code> hook dan <code>surveyService.ts</code>.</li>
+  <li>Validasi input form: Nama, Perusahaan, Email, Telepon, Jenis Layanan, Lokasi, Perkiraan Tanggal, Deskripsi.</li>
+  <li>Mengirimkan record ke tabel Supabase <code>bookings</code> melalui <code>SupabaseSurveyRepository.ts</code>.</li>
+  <li>Navigasi ke <code>SuccessScreen.tsx</code> setelah permohonan berhasil dikirim.</li>
+</ul>
+<h3>2.3 Manajemen Permohonan Survei (<code>src/screens/BookSurvey/SurveyRequestsScreen.tsx</code>)</h3>
+<ul>
+  <li>Digunakan oleh Staf Marketing dan Admin.</li>
+  <li>Menampilkan antrean permohonan survei (<code>pending</code>, <code>claimed</code>, <code>approved</code>, <code>rejected</code>).</li>
+  <li>Fitur Klaim Permohonan (<code>claimSurveyRequest</code>), Persetujuan/Penolakan (<code>approveSurveyRequest</code>, <code>rejectSurveyRequest</code>).</li>
+  <li>Tombol aksi "Konversi ke Proyek" yang mengarahkan ke <code>CreateProjectScreen</code> dengan parameter terisi otomatis.</li>
+</ul>
+<hr />
+<h2>3. Desain Modul Manajemen Proyek &amp; Tracking</h2>
+<h3>3.1 Layar Daftar Proyek (<code>src/screens/Projects/ProjectListScreen.tsx</code>)</h3>
+<ul>
+  <li>Menampilkan daftar proyek dengan pencarian, filter status (<code>in_progress</code>, <code>completed</code>, <code>draft</code>), dan penyaringan berbasis role (Klien hanya melihat proyeknya, Engineer melihat proyek ditugaskan, Admin/Marketing melihat semua).</li>
+  <li>Menggunakan <code>useProjects()</code> hook.</li>
+</ul>
+<h3>3.2 Layar Detail Proyek (<code>src/screens/Projects/ProjectDetailScreen.tsx</code>)</h3>
+<ul>
+  <li>Menggunakan <code>useProjectDetail(projectId)</code> hook.</li>
+  <li>Menampilkan linimasa proyek (<code>StageTimeline.tsx</code>), persentase kemajuan total, catatan progres (<code>stage<em>updates</code>), dan dokumen inspection/laporan PDF (<code>project</em>files</code>).</li>
+  <li>Komponen Modal: <code>AddLogModal.tsx</code> (tambah log harian) dan <code>UploadFileModal.tsx</code> (unggah foto/berkas ke Supabase Storage).</li>
+</ul>
+<h3>3.3 Pembuatan Proyek (<code>src/screens/Projects/CreateProjectScreen.tsx</code>)</h3>
+<ul>
+  <li>Menggunakan <code>useCreateProjectForm()</code> hook.</li>
+  <li>Form pengisian data proyek baru, penentuan klien, tanggal, jenis layanan, dan penugasan insinyur lapangan.</li>
+  <li>Memanggil <code>projectService.createProject()</code> yang secara otomatis membuat entitas proyek dan 4 tahapan default (<code>project_stages</code>).</li>
+</ul>
+<hr />
+<h2>4. Desain Modul Multi-Role Dashboard</h2>
+<h3>4.1 Route Guard &amp; Dynamic Dashboard Router (<code>src/screens/Dashboard/index.tsx</code>)</h3>
+<ul>
+  <li>Membaca <code>user.role</code> dari <code>useAuthStore()</code>.</li>
+  <li>Merender komponen dashboard khusus sesuai peran pengguna:</li>
+  <li><code>AdminDashboard.tsx</code>: Ringkasan statistik sistem, manajemen user, antrean survei, proyek aktif.</li>
+  <li><code>MarketingDashboard.tsx</code>: Pipeline permohonan survei, status klaim, dan konversi proyek.</li>
+  <li><code>EngineerDashboard.tsx</code>: Proyek yang ditugaskan, update linimasa berjalan, input log harian cepat.</li>
+  <li><code>ClientDashboard.tsx</code>: Progres proyek klien, status kesehatan struktur SHMS, dan laporan inspeksi.</li>
+</ul>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Use Case Specification - GSI One Dokumentasi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+  <style>
+    :root {
+      --bg-primary: #0b1329;
+      --bg-card: #111c44;
+      --border: #1e295d;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent: #e8722a;
+    }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    h1, h2, h3, h4 { color: #fff; margin-top: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    h1 { border-bottom: 2px solid var(--accent); }
+    a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    a:hover { text-decoration: underline; }
+    p { margin-bottom: 1.25rem; }
+    code {
+      font-family: monospace;
+      background: rgba(232, 114, 42, 0.1);
+      color: var(--accent);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: #070d19;
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+    pre code {
+      background: none;
+      color: var(--text-primary);
+      padding: 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      text-align: left;
+    }
+    th {
+      background-color: rgba(30, 41, 93, 0.5);
+      color: #fff;
+    }
+    blockquote {
+      border-left: 4px solid var(--accent);
+      background: rgba(232, 114, 42, 0.05);
+      margin: 1.5rem 0;
+      padding: 1rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .alert-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+    .alert-note { background: #3b82f6; color: #fff; }
+    .alert-tip { background: #10b981; color: #fff; }
+    .alert-warning { background: #f59e0b; color: #fff; }
+    .alert-important { background: #8b5cf6; color: #fff; }
+    .alert-caution { background: #ef4444; color: #fff; }
+    .diagram-img-container {
+      margin-top: 1rem;
+      padding: 1.5rem;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+    }
+    .diagram-img { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Use Case Specification</h1>
+<h2>Proyek: GSI One Mobile Application</h2>
+<hr />
+<h2>1. Daftar Aktor</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Aktor</th>
+      <th>Deskripsi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Klien / Customer GSI</strong></td>
+      <td>Pengguna yang mengakses aplikasi via Nomor Tiket / Email untuk memantau progres proyek, status SHMS, dan mengunduh berkas laporan inspeksi PDF.</td>
+    </tr>
+    <tr>
+      <td><strong>Field Engineer</strong></td>
+      <td>Insinyur lapangan GSI yang memperbarui status tahapan proyek, memasukkan catatan progres (<code>stage<em>updates</code>), dan mengunggah berkas foto inspeksi/laporan (<code>project</em>files</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>Staf Marketing</strong></td>
+      <td>Staf yang memantau antrean permohonan survei (<code>bookings</code>), mengklaim permohonan, memproses persetujuan/penolakan, dan menginisiasi konversi permohonan menjadi proyek baru.</td>
+    </tr>
+    <tr>
+      <td><strong>System Administrator (Admin)</strong></td>
+      <td>Pengelola sistem dengan akses penuh untuk mendaftarkan akun baru via <code>AdminRegisterModal</code>, membuat proyek, dan mengelola kontrol operasional.</td>
+    </tr>
+    <tr>
+      <td><strong>Pengunjung Publik</strong></td>
+      <td>Pengguna umum yang mengeksplorasi katalog 6 layanan resmi GSI, studi kasus struktur, artikel insight, dan mengirimkan form permohonan survei.</td>
+    </tr>
+  </tbody>
+</table>
+<hr />
+<h2>2. Spesifikasi Use Case Utama</h2>
+<h3>UC-01: Pendaftaran Akun Pengguna Terpusat (Admin-Only)</h3>
+<ul>
+  <li><strong>Aktor Utama</strong>: System Administrator (Admin)</li>
+  <li><strong>Pre-kondisi</strong>: Admin sudah login dan membuka modal <code>AdminRegisterModal</code> pada Admin Dashboard.</li>
+  <li><strong>Alur Utama</strong>:</li>
+</ul>
+<ol>
+  <li>Admin memasukkan Nama Lengkap, Email, Kata Sandi (minimal 8 karakter), dan memilih Role (<code>client</code>, <code>marketing</code>, <code>field_engineer</code>).</li>
+  <li>Admin menekan tombol "Buat Akun".</li>
+  <li>Sistem memvalidasi kelengkapan data input.</li>
+  <li>Sistem memanggil <code>authStore.adminCreateUser()</code> yang berkomunikasi dengan Supabase Auth &amp; tabel <code>profiles</code>.</li>
+  <li>Sistem menampilkan notifikasi sukses dan menutup modal.</li>
+</ol>
+<ul>
+  <li><strong>Post-kondisi</strong>: Akun pengguna baru berhasil terdaftar di database Supabase dan siap digunakan untuk login.</li>
+</ul>
+<h3>UC-02: Autentikasi Login (Nomor Tiket / Email &amp; Password)</h3>
+<ul>
+  <li><strong>Aktor Utama</strong>: Klien, Field Engineer, Marketing, Admin</li>
+  <li><strong>Pre-kondisi</strong>: Pengguna telah memiliki akun yang didaftarkan oleh Admin.</li>
+  <li><strong>Alur Utama</strong>:</li>
+</ul>
+<ol>
+  <li>Pengguna memasukkan Nomor Tiket / Email dan kata sandi pada <code>LoginScreen</code>.</li>
+  <li>Pengguna menekan tombol "Masuk Log".</li>
+  <li>Sistem mengirim kredensial ke layanan autentikasi Supabase/REST yang dikonfigurasi.</li>
+  <li>Server mengembalikan data sesi dan profil pengguna.</li>
+  <li>Sistem menyimpan token dan data profil ke <code>AsyncStorage</code>.</li>
+  <li>Pengguna diarahkan ke <code>AuthenticatedTabs</code> dengan tampilan Dashboard sesuai role.</li>
+</ol>
+<ul>
+  <li><strong>Alur Alternatif</strong>: Jika kredensial salah, sistem menggunakan <code>errorHelpers.ts</code> untuk menampilkan pesan kesalahan yang relevan.</li>
+</ul>
+<h3>UC-03: Pengajuan Survei Lokasi (Book Survey)</h3>
+<ul>
+  <li><strong>Aktor Utama</strong>: Pengunjung Publik / Klien</li>
+  <li><strong>Pre-kondisi</strong>: Pengguna berada di layar <code>BookSurveyScreen</code>.</li>
+  <li><strong>Alur Utama</strong>:</li>
+</ul>
+<ol>
+  <li>Pengguna mengisi form: Nama Lengkap, Perusahaan, Email, Telepon, Jenis Layanan, Lokasi, Perkiraan Tanggal, Informasi Struktur, dan Catatan.</li>
+  <li>Pengguna menekan tombol "Kirim Booking".</li>
+  <li>Sistem memvalidasi kolom wajib.</li>
+  <li>Sistem menyimpan entri baru ke tabel <code>bookings</code> (status <code>pending</code>).</li>
+  <li>Pengguna diarahkan ke <code>SuccessScreen</code> dengan menyajikan rangkuman pengajuan.</li>
+</ol>
+<h3>UC-04: Klaim &amp; Persetujuan Permohonan Survei (Survey Request Pipeline)</h3>
+<ul>
+  <li><strong>Aktor Utama</strong>: Staf Marketing, Admin</li>
+  <li><strong>Pre-kondisi</strong>: Staf login dan membuka <code>SurveyRequestsScreen</code>.</li>
+  <li><strong>Alur Utama</strong>:</li>
+</ul>
+<ol>
+  <li>Staf melihat daftar permohonan survei berstatus <code>pending</code>.</li>
+  <li>Staf menekan tombol "Klaim Permohonan" untuk mengikat permohonan ke ID akun staf (<code>status: claimed</code>).</li>
+  <li>Staf menghubungi calon klien untuk verifikasi kebutuhan.</li>
+  <li>Staf memilih "Setujui" (<code>status: approved</code>) atau "Tolak" (<code>status: rejected</code> dengan alasan).</li>
+</ol>
+<ul>
+  <li><strong>Post-kondisi</strong>: Permohonan survei berstatus <code>approved</code> siap dikonversi menjadi proyek baru.</li>
+</ul>
+<h3>UC-05: Konversi Permohonan Survei &amp; Pembuatan Proyek Baru</h3>
+<ul>
+  <li><strong>Aktor Utama</strong>: Admin, Staf Marketing</li>
+  <li><strong>Pre-kondisi</strong>: Permohonan survei berstatus <code>approved</code>.</li>
+  <li><strong>Alur Utama</strong>:</li>
+</ul>
+<ol>
+  <li>Staf menekan tombol "Konversi ke Proyek" pada permohonan survei yang disetujui.</li>
+  <li>Sistem membuka <code>CreateProjectScreen</code> dengan parameter nama klien, layanan, dan lokasi terisi otomatis.</li>
+  <li>Staf memilih Klien terdaftar, Tanggal Mulai/Selesai, dan memasukkan Field Engineer penanggung jawab.</li>
+  <li>Staf menekan tombol "Buat Proyek".</li>
+  <li>Sistem memanggil <code>projectService.createProject()</code> yang secara otomatis membuat record di <code>projects</code> beserta 4 tahapan di <code>project_stages</code>.</li>
+</ol>
+<h3>UC-06: Pembaruan Linimasa Tahapan &amp; Log Harian Lapangan</h3>
+<ul>
+  <li><strong>Aktor Utama</strong>: Field Engineer, Admin</li>
+  <li><strong>Pre-kondisi</strong>: Engineer login dan membuka <code>ProjectDetailScreen</code> proyek yang ditugaskan.</li>
+  <li><strong>Alur Utama</strong>:</li>
+</ul>
+<ol>
+  <li>Engineer memilih tahapan proyek yang berjalan (misal: Survei Lapangan).</li>
+  <li>Engineer memperbarui status tahapan (<code>in_progress</code> / <code>done</code>) dan memasukkan persentase kemajuan total.</li>
+  <li>Engineer menekan "Tambah Log Harian", memasukkan aktivitas harian dan catatan kendala.</li>
+  <li>Sistem menyimpan entri ke <code>stage_updates</code> dan ter-sync secara realtime per proyek.</li>
+</ol>
+<h3>UC-07: Pengunggahan &amp; Unduh Dokumen Inspection / PDF Laporan</h3>
+<ul>
+  <li><strong>Aktor Utama</strong>: Field Engineer, Admin (Pengunggah), Klien (Pengunduh)</li>
+  <li><strong>Pre-kondisi</strong>: Berada di <code>ProjectDetailScreen</code>.</li>
+  <li><strong>Alur Utama</strong>:</li>
+</ul>
+<ol>
+  <li>Field Engineer menekan "Unggah Berkas", memilih foto inspeksi atau dokumen laporan PDF.</li>
+  <li>Sistem mengunggah file ke bucket Supabase Storage <code>projects</code> privat dan menginsert metadata ke <code>project_files</code>.</li>
+  <li>Klien membuka <code>ClientDashboard</code> atau <code>ProjectDetailScreen</code>, melihat daftar dokumen laporan, dan menekan tombol "Unduh PDF".</li>
+</ol>
+
+  </div>
+</body>
+</html>

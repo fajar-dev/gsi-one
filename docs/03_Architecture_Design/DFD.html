@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DFD - GSI One Dokumentasi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+  <style>
+    :root {
+      --bg-primary: #0b1329;
+      --bg-card: #111c44;
+      --border: #1e295d;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent: #e8722a;
+    }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    h1, h2, h3, h4 { color: #fff; margin-top: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    h1 { border-bottom: 2px solid var(--accent); }
+    a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    a:hover { text-decoration: underline; }
+    p { margin-bottom: 1.25rem; }
+    code {
+      font-family: monospace;
+      background: rgba(232, 114, 42, 0.1);
+      color: var(--accent);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: #070d19;
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+    pre code {
+      background: none;
+      color: var(--text-primary);
+      padding: 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      text-align: left;
+    }
+    th {
+      background-color: rgba(30, 41, 93, 0.5);
+      color: #fff;
+    }
+    blockquote {
+      border-left: 4px solid var(--accent);
+      background: rgba(232, 114, 42, 0.05);
+      margin: 1.5rem 0;
+      padding: 1rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .alert-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+    .alert-note { background: #3b82f6; color: #fff; }
+    .alert-tip { background: #10b981; color: #fff; }
+    .alert-warning { background: #f59e0b; color: #fff; }
+    .alert-important { background: #8b5cf6; color: #fff; }
+    .alert-caution { background: #ef4444; color: #fff; }
+    .diagram-img-container {
+      margin-top: 1rem;
+      padding: 1.5rem;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+    }
+    .diagram-img { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Data Flow Diagram (DFD) Specification</h1>
+<h2>Proyek: GSI One Mobile Application &amp; Express Backend API</h2>
+<hr />
+<h2>1. DFD Level 0 (Context Diagram)</h2>
+<p>Diagram konteks memvisualisasikan seluruh masukan data dari entitas luar (Publik, Klien, Engineer, Marketing, Admin) ke dalam Sistem GSI One dan keluaran data yang dihasilkan.</p>
+<pre class="mermaid">
+graph TB
+    subgraph ExternalEntities["Entitas Luar (External Entities)"]
+        Public["Pengunjung Publik"]
+        Client["Client Terdaftar"]
+        Engineer["Field Engineer"]
+        Marketing["Staf Marketing"]
+        Admin["System Administrator"]
+    end
+
+    subgraph Process0["Sistem Utama GSI One (Process 0)"]
+        System0["0. Sistem Informasi GSI One\n(Mobile App &amp; Backend REST API)"]
+    end
+
+    Public --&gt;|"Formulir Book Survey"| System0
+    System0 --&gt;|"Katalog Layanan &amp; Konfirmasi Booking"| Public
+
+    Client --&gt;|"Kredensial Login &amp; Request PDF"| System0
+    System0 --&gt;|"Data Progres Proyek &amp; Signed URL PDF"| Client
+
+    Engineer --&gt;|"Kredensial Login, Update Stage, Log Harian, File"| System0
+    System0 --&gt;|"Daftar Proyek Ditugaskan &amp; Notifikasi"| Engineer
+
+    Marketing --&gt;|"Kredensial Login, Klaim, Approval/Rejection"| System0
+    System0 --&gt;|"Antrean Booking &amp; Notifikasi Booking Baru"| Marketing
+
+    Admin --&gt;|"Kredensial Login, Data User Baru, Data Proyek Baru"| System0
+    System0 --&gt;|"Statistik Sistem Global &amp; Full Access Data"| Admin
+</pre>
+<hr />
+<h2>2. DFD Level 1 (Process Diagram)</h2>
+<p>Diagram DFD Level 1 mempecah Sistem GSI One menjadi 4 sub-proses utama dan aliran data ke database (<em>data store</em>).</p>
+<pre class="mermaid">
+graph TB
+    subgraph Entities["Entitas Luar"]
+        UserExt["Pengguna (Publik/Client/Eng/Mkt/Admin)"]
+    end
+
+    subgraph Processes["Sub-Proses Utama (Process 1.0 - 4.0)"]
+        P1["1.0 Autentikasi &amp; Manajemen Akun"]
+        P2["2.0 Pengelolaan Booking Survei"]
+        P3["3.0 Tracking Proyek &amp; Stages"]
+        P4["4.0 Pengelolaan Berkas Lapangan"]
+    end
+
+    subgraph DataStores["Penyimpanan Data (Data Stores)"]
+        D1[("D1: users")]
+        D2[("D2: bookings")]
+        D3[("D3: projects")]
+        D4[("D4: project_stages")]
+        D5[("D5: stage_updates")]
+        D6[("D6: project_files")]
+        D7[("D7: notifications")]
+    end
+
+    UserExt --&gt;|"Form Login / Admin Create User"| P1
+    P1 &lt;--&gt;|"Verifikasi Kredensial &amp; Profile Data"| D1
+    P1 --&gt;|"Simpan JWT Token Session"| UserExt
+
+    UserExt --&gt;|"Form Booking Survei"| P2
+    P2 --&gt;|"INSERT Booking (pending)"| D2
+    P2 &lt;--&gt;|"UPDATE Status (claimed/approved/rejected)"| D2
+    P2 --&gt;|"Trigger Notifikasi Booking"| D7
+
+    P2 --&gt;|"Konversi Booking ke Proyek"| P3
+    UserExt --&gt;|"Create Project / Update Stage Status"| P3
+    P3 &lt;--&gt;|"Kueri / UPDATE Proyek"| D3
+    P3 &lt;--&gt;|"Auto-Generate &amp; UPDATE 4 Stages"| D4
+    P3 --&gt;|"INSERT Progress Update Log"| D5
+    P3 --&gt;|"Trigger Notifikasi Progress"| D7
+
+    UserExt --&gt;|"Upload Foto / PDF Laporan"| P4
+    P4 --&gt;|"INSERT File Metadata"| D6
+    P4 --&gt;|"Generate Signed Download URL"| UserExt
+</pre>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cost Plan - GSI One Dokumentasi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+  <style>
+    :root {
+      --bg-primary: #0b1329;
+      --bg-card: #111c44;
+      --border: #1e295d;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent: #e8722a;
+    }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    h1, h2, h3, h4 { color: #fff; margin-top: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    h1 { border-bottom: 2px solid var(--accent); }
+    a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    a:hover { text-decoration: underline; }
+    p { margin-bottom: 1.25rem; }
+    code {
+      font-family: monospace;
+      background: rgba(232, 114, 42, 0.1);
+      color: var(--accent);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: #070d19;
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+    pre code {
+      background: none;
+      color: var(--text-primary);
+      padding: 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      text-align: left;
+    }
+    th {
+      background-color: rgba(30, 41, 93, 0.5);
+      color: #fff;
+    }
+    blockquote {
+      border-left: 4px solid var(--accent);
+      background: rgba(232, 114, 42, 0.05);
+      margin: 1.5rem 0;
+      padding: 1rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .alert-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+    .alert-note { background: #3b82f6; color: #fff; }
+    .alert-tip { background: #10b981; color: #fff; }
+    .alert-warning { background: #f59e0b; color: #fff; }
+    .alert-important { background: #8b5cf6; color: #fff; }
+    .alert-caution { background: #ef4444; color: #fff; }
+    .diagram-img-container {
+      margin-top: 1rem;
+      padding: 1.5rem;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+    }
+    .diagram-img { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Rencana Anggaran dan Biaya (Cost Plan)</h1>
+<h2>Proyek: GSI One Mobile Application</h2>
+<hr />
+<h2>1. Pendahuluan</h2>
+<p>Dokumen Rencana Anggaran dan Biaya (Cost Plan) ini disusun untuk memberikan perkiraan biaya yang komprehensif bagi pengembangan, peluncuran, dan operasional aplikasi GSI One Mobile. Rencana ini dibagi menjadi dua kategori utama:</p>
+<ol>
+  <li><strong>Capital Expenditure (CapEx)</strong>: Biaya investasi awal untuk pengembangan perangkat lunak dan persiapan lisensi.</li>
+  <li><strong>Operational Expenditure (OpEx)</strong>: Biaya operasional berulang untuk infrastruktur cloud, layanan pihak ketiga, dan pemeliharaan sistem.</li>
+</ol>
+<p>Estimasi ini didasarkan pada arsitektur teknis yang direncanakan: aplikasi mobile berbasis React Native yang terintegrasi dengan backend Node.js (Express.js) dan database Supabase (PostgreSQL + Storage).</p>
+<hr />
+<h2>2. Biaya Investasi Awal (Capital Expenditure - CapEx)</h2>
+<p>Biaya investasi awal mencakup seluruh aktivitas dari fase perencanaan hingga peluncuran aplikasi ke produksi.</p>
+<h3>2.1 Pengembangan Perangkat Lunak (Software Development)</h3>
+<p>Pengembangan aplikasi mobile dan backend dilakukan secara mandiri / internal oleh pengembang internal. Oleh karena itu, komponen biaya SDM dialokasikan sebesar Rp 0.</p>
+<table>
+  <thead>
+    <tr>
+      <th>Peran</th>
+      <th>Estimasi Durasi</th>
+      <th>Biaya Bulanan (IDR)</th>
+      <th>Total Biaya (IDR)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Pengembang Internal</td>
+      <td>-</td>
+      <td>Rp 0</td>
+      <td>Rp 0</td>
+    </tr>
+    <tr>
+      <td><strong>Total Biaya SDM</strong></td>
+      <td></td>
+      <td></td>
+      <td><strong>Rp 0</strong></td>
+    </tr>
+  </tbody>
+</table>
+<h3>2.2 Lisensi dan Akun Developer</h3>
+<p>Biaya pendaftaran akun resmi pada Google Play Store dan Apple App Store untuk publikasi aplikasi.</p>
+<table>
+  <thead>
+    <tr>
+      <th>Komponen</th>
+      <th>Frekuensi</th>
+      <th>Biaya (USD)</th>
+      <th>Estimasi Biaya (IDR)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Google Play Console Developer Account</td>
+      <td>Sekali seumur hidup</td>
+      <td>$25</td>
+      <td>Rp 410.000</td>
+    </tr>
+    <tr>
+      <td>Apple Developer Program Membership</td>
+      <td>Tahunan</td>
+      <td>$99</td>
+      <td>Rp 1.630.000</td>
+    </tr>
+    <tr>
+      <td><strong>Total Lisensi</strong></td>
+      <td></td>
+      <td></td>
+      <td><strong>Rp 2.040.000</strong></td>
+    </tr>
+  </tbody>
+</table>
+<p><em>Kurs konversi diasumsikan $1 USD = Rp 16.400.</em></p>
+<h3>2.3 Setup Infrastruktur Awal</h3>
+<p>Biaya konfigurasi server awal, migrasi database SQLite lokal ke Supabase PostgreSQL, dan setup lingkungan deployment (CI/CD pipeline).</p>
+<table>
+  <thead>
+    <tr>
+      <th>Aktivitas</th>
+      <th>Estimasi Biaya (IDR)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Konfigurasi Cloud Database &amp; Backend Server</td>
+      <td>Rp 1.500.000</td>
+    </tr>
+    <tr>
+      <td>Setup SSL, Subdomain, &amp; Security Hardening</td>
+      <td>Rp 1.000.000</td>
+    </tr>
+    <tr>
+      <td><strong>Total Setup</strong></td>
+      <td><strong>Rp 2.500.000</strong></td>
+    </tr>
+  </tbody>
+</table>
+<hr />
+<h2>3. Biaya Operasional Berulang (Operational Expenditure - OpEx)</h2>
+<p>Biaya ini dikeluarkan secara bulanan atau tahunan untuk memastikan aplikasi tetap berjalan secara optimal di lingkungan produksi.</p>
+<h3>3.1 Layanan Infrastruktur Cloud (Hosting &amp; Database)</h3>
+<p>Untuk mendukung performa terbaik dan kedaulatan data di Indonesia (sesuai UU PDP), kita dapat memilih salah satu dari dua skenario infrastruktur berikut dengan memanfaatkan Biznet Gio Cloud:</p>
+<h4>Opsi A: Skema Biznet Gio 100% (Rekomendasi Lokal &amp; Hemat)</h4>
+<p>Seluruh backend, database PostgreSQL, dan penyimpanan berkas (object storage) di-host di Biznet Gio Cloud (Indonesia). Database PostgreSQL diinstal dan dikelola mandiri di dalam VPS.</p>
+<table>
+  <thead>
+    <tr>
+      <th>Layanan</th>
+      <th>Skema / Paket</th>
+      <th>Biaya Bulanan (IDR)</th>
+      <th>Biaya Tahunan (IDR)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>VPS Backend &amp; DB (NEO Lite SS 2.1)</strong></td>
+      <td>1 Core vCPU, 2 GB RAM, 60 GB SSD</td>
+      <td>Rp 80.000</td>
+      <td>Rp 960.000</td>
+    </tr>
+    <tr>
+      <td><strong>NEO Object Storage</strong></td>
+      <td>S3-Compatible Storage (50 GB)</td>
+      <td>Rp 20.000</td>
+      <td>Rp 240.000</td>
+    </tr>
+    <tr>
+      <td><strong>Domain Name Renewal (.com)</strong></td>
+      <td>Perpanjangan tahunan</td>
+      <td>-</td>
+      <td>Rp 200.000</td>
+    </tr>
+    <tr>
+      <td><strong>Total Infrastruktur Opsi A</strong></td>
+      <td></td>
+      <td><strong>Rp 100.000</strong></td>
+      <td><strong>Rp 1.400.000</strong></td>
+    </tr>
+  </tbody>
+</table>
+<h4>Opsi B: Skema Hybrid (Biznet Gio VPS + Supabase Pro)</h4>
+<p>Server API Express di-host di Biznet Gio VPS, sedangkan database &amp; otentikasi menggunakan layanan managed cloud Supabase Pro.</p>
+<table>
+  <thead>
+    <tr>
+      <th>Layanan</th>
+      <th>Skema / Paket</th>
+      <th>Biaya Bulanan (IDR)</th>
+      <th>Biaya Tahunan (IDR)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>VPS Backend (NEO Lite SS 2.1)</strong></td>
+      <td>1 Core vCPU, 2 GB RAM, 60 GB SSD</td>
+      <td>Rp 80.000</td>
+      <td>Rp 960.000</td>
+    </tr>
+    <tr>
+      <td><strong>Supabase Pro Tier</strong></td>
+      <td>Managed Database PostgreSQL</td>
+      <td>Rp 410.000 ($25)</td>
+      <td>Rp 4.920.000</td>
+    </tr>
+    <tr>
+      <td><strong>Supabase Storage</strong></td>
+      <td>Kuota penyimpanan berkas tambahan</td>
+      <td>Rp 50.000</td>
+      <td>Rp 600.000</td>
+    </tr>
+    <tr>
+      <td><strong>Domain Name Renewal (.com)</strong></td>
+      <td>Perpanjangan tahunan</td>
+      <td>-</td>
+      <td>Rp 200.000</td>
+    </tr>
+    <tr>
+      <td><strong>Total Infrastruktur Opsi B</strong></td>
+      <td></td>
+      <td><strong>Rp 540.000</strong></td>
+      <td><strong>Rp 6.680.000</strong></td>
+    </tr>
+  </tbody>
+</table>
+<h3>3.2 Layanan Pihak Ketiga (Third-Party Services)</h3>
+<p>Integrasi layanan eksternal untuk notifikasi.</p>
+<table>
+  <thead>
+    <tr>
+      <th>Layanan</th>
+      <th>Kegunaan</th>
+      <th>Estimasi Biaya Bulanan (IDR)</th>
+      <th>Estimasi Biaya Tahunan (IDR)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>WhatsApp Gateway (Fonnte/Wablas)</strong></td>
+      <td>Notifikasi real-time update project &amp; booking</td>
+      <td>Rp 120.000</td>
+      <td>Rp 1.440.000</td>
+    </tr>
+    <tr>
+      <td><strong>Email Gateway (Brevo / Mailgun)</strong></td>
+      <td>Autentikasi akun &amp; OTP</td>
+      <td>Rp 0 (Free Tier 300 email/hari)</td>
+      <td>Rp 0</td>
+    </tr>
+    <tr>
+      <td><strong>Total Layanan Ketiga</strong></td>
+      <td></td>
+      <td><strong>Rp 120.000</strong></td>
+      <td><strong>Rp 1.440.000</strong></td>
+    </tr>
+  </tbody>
+</table>
+<h3>3.3 Pemeliharaan dan Dukungan Teknis (Maintenance &amp; Support)</h3>
+<p>Pemeliharaan sistem paska-pengembangan seperti penanganan bug kecil, pembaruan keamanan, kompatibilitas OS Android/iOS, dan pemantauan server dilakukan secara internal oleh pengembang mandiri.</p>
+<ul>
+  <li><strong>Biaya Bulanan</strong>: Rp 0</li>
+  <li><strong>Total Tahunan</strong>: Rp 0</li>
+</ul>
+<hr />
+<h2>4. Rangkuman Proyeksi Anggaran (Cost Summary)</h2>
+<p>Berikut adalah perbandingan total anggaran tahun pertama dan tahun-tahun berikutnya antara Opsi A (100% Biznet Gio) dan Opsi B (Hybrid Biznet + Supabase) dengan kondisi tanpa biaya SDM eksternal.</p>
+<h3>4.1 Perbandingan Tahun Pertama (Inisiasi &amp; Operasional)</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Komponen Biaya</th>
+      <th>Opsi A (100% Biznet Gio)</th>
+      <th>Opsi B (Hybrid)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>CapEx (Investasi Awal)</strong></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>- Pengembangan Aplikasi</td>
+      <td>Rp 0</td>
+      <td>Rp 0</td>
+    </tr>
+    <tr>
+      <td>- Registrasi Google Play &amp; Apple Developer</td>
+      <td>Rp 2.040.000</td>
+      <td>Rp 2.040.000</td>
+    </tr>
+    <tr>
+      <td>- Setup Awal &amp; Deployment</td>
+      <td>Rp 2.500.000</td>
+      <td>Rp 2.500.000</td>
+    </tr>
+    <tr>
+      <td><strong>OpEx (Operasional 1 Tahun)</strong></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>- Infrastruktur Cloud &amp; Domain</td>
+      <td>Rp 1.400.000</td>
+      <td>Rp 6.680.000</td>
+    </tr>
+    <tr>
+      <td>- WhatsApp Gateway (12 bulan)</td>
+      <td>Rp 1.440.000</td>
+      <td>Rp 1.440.000</td>
+    </tr>
+    <tr>
+      <td>- Pemeliharaan Teknis</td>
+      <td>Rp 0</td>
+      <td>Rp 0</td>
+    </tr>
+    <tr>
+      <td><strong>Total Tahun Pertama</strong></td>
+      <td><strong>Rp 7.380.000</strong></td>
+      <td><strong>Rp 12.660.000</strong></td>
+    </tr>
+  </tbody>
+</table>
+<h3>4.2 Proyeksi Tahun Kedua dan Seterusnya (Hanya OpEx Tahunan)</h3>
+<p>Untuk tahun kedua dan selanjutnya, biaya investasi awal ditiadakan. Proyeksi biaya langganan tahunan adalah:</p>
+<table>
+  <thead>
+    <tr>
+      <th>Komponen Biaya</th>
+      <th>Opsi A (100% Biznet Gio)</th>
+      <th>Opsi B (Hybrid)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>- Infrastruktur Cloud &amp; Domain</td>
+      <td>Rp 1.400.000 / tahun</td>
+      <td>Rp 6.680.000 / tahun</td>
+    </tr>
+    <tr>
+      <td>- WhatsApp Gateway</td>
+      <td>Rp 1.440.000 / tahun</td>
+      <td>Rp 1.440.000 / tahun</td>
+    </tr>
+    <tr>
+      <td>- Registrasi Apple Developer</td>
+      <td>Rp 1.630.000 / tahun</td>
+      <td>Rp 1.630.000 / tahun</td>
+    </tr>
+    <tr>
+      <td>- Pemeliharaan Teknis</td>
+      <td>Rp 0 / tahun</td>
+      <td>Rp 0 / tahun</td>
+    </tr>
+    <tr>
+      <td><strong>Total Estimasi Tahunan</strong></td>
+      <td><strong>Rp 4.470.000 / tahun</strong></td>
+      <td><strong>Rp 9.750.000 / tahun</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Rata-rata per Bulan</strong></td>
+      <td><strong>Rp 372.500 / bulan</strong></td>
+      <td><strong>Rp 812.500 / bulan</strong></td>
+    </tr>
+  </tbody>
+</table>
+<hr />
+<h2>5. Strategi Efisiensi Biaya</h2>
+<p>Beberapa pendekatan yang dapat dilakukan untuk meminimalkan pengeluaran khususnya pada tahap awal:</p>
+<ol>
+  <li><strong>Pemanfaatan Free Tier</strong>: Memaksimalkan paket gratis dari Supabase, Brevo, dan Google Maps selama masa pengujian internal dan beta testing. Migrasi ke paket Pro hanya dilakukan menjelang peluncuran resmi.</li>
+  <li><strong>Pengembangan Bertahap (Incremental Development)</strong>: Mengutamakan fitur penting (MVP) seperti Onboarding, Katalog Layanan, dan Form Booking Survei pada rilis awal. Fitur sekunder seperti Project Tracking detail dapat ditunda ke fase berikutnya.</li>
+  <li><strong>VPS vs Serverless</strong>: Evaluasi berkala apakah backend Express.js dapat dimigrasikan sepenuhnya ke Supabase Edge Functions untuk menghemat biaya langganan VPS backend bulanan.</li>
+</ol>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Software Requirement Specification - GSI One Dokumentasi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+  <style>
+    :root {
+      --bg-primary: #0b1329;
+      --bg-card: #111c44;
+      --border: #1e295d;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent: #e8722a;
+    }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    h1, h2, h3, h4 { color: #fff; margin-top: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    h1 { border-bottom: 2px solid var(--accent); }
+    a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    a:hover { text-decoration: underline; }
+    p { margin-bottom: 1.25rem; }
+    code {
+      font-family: monospace;
+      background: rgba(232, 114, 42, 0.1);
+      color: var(--accent);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: #070d19;
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+    pre code {
+      background: none;
+      color: var(--text-primary);
+      padding: 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      text-align: left;
+    }
+    th {
+      background-color: rgba(30, 41, 93, 0.5);
+      color: #fff;
+    }
+    blockquote {
+      border-left: 4px solid var(--accent);
+      background: rgba(232, 114, 42, 0.05);
+      margin: 1.5rem 0;
+      padding: 1rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .alert-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+    .alert-note { background: #3b82f6; color: #fff; }
+    .alert-tip { background: #10b981; color: #fff; }
+    .alert-warning { background: #f59e0b; color: #fff; }
+    .alert-important { background: #8b5cf6; color: #fff; }
+    .alert-caution { background: #ef4444; color: #fff; }
+    .diagram-img-container {
+      margin-top: 1rem;
+      padding: 1.5rem;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+    }
+    .diagram-img { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Software Requirement Specification (SRS)</h1>
+<h2>Proyek: GSI One Mobile Application &amp; Backend REST API</h2>
+<h2>Standar: ISO/IEC/IEEE 29148</h2>
+<hr />
+<h2>1. Pendahuluan</h2>
+<h3>1.1 Tujuan</h3>
+<p>Dokumen ini mendeskripsikan persyaratan fungsional dan non-fungsional untuk aplikasi <strong>GSI One</strong> (Mobile React Native &amp; Express Backend API) yang digunakan oleh PT Graha Survei Indonesia dalam memfasilitasi pemesanan survei, pelacakan proyek teknis, manajemen berkas inspeksi, dan notifikasi otomatis.</p>
+<h3>1.2 Lingkup Produk</h3>
+<p>GSI One menyediakan ekosistem terpadu berbasis 4 Peran Pengguna:</p>
+<ul>
+  <li><strong>Admin</strong>: Pembuat akun pengguna, pengelola seluruh proyek, booking, dan berkas.</li>
+  <li><strong>Marketing</strong>: Pengelola permohonan survei (klaim, setuju, tolak) dan pemantau proyek.</li>
+  <li><strong>Engineer (Field Engineer)</strong>: Pembaru status tahapan linimasa proyek, pencatat harian (<em>stage updates</em>), dan pengunggah dokumen/foto inspeksi.</li>
+  <li><strong>Client</strong>: Pemantau progres proyek real-time dan pengunduh berkas laporan resmi.</li>
+</ul>
+<h3>1.3 Definisi, Akronim, dan Singkatan</h3>
+<ul>
+  <li><strong>GSI</strong>: PT Graha Survei Indonesia, perusahaan penyedia jasa audit struktur, NDT, dan monitoring bangunan.</li>
+  <li><strong>SRS</strong>: Software Requirements Specification (Spesifikasi Persyaratan Perangkat Lunak).</li>
+  <li><strong>SHMS</strong>: Structural Health Monitoring System (Sistem Pemantauan Kesehatan Struktur).</li>
+  <li><strong>EEWS</strong>: Early Earthquake Warning System (Sistem Peringatan Dini Gempa Bumi).</li>
+  <li><strong>NDT / DT</strong>: Non-Destructive Testing / Destructive Testing (Pengujian Non-Destruktif dan Destruktif).</li>
+  <li><strong>RLS</strong>: Row Level Security (Kebijakan Keamanan Tingkat Baris pada Supabase PostgreSQL).</li>
+  <li><strong>AsyncStorage</strong>: Penyimpanan data key-value lokal pada React Native untuk persistensi token autentikasi dan profil pengguna.</li>
+  <li><strong>Zustand</strong>: Library manajemen state global yang digunakan pada aplikasi (<code>authStore</code>, <code>projectStore</code>).</li>
+  <li><strong>CORS</strong>: Cross-Origin Resource Sharing (Mekanisme keamanan HTTP untuk membatasi origin request terdaftar pada backend Express).</li>
+  <li><strong>JWT</strong>: JSON Web Token (Standar enkripsi token untuk autentikasi dan otorisasi sesi pengguna).</li>
+  <li><strong>RBAC</strong>: Role-Based Access Control (Sistem pengontrolan hak akses terstruktur berdasarkan 4 peran: Admin, Marketing, Engineer, dan Client).</li>
+  <li><strong>DTO</strong>: Data Transfer Object (Pola objek pemetaan data terisolasi antara skema database dan entitas domain aplikasi via <code>projectMapper.ts</code>).</li>
+  <li><strong>REST API</strong>: Representational State Transfer Application Programming Interface (Antarmuka komunikasi HTTP terstruktur berbasis JSON).</li>
+  <li><strong>BaaS</strong>: Backend as a Service (Platform cloud backend terintegrasi Supabase untuk Database PostgreSQL, Auth, Realtime, dan Storage).</li>
+  <li><strong>Helmet</strong>: Middleware keamanan Express.js untuk mengonfigurasi HTTP security headers (<code>X-Content-Type-Options</code>, <code>X-Frame-Options</code>, HSTS).</li>
+  <li><strong>Multer</strong>: Middleware Node.js/Express untuk menangani penanganan pengungahan berkas <code>multipart/form-data</code> (foto inspeksi &amp; laporan PDF).</li>
+  <li><strong>Signed URL</strong>: URL akses berdurasi terbatas yang diterbitkan oleh Supabase Storage untuk mengunduh dokumen dari bucket privat <code>projects</code>.</li>
+  <li><strong>Stage Updates</strong>: Catatan harian aktivitas kemajuan pekerjaan proyek di lapangan yang diinput oleh Field Engineer.</li>
+  <li><strong>Project Stages</strong>: 4 tahapan linimasa standar dalam proyek GSI One (Inisiasi, Survei Lapangan, Analisis &amp; Laporan, Selesai).</li>
+  <li><strong>SLO</strong>: Service Level Objective (Target tingkat kualitas performa layanan aplikasi mencakup latensi, error rate, dan availability).</li>
+</ul>
+<hr />
+<h2>2. Persyaratan Fungsional (Functional Requirements)</h2>
+<h3>2.1 Modul Autentikasi &amp; Otorisasi (<code>FR-AUTH</code>)</h3>
+<ul>
+  <li><strong>FR-AUTH-01</strong>: Sistem harus menyediakan login berbasis JWT Token &amp; Supabase Auth.</li>
+  <li><strong>FR-AUTH-02</strong>: Registrasi akun baru hanya dapat dilakukan oleh <strong>Admin</strong> (Admin-Only Registration) demi menjaga keamanan data proyek.</li>
+  <li><strong>FR-AUTH-03</strong>: Sistem harus menerapkan Role-Based Access Control (RBAC) pada level aplikasi dan database (RLS).</li>
+</ul>
+<h3>2.2 Modul Pemesanan Survei &amp; Booking (<code>FR-BOOK</code>)</h3>
+<ul>
+  <li><strong>FR-BOOK-01</strong>: Pengguna publik/klien dapat mengajukan permohonan survei lokasi dengan mengisi data lengkap.</li>
+  <li><strong>FR-BOOK-02</strong>: Tim Marketing/Admin dapat mengklaim status booking (<code>pending</code> -&gt; <code>claimed</code>), menyetujui (<code>approved</code>), atau menolak (<code>rejected</code>).</li>
+  <li><strong>FR-BOOK-03</strong>: Booking berstatus <code>approved</code> dapat secara otomatis dikonversi menjadi proyek teknis baru.</li>
+</ul>
+<h3>2.3 Modul Tracking Proyek &amp; Stages (<code>FR-PROJ</code>)</h3>
+<ul>
+  <li><strong>FR-PROJ-01</strong>: Proyek baru dibuat dengan 4 tahapan standar (Inisiasi, Survei Lapangan, Analisis &amp; Laporan, Selesai).</li>
+  <li><strong>FR-PROJ-02</strong>: Field Engineer &amp; Admin dapat memperbarui persentase progres total dan status per tahapan.</li>
+  <li><strong>FR-PROJ-03</strong>: Setiap pembaruan aktivitas harian dicatat ke tabel <code>stage_updates</code>.</li>
+</ul>
+<h3>2.4 Modul Manajemen Berkas &amp; Dokumen (<code>FR-DOC</code>)</h3>
+<ul>
+  <li><strong>FR-DOC-01</strong>: Field Engineer &amp; Admin dapat mengunggah berkas/foto inspeksi (format PDF/Gambar, maks 10MB).</li>
+  <li><strong>FR-DOC-02</strong>: Berkas tersimpan secara aman di Supabase Storage privat dan hanya dapat diakses melalui Signed URL terotentikasi.</li>
+</ul>
+<h3>2.5 Modul Notifikasi &amp; Event (<code>FR-NOTIF</code>)</h3>
+<ul>
+  <li><strong>FR-NOTIF-01</strong>: Sistem mengirim notifikasi berbasis <code>user<em>id</code> atau <code>target</em>role</code> saat terjadi pembaruan status booking atau proyek.</li>
+</ul>
+<hr />
+<h2>3. Persyaratan Non-Fungsional (Non-Functional Requirements)</h2>
+<h3>3.1 Keamanan &amp; Networking (<code>NFR-SEC</code>)</h3>
+<ul>
+  <li><strong>NFR-SEC-01 (CORS)</strong>: Backend Express wajib membatasi origin HTTP request hanya ke domain resmi (<code>https://grahasurvei.com</code>, <code>http://localhost:3000</code>, <code>http://10.0.2.2:3000</code>).</li>
+  <li><strong>NFR-SEC-02 (Headers)</strong>: Menggunakan <code>helmet()</code> untuk proteksi XSS, HSTS, dan MIME sniffing.</li>
+  <li><strong>NFR-SEC-03 (RLS)</strong>: Row Level Security (RLS) PostgreSQL aktif untuk semua tabel Supabase.</li>
+</ul>
+<h3>3.2 Performa &amp; Skalabilitas (<code>NFR-PERF</code>)</h3>
+<ul>
+  <li><strong>NFR-PERF-01</strong>: Waktu respons REST API rata-rata &lt; 300ms.</li>
+  <li><strong>NFR-PERF-02</strong>: Pagination terimplementasi pada listing proyek &amp; notifikasi untuk efisiensi memori.</li>
+</ul>
+<hr />
+<h2>4. Diagram Transisi Status (State Machine Diagrams)</h2>
+<h3>4.1 State Machine Alur Status Booking Survei (<code>bookings.status</code>)</h3>
+<pre class="mermaid">
+stateDiagram-v2
+    [*] --&gt; Pending : Pengajuan Form (Publik/Client)
+    Pending --&gt; Claimed : Ditangani Staf (Marketing/Admin)
+    Claimed --&gt; Approved : Disetujui (Marketing/Admin)
+    Claimed --&gt; Rejected : Ditolak (Marketing/Admin)
+    Approved --&gt; ConvertedToProject : Konversi ke Proyek Baru
+    ConvertedToProject --&gt; [*]
+    Rejected --&gt; [*]
+</pre>
+<h3>4.2 State Machine Alur Status Proyek &amp; Stage (<code>projects.status</code> &amp; <code>project_stages.status</code>)</h3>
+<pre class="mermaid">
+stateDiagram-v2
+    [*] --&gt; PendingProject : Proyek Dibuat
+    PendingProject --&gt; OnProgress : Memulai Tahapan Pertama
+    OnProgress --&gt; OnHold : Proyek Ditunda
+    OnHold --&gt; OnProgress : Proyek Dilanjutkan
+    OnProgress --&gt; DoneProject : Seluruh 4 Stages Selesai
+    DoneProject --&gt; [*]
+
+    note right of OnProgress
+        Setiap Stage (1 s/d 4) memiliki transisi:
+        Pending -&gt; In_Progress -&gt; Done
+    end note
+</pre>
+
+  </div>
+</body>
+</html>

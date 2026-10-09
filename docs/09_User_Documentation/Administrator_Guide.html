@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administrator Guide - GSI One Dokumentasi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+  <style>
+    :root {
+      --bg-primary: #0b1329;
+      --bg-card: #111c44;
+      --border: #1e295d;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent: #e8722a;
+    }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    h1, h2, h3, h4 { color: #fff; margin-top: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    h1 { border-bottom: 2px solid var(--accent); }
+    a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    a:hover { text-decoration: underline; }
+    p { margin-bottom: 1.25rem; }
+    code {
+      font-family: monospace;
+      background: rgba(232, 114, 42, 0.1);
+      color: var(--accent);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: #070d19;
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+    pre code {
+      background: none;
+      color: var(--text-primary);
+      padding: 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      text-align: left;
+    }
+    th {
+      background-color: rgba(30, 41, 93, 0.5);
+      color: #fff;
+    }
+    blockquote {
+      border-left: 4px solid var(--accent);
+      background: rgba(232, 114, 42, 0.05);
+      margin: 1.5rem 0;
+      padding: 1rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .alert-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+    .alert-note { background: #3b82f6; color: #fff; }
+    .alert-tip { background: #10b981; color: #fff; }
+    .alert-warning { background: #f59e0b; color: #fff; }
+    .alert-important { background: #8b5cf6; color: #fff; }
+    .alert-caution { background: #ef4444; color: #fff; }
+    .diagram-img-container {
+      margin-top: 1rem;
+      padding: 1.5rem;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+    }
+    .diagram-img { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Panduan Administrator (Administrator Guide)</h1>
+<h2>Proyek: GSI One Mobile Application</h2>
+<hr />
+<h2>1. Peran &amp; Hak Akses System Administrator</h2>
+<p>System Administrator (Admin) memegang kontrol penuh operasional aplikasi GSI One Mobile, mencakup pendaftaran akun terpusat, pengelolaan proyek, persetujuan survei, dan monitoring sistem.</p>
+<hr />
+<h2>2. Prosedur Pendaftaran Akun Pengguna Baru (<code>AdminRegisterModal</code>)</h2>
+<blockquote>
+<div class="alert-badge alert-important">IMPORTANT</div>
+
+Registrasi mandiri publik telah ditiadakan demi menjaga kerahasiaan dan keamanan data proyek GSI. Semua akun (Klien, Engineer, Marketing) wajib dibuatkan oleh Admin.
+</blockquote>
+<p>Langkah Pendaftaran Akun:</p>
+<ol>
+  <li>Login ke aplikasi menggunakan akun Admin.</li>
+  <li>Pada <strong>Admin Dashboard</strong>, tekan tombol <strong>Buat Akun Baru</strong>.</li>
+  <li>Modal <code>AdminRegisterModal</code> akan terbuka.</li>
+  <li>Isi data:</li>
+</ol>
+<ul>
+  <li>Nama Lengkap</li>
+  <li>Email Resmi</li>
+  <li>Kata Sandi (Minimal 8 Karakter)</li>
+  <li>Role Pengguna (<code>client</code>, <code>marketing</code>, <code>field_engineer</code>)</li>
+</ul>
+<ol>
+  <li>Tekan <strong>Buat Akun</strong>.</li>
+  <li>Sistem akan memproses via Supabase Auth &amp; membuat profil di tabel <code>profiles</code>. Terbitkan kredensial tersebut kepada pengguna terkait.</li>
+</ol>
+<hr />
+<h2>3. Pembuatan &amp; Pengelolaan Proyek Baru</h2>
+<ol>
+  <li>Pada Admin Dashboard, tekan <strong>Buat Proyek Baru</strong>.</li>
+  <li>Form <code>CreateProjectScreen</code> akan tampil.</li>
+  <li>Masukkan Kode Proyek, Nama Proyek, Klien Pemilik, Jenis Layanan, Lokasi, Tanggal Mulai/Selesai, dan tentukan Field Engineer Penanggung Jawab.</li>
+  <li>Tekan <strong>Simpan Proyek</strong>. Sistem secara otomatis menggenerasi 4 tahapan standar proyek (<code>project_stages</code>).</li>
+</ol>
+<hr />
+<h2>4. Pemeliharaan Otorisasi &amp; Sinkronisasi Nama User (Migrasi &amp; Trigger SQL)</h2>
+<ol>
+  <li><strong>Jalankan Skrip Migrasi <code>backend/fix<em>project</em>client_ids.sql</code></strong>:</li>
+</ol>
+<ul>
+  <li>Memastikan seluruh data proyek Klien terhubung dengan kolom UUID <code>client_id</code>.</li>
+</ul>
+<ol>
+  <li><strong>Jalankan Skrip RLS &amp; Trigger <code>backend/update<em>rls</em>policies.sql</code></strong>:</li>
+</ol>
+<ul>
+  <li>Mengaktifkan aturan RLS berbasis UUID <code>client<em>id = auth.uid()</code> dan memasang PostgreSQL Trigger <code>sync</em>user<em>name</em>changes</code> agar pengubahan nama profil pengguna secara otomatis mensinkronkan <code>projects.client_name</code> tanpa merusak otorisasi proyek.</li>
+</ul>
+<hr />
+<h2>5. Tabel Hak Akses System Administrator</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Operasi</th>
+      <th>Admin</th>
+      <th>Non-Admin</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Membuat akun pengguna baru (Client, Marketing, Engineer)</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td>Menghapus akun pengguna</td>
+      <td>Ya (via Supabase Dashboard)</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td>Membuat proyek baru</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td>Menghapus proyek</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td>Mengedit metadata semua proyek</td>
+      <td>Ya</td>
+      <td>Terbatas (hanya proyek sendiri)</td>
+    </tr>
+    <tr>
+      <td>Melihat semua proyek tanpa filter</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td>Menyetujui / menolak booking survei</td>
+      <td>Ya</td>
+      <td>Marketing saja</td>
+    </tr>
+    <tr>
+      <td>Menjalankan migrasi SQL database</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td>Mengakses Supabase Dashboard</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td>Melihat log audit CORS</td>
+      <td>Ya (via server console)</td>
+      <td>Tidak</td>
+    </tr>
+  </tbody>
+</table>
+<hr />
+<h2>6. Tabel Konfigurasi Environment Wajib (Checklist Admin)</h2>
+<table>
+  <thead>
+    <tr>
+      <th>File</th>
+      <th>Variabel</th>
+      <th>Deskripsi</th>
+      <th>Wajib</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>backend/.env</code></td>
+      <td><code>JWT_SECRET</code></td>
+      <td>Secret key untuk signing JWT token</td>
+      <td>Ya (Fatal jika kosong)</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td><code>backend/.env</code></td>
+      <td><code>PORT</code></td>
+      <td>Port server Express</td>
+      <td>Tidak</td>
+      <td><code>3000</code></td>
+    </tr>
+    <tr>
+      <td><code>backend/.env</code></td>
+      <td><code>SUPABASE_URL</code></td>
+      <td>URL proyek Supabase Cloud</td>
+      <td>Tidak (jika pakai SQLite saja)</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td><code>backend/.env</code></td>
+      <td><code>SUPABASE<em>SECRET</em>KEY</code></td>
+      <td>Service Role Key Supabase</td>
+      <td>Tidak (jika pakai SQLite saja)</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td><code>.env</code> (root)</td>
+      <td><code>SUPABASE_URL</code></td>
+      <td>URL proyek Supabase Cloud untuk frontend</td>
+      <td>Ya</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td><code>.env</code> (root)</td>
+      <td><code>SUPABASE<em>ANON</em>KEY</code></td>
+      <td>Anon/Public API Key Supabase</td>
+      <td>Ya</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td><code>.env</code> (root)</td>
+      <td><code>APP_ENV</code></td>
+      <td>Environment flag</td>
+      <td>Tidak</td>
+      <td><code>development</code></td>
+    </tr>
+    <tr>
+      <td><code>.env</code> (root)</td>
+      <td><code>API<em>BASE</em>URL_EMULATOR</code></td>
+      <td>Base URL backend untuk Android emulator</td>
+      <td>Tidak</td>
+      <td><code>http://10.0.2.2:3000</code></td>
+    </tr>
+    <tr>
+      <td><code>.env</code> (root)</td>
+      <td><code>API<em>BASE</em>URL_PRODUCTION</code></td>
+      <td>Base URL backend produksi</td>
+      <td>Ya (untuk build release)</td>
+      <td>-</td>
+    </tr>
+  </tbody>
+</table>
+<hr />
+<h2>7. Tabel Skrip SQL Administrasi Database</h2>
+<table>
+  <thead>
+    <tr>
+      <th>File Skrip</th>
+      <th>Fungsi</th>
+      <th>Kapan Dijalankan</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>backend/supabase_schema.sql</code></td>
+      <td>Membuat 7 tabel utama, indeks, dan trigger</td>
+      <td>Setup awal Supabase</td>
+    </tr>
+    <tr>
+      <td><code>backend/update<em>rls</em>policies.sql</code></td>
+      <td>Mengaktifkan RLS policies &amp; trigger sync nama</td>
+      <td>Setelah setup skema</td>
+    </tr>
+    <tr>
+      <td><code>backend/fix<em>project</em>client_ids.sql</code></td>
+      <td>Migrasi kolom <code>client_id</code> pada proyek lama</td>
+      <td>Sekali saat migrasi v2.0</td>
+    </tr>
+    <tr>
+      <td><code>backend/fix<em>booking</em>notifications.sql</code></td>
+      <td>Perbaikan notifikasi booking</td>
+      <td>Sekali saat migrasi</td>
+    </tr>
+    <tr>
+      <td><code>backend/setup<em>storage</em>bucket.sql</code></td>
+      <td>Konfigurasi bucket Storage <code>projects</code> privat</td>
+      <td>Setup awal Supabase</td>
+    </tr>
+    <tr>
+      <td><code>backend/verify_rls.sql</code></td>
+      <td>Verifikasi status RLS aktif di semua tabel</td>
+      <td>Audit berkala</td>
+    </tr>
+    <tr>
+      <td><code>backend/add<em>delete</em>policies.sql</code></td>
+      <td>Menambahkan policy DELETE untuk Admin</td>
+      <td>Sekali saat migrasi</td>
+    </tr>
+  </tbody>
+</table>
+
+  </div>
+</body>
+</html>

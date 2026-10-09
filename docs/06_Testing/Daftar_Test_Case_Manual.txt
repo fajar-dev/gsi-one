@@ -1,0 +1,315 @@
+================================================================================
+DAFTAR TEST CASE PENGUIAN MANUAL PER ROLE (MANUAL TESTING SCENARIOS)
+PROYEK: GSI ONE MOBILE APPLICATION
+================================================================================
+
+--------------------------------------------------------------------------------
+1. MATRIKS HAK AKSES PERAN PENGGUNA (ROLE ACCESS MATRIX)
+--------------------------------------------------------------------------------
+
++------------------------------------------------+-------+--------+----------+-----------+-------+
+| Modul / Fitur                                  | Guest | Client | Engineer | Marketing | Admin |
++------------------------------------------------+-------+--------+----------+-----------+-------+
+| Katalog Layanan & Insight                      | Read  | Read   | Read     | Read      | Read  |
+| Form Pengajuan Survei (Book Survey)            | Create| Create | Create   | Create    | Create|
+| Dashboard Klien & Tracking Proyek Klien        | No    | Own    | No       | No        | All   |
+| Log Harian & Unduh Dokumen Proyek              | No    | Read   | Read/Write| Read     | Full  |
+| Update Tahapan Progres Proyek                  | No    | No     | Assigned | No        | Full  |
+| Unggah Foto / Berkas Inspeksi PDF              | No    | No     | Assigned | No        | Full  |
+| Kelola Antrean Survei (Claim/Approve/Reject)   | No    | No     | No       | Process   | Full  |
+| Konversi Survei menjadi Proyek Baru            | No    | No     | No       | Initiate  | Full  |
+| Registrasi Akun Pengguna Baru                  | No    | No     | No       | No        | Full  |
++------------------------------------------------+-------+--------+----------+-----------+-------+
+
+
+--------------------------------------------------------------------------------
+2. TEST CASES - ROLE: PENGGUNA PUBLIK / GUEST (TANPA LOGIN)
+--------------------------------------------------------------------------------
+
+[TC-GUEST-001] Eksplorasi Katalog Layanan Teknis GSI
+- Prasyarat: Aplikasi dibuka dalam kondisi pengguna belum login (Guest).
+- Langkah Pengujian:
+  1. Buka aplikasi GSI One Mobile.
+  2. Navigasi ke menu "Layanan Kami".
+  3. Pilih salah satu dari 6 layanan (contoh: Structural Forensic atau SHMS).
+  4. Tekan item layanan untuk membuka halaman detail layanan.
+- Data Uji: Kategori layanan Structural Forensic.
+- Hasil yang Diharapkan: Halaman detail menampilkan deskripsi teknis, cakupan pengujian NDT/DT, serta gambar pendukung dengan responsif tanpa error.
+- Status: [ ] Pass   [ ] Fail
+
+[TC-GUEST-002] Mengajukan Permohonan Survei Lokasi (Book Survey)
+- Prasyarat: Pengguna berada pada halaman utama atau detail layanan.
+- Langkah Pengujian:
+  1. Tekan tombol "Ajukan Survei / Book Site Survey".
+  2. Isi formulir pengajuan survei dengan data valid:
+     - Nama Lengkap
+     - Email & Nomor Telepon / WhatsApp
+     - Nama Perusahaan / Instansi
+     - Jenis Layanan yang Dibutuhkan
+     - Alamat / Lokasi Bangunan
+     - Catatan Tambahan
+  3. Tekan tombol "Kirim Permohonan".
+- Data Uji: Form data survei valid.
+- Hasil yang Diharapkan:
+  1. Sistem menampilkan dialog/halaman sukses pengajuan survei beserta Nomor Tiket Referensi.
+  2. Data tersimpan di database survey_requests dengan status awal "pending".
+- Status: [ ] Pass   [ ] Fail
+
+[TC-GUEST-003] Validasi Form Pengajuan Survei dengan Data Kosong
+- Prasyarat: Pengguna berada pada halaman "Book Site Survey".
+- Langkah Pengujian:
+  1. Biarkan seluruh bidang input kosong atau masukkan format email yang salah.
+  2. Tekan tombol "Kirim Permohonan".
+- Data Uji: Email format salah (contoh: email_invalid).
+- Hasil yang Diharapkan: Pesan validasi merah muncul di bawah bidang input yang belum terisi/salah format, dan pengajuan tidak terproses.
+- Status: [ ] Pass   [ ] Fail
+
+
+--------------------------------------------------------------------------------
+3. TEST CASES - ROLE: CLIENT (KLIEN PT GSI)
+--------------------------------------------------------------------------------
+
+[TC-CLI-001] Login Akun Klien menggunakan Nomor Tiket / Email
+- Prasyarat: Akun Klien telah terdaftar oleh Admin.
+- Langkah Pengujian:
+  1. Buka halaman Login.
+  2. Masukkan Email atau Nomor Tiket Klien dan Kata Sandi.
+  3. Tekan tombol "Masuk".
+- Data Uji: Email Klien valid & Kata Sandi valid.
+- Hasil yang Diharapkan: Login berhasil, sesi tersimpan, dan pengguna langsung diarahkan ke Dashboard Klien (ClientDashboard).
+- Status: [ ] Pass   [ ] Fail
+
+[TC-CLI-002] Memantau Progres Linimasa Proyek Aktif
+- Prasyarat: Klien memiliki minimal 1 proyek yang berjalan.
+- Langkah Pengujian:
+  1. Pada Dashboard Klien, pilih proyek aktif dari daftar proyek.
+  2. Amati indikator linimasa 4 tahapan proyek:
+     - Tahap 1: Inisiasi
+     - Tahap 2: Survei Lapangan
+     - Tahap 3: Analisis & Laporan
+     - Tahap 4: Selesai
+  3. Periksa persentase progres total proyek.
+- Data Uji: ID Proyek terasosiasi dengan akun Klien.
+- Hasil yang Diharapkan: Linimasa menampilkan status aktif/selesai pada tiap tahapan secara akurat sesuai pembaruan dari tim teknis.
+- Status: [ ] Pass   [ ] Fail
+
+[TC-CLI-003] Membaca Catatan Log Harian Lapangan (Daily Logs)
+- Prasyarat: Field Engineer telah menginput log harian pada proyek Klien.
+- Langkah Pengujian:
+  1. Buka Halaman Detail Proyek.
+  2. Masuk ke tab "Log Harian / Daily Logs".
+  3. Urutkan atau gulir daftar catatan harian.
+- Data Uji: Data log harian proyek.
+- Hasil yang Diharapkan: Klien dapat membaca ringkasan pekerjaan harian, informasi cuaca lapangan, dan status kendala tanpa memiliki akses untuk mengubah data.
+- Status: [ ] Pass   [ ] Fail
+
+[TC-CLI-004] Mengunduh Dokumen Laporan Inspeksi PDF
+- Prasyarat: Terdapat dokumen PDF laporan yang diunggah oleh tim teknis.
+- Langkah Pengujian:
+  1. Buka Halaman Detail Proyek.
+  2. Masuk ke tab "Dokumen Proyek".
+  3. Tekan tombol "Unduh / Download" pada berkas Laporan Akhir Inspeksi PDF.
+- Data Uji: Berkas PDF laporan teknis.
+- Hasil yang Diharapkan: File PDF terunduh atau terbuka pada PDF Viewer bawaan perangkat dengan kondisi utuh.
+- Status: [ ] Pass   [ ] Fail
+
+
+--------------------------------------------------------------------------------
+4. TEST CASES - ROLE: FIELD ENGINEER (INSINYUR LAPANGAN)
+--------------------------------------------------------------------------------
+
+[TC-ENG-001] Pembaruan Status Tahapan & Persentase Progres Proyek
+- Prasyarat: Field Engineer ditugaskan pada proyek target.
+- Langkah Pengujian:
+  1. Login sebagai Field Engineer.
+  2. Buka proyek yang ditugaskan pada EngineerDashboard.
+  3. Buka menu "Pembaruan Progres".
+  4. Ubah status Tahap 2 (Survei Lapangan) menjadi "Selesai" dan perbarui persentase total progres ke 50%.
+  5. Tekan tombol "Simpan Pembaruan".
+- Data Uji: Nilai progres 50%, Status tahapan diperbarui.
+- Hasil yang Diharapkan:
+  1. Pembaruan berhasil disimpan.
+  2. Perubahan progres langsung terefleksi pada dashboard Klien dan Admin secara real-time.
+- Status: [ ] Pass   [ ] Fail
+
+[TC-ENG-002] Penginputan Catatan Log Harian Lapangan (project_daily_logs)
+- Prasyarat: Field Engineer sedang melakukan pekerjaan inspeksi lapangan.
+- Langkah Pengujian:
+  1. Masuk ke Detail Proyek -> Tab "Log Harian".
+  2. Tekan tombol "Tambah Log Harian".
+  3. Isi form:
+     - Tanggal Kegiatan
+     - Ringkasan Pekerjaan (contoh: Pengujian UPV dan Core Drill pada Lantai 2)
+     - Kondisi Cuaca (contoh: Cerah / Hujan Ringan)
+     - Catatan Kendala & Solusi
+  4. Tekan "Simpan Log".
+- Data Uji: Form Log Harian lengkap.
+- Hasil yang Diharapkan: Catatan log harian baru tampil di linimasa proyek beserta nama penulis (Engineer).
+- Status: [ ] Pass   [ ] Fail
+
+[TC-ENG-003] Pengunggahan Foto Inspeksi & Dokumen PDF Laporan
+- Prasyarat: Berkas foto inspeksi atau dokumen PDF tersedia di perangkat.
+- Langkah Pengujian:
+  1. Masuk ke Detail Proyek -> Tab "Dokumen & Berkas".
+  2. Tekan tombol "Unggah Dokumen".
+  3. Pilih kategori dokumen (contoh: Foto Inspeksi Lapangan atau Laporan Pengujian NDT).
+  4. Unggah berkas PDF/Gambar dari galeri atau penyimpanan lokal.
+  5. Tekan "Unggah".
+- Data Uji: Berkas PDF laporan teknis (< 10MB).
+- Hasil yang Diharapkan: Berkas berhasil diunggah ke Supabase Storage, tercatat di project_documents, dan dapat diakses oleh Klien serta Admin.
+- Status: [ ] Pass   [ ] Fail
+
+
+--------------------------------------------------------------------------------
+5. TEST CASES - ROLE: MARKETING STAFF (STAF PEMASARAN)
+--------------------------------------------------------------------------------
+
+[TC-MKT-001] Mengklaim Permohonan Survei Masuk (Claim Survey Request)
+- Prasyarat: Terdapat pengajuan survei baru dari publik/guest dengan status "pending".
+- Langkah Pengujian:
+  1. Login sebagai Marketing Staff.
+  2. Buka MarketingDashboard -> Tab "Permohonan Survei Masuk".
+  3. Pilih permohonan survei dengan status "pending".
+  4. Tekan tombol "Klaim Permohonan / Claim Request".
+- Data Uji: Survey Request ID status "pending".
+- Hasil yang Diharapkan: Status permohonan survei berubah menjadi "claimed" dan kolom assigned_to terisi ID akun Marketing yang mengklaim.
+- Status: [ ] Pass   [ ] Fail
+
+[TC-MKT-002] Memproses Persetujuan / Penolakan Permohonan Survei
+- Prasyarat: Permohonan survei telah diklaim ("claimed").
+- Langkah Pengujian:
+  1. Buka detail permohonan survei yang diklaim.
+  2. Masukkan catatan tinjauan marketing (contoh: Lokasi terverifikasi, siap dijadwalkan survei awal).
+  3. Tekan tombol "Setujui / Approve".
+- Data Uji: Status permohonan survei "claimed".
+- Hasil yang Diharapkan: Status permohonan berubah menjadi "approved", dan tombol "Konversi ke Proyek" menjadi aktif.
+- Status: [ ] Pass   [ ] Fail
+
+[TC-MKT-003] Inisiasi Konversi Permohonan Survei menjadi Proyek Baru
+- Prasyarat: Permohonan survei berstatus "approved".
+- Langkah Pengujian:
+  1. Tekan tombol "Konversi ke Proyek Baru".
+  2. Sistem membuka form pembuatan proyek baru dengan data survei yang terisi otomatis (Nama Klien, Perusahaan, Lokasi, Jenis Layanan).
+  3. Pilih Field Engineer yang akan ditugaskan.
+  4. Tekan tombol "Buat Proyek".
+- Data Uji: Form konversi proyek disetujui.
+- Hasil yang Diharapkan:
+  1. Record proyek baru terbuat di tabel projects.
+  2. 4 Tahapan linimasa proyek tergenerasi otomatis (Inisiasi, Survei Lapangan, Analisis & Laporan, Selesai).
+  3. Status permohonan survei terbarui menjadi "converted".
+- Status: [ ] Pass   [ ] Fail
+
+
+--------------------------------------------------------------------------------
+6. TEST CASES - ROLE: SYSTEM ADMINISTRATOR (ADMIN)
+--------------------------------------------------------------------------------
+
+[TC-ADM-001] Pendaftaran Akun Pengguna Baru Terpusat (AdminRegisterModal)
+- Prasyarat: Login sebagai System Administrator.
+- Langkah Pengujian:
+  1. Buka AdminDashboard -> Tab "Manajemen Pengguna".
+  2. Tekan tombol "Tambah Pengguna Baru / Register User".
+  3. Isi form registrasi modal (AdminRegisterModal):
+     - Nama Lengkap
+     - Email
+     - Nomor Telepon
+     - Kata Sandi Initial
+     - Peran / Role (Pilih: Client, Field Engineer, atau Marketing Staff)
+     - Nama Perusahaan (jika Role = Client)
+  4. Tekan "Daftarkan Pengguna".
+- Data Uji: Data kredensial pengguna baru.
+- Hasil yang Diharapkan: Akun baru berhasil dibuat di Supabase Auth & tabel profiles. Pengguna baru dapat login menggunakan kredensial tersebut.
+- Status: [ ] Pass   [ ] Fail
+
+[TC-ADM-002] Uji Keamanan RLS - Pembatasan Registrasi Pengguna Mandiri
+- Prasyarat: Pengguna biasa (Non-Admin / Client / Engineer) sedang login.
+- Langkah Pengujian:
+  1. Amati navigasi dan halaman pengguna non-admin.
+  2. Pastikan tombol/menu registrasi akun pengguna baru tidak muncul.
+  3. (Opsional API Testing) Lakukan pemanggilan endpoint pembuatan akun menggunakan token Non-Admin.
+- Data Uji: Token sesi akun Client / Engineer.
+- Hasil yang Diharapkan: Akses ditolak oleh aturan RLS (Row Level Security) / Otorisasi sistem dengan pesan Forbidden / Unauthorized.
+- Status: [ ] Pass   [ ] Fail
+
+[TC-ADM-003] Pembuatan Proyek Manual & Pengaturan Tim Lapangan
+- Prasyarat: Admin berada di Dashboard Admin.
+- Langkah Pengujian:
+  1. Masuk ke menu "Manajemen Proyek" -> Tekan "Buat Proyek Baru".
+  2. Isi detail proyek: Nama Proyek, Klien Terasosiasi, Lokasi, Tanggal Mulai, dan Target Selesai.
+  3. Tetapkan Marketing Staff dan Field Engineer penanggung jawab.
+   4. Tekan "Simpan Proyek".
+- Data Uji: Form proyek baru lengkap.
+- Hasil yang Diharapkan: Proyek baru berhasil dibuat dan langsung muncul pada dashboard Klien dan Field Engineer yang ditunjuk.
+- Status: [ ] Pass   [ ] Fail
+
+[TC-ADM-004] Impor Data Booking Survey pada Registrasi Akun Admin (AdminRegisterModal)
+- Prasyarat: Login sebagai System Administrator. Ada permohonan survey dari calon Klien yang belum memiliki akun.
+- Langkah Pengujian:
+  1. Buka AdminDashboard -> Tekan "Daftar Akun Baru".
+  2. Tekan bidang "Impor dari Booking Survey (Opsional)".
+  3. Pilih salah satu calon Klien dari daftar permohonan survey.
+  4. Amati pengisian form Nama Lengkap dan Email.
+  5. Masukkan Kata Sandi dan tekan "Buat Akun".
+- Data Uji: Item permohonan survey calon Klien.
+- Hasil yang Diharapkan: Nama Lengkap dan Email terisi otomatis secara presisi. Akun Klien berhasil dibuat di Supabase tanpa kesalahan ketik.
+- Status: [ ] Pass   [ ] Fail
+
+[TC-ADM-005] Validasi Pemblokiran Pembuatan Proyek Jika Akun Klien Belum Didaftarkan
+- Prasyarat: Permohonan survey milik calon Klien yang akun aplikasinya belum pernah dibuat oleh Admin.
+- Langkah Pengujian:
+  1. Buka menu "Daftar Survey" -> Tekan "Buat Proyek" pada permohonan survey tersebut.
+  2. Amati peringatan (Warning Banner) pada CreateProjectScreen.
+  3. Tekan "Simpan Proyek".
+- Data Uji: Form konversi proyek dari survey Klien belum terdaftar.
+- Hasil yang Diharapkan: Sistem menolak penyimpanan proyek dengan Alert yang ditegaskan bahwa akun Klien wajib didaftarkan oleh Admin terlebih dahulu. Permohonan survey tetap ada (tidak terhapus).
+- Status: [ ] Pass   [ ] Fail
+
+[TC-ADM-006] Penghapusan Otomatis Permohonan Survey Setelah Berhasil Diubah Menjadi Proyek
+- Prasyarat: Akun Klien telah didaftarkan oleh Admin di aplikasi.
+- Langkah Pengujian:
+  1. Buka permohonan survey Klien terdaftar -> Tekan "Buat Proyek".
+  2. Pastikan Klien terdeteksi dan terpilih otomatis.
+  3. Isi seluruh bidang proyek yang wajib -> Tekan "Simpan Proyek".
+  4. Buka kembali menu "Daftar Survey".
+- Data Uji: Proyek baru terkonversi dari survey.
+- Hasil yang Diharapkan: Proyek baru berhasil didaftarkan, dan permohonan survey tersebut otomatis terhapus dari daftar survey.
+- Status: [ ] Pass   [ ] Fail
+
+
+--------------------------------------------------------------------------------
+7. SKENARIO PENGUJIAN END-TO-END (E2E WORKFLOW TESTING)
+--------------------------------------------------------------------------------
+
+[Guest/Publik] -> (Submit Survey)
+      |
+      v
+[Marketing Staff] -> (Claim & Approve Survey)
+      |
+      v
+[System Admin] -> (Impor Booking -> Registrasi Akun Klien)
+      |
+      v
+[System Admin / Marketing] -> (Konversi ke Proyek & Assign Engineer/Client)
+      |
+      v
+[Field Engineer] -> (Update Progres, Input Log Harian, Unggah Laporan PDF)
+      |
+      v
+[Client] -> (Pantau Linimasa Real-time & Unduh Laporan Inspeksi PDF)
+
+Langkah-langkah Pengujian E2E:
+1. Langkah 1 (Guest): Ajukan survei lokasi baru via form Book Survey (TC-GUEST-002). Catat Nomor Tiket.
+2. Langkah 2 (Marketing): Login sebagai Marketing Staff, klaim permohonan survei tersebut (TC-MKT-001). Pastikan klaim persisten setelah logout/login kembali.
+3. Langkah 3 (Admin): Impor booking survey tersebut pada modal Registrasi Akun (TC-ADM-004) untuk membuatkan akun Klien resmi.
+4. Langkah 4 (Marketing / Admin): Konversi permohonan survei menjadi Proyek Baru (TC-ADM-006). Permohonan survey otomatis terhapus dari antrean.
+5. Langkah 5 (Field Engineer): Login sebagai Field Engineer, perbarui progres proyek ke tahap Survei Lapangan, tambahkan catatan Daily Log, dan unggah berkas laporan PDF (TC-ENG-001, TC-ENG-002, TC-ENG-003).
+6. Langkah 6 (Client): Login sebagai Client, periksa linimasa proyek aktif, pastikan progres 50% terlihat, dan unduh berkas laporan PDF yang diunggah oleh Field Engineer (TC-CLI-001 s/d TC-CLI-004).
+
+
+================================================================================
+RINGKASAN CHECKLIST EKSEKUSI MANUAL
+Total Test Cases: 19 Test Cases
+Peran Pengguna Teruji: 5 Peran (Guest, Client, Engineer, Marketing, Admin)
+Jenis Pengujian: Fungsional, RLS Access Control, E2E Workflow
+================================================================================
+

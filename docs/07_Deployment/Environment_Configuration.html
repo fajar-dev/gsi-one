@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Environment Configuration - GSI One Dokumentasi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+  <style>
+    :root {
+      --bg-primary: #0b1329;
+      --bg-card: #111c44;
+      --border: #1e295d;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent: #e8722a;
+    }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    h1, h2, h3, h4 { color: #fff; margin-top: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    h1 { border-bottom: 2px solid var(--accent); }
+    a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    a:hover { text-decoration: underline; }
+    p { margin-bottom: 1.25rem; }
+    code {
+      font-family: monospace;
+      background: rgba(232, 114, 42, 0.1);
+      color: var(--accent);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: #070d19;
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+    pre code {
+      background: none;
+      color: var(--text-primary);
+      padding: 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      text-align: left;
+    }
+    th {
+      background-color: rgba(30, 41, 93, 0.5);
+      color: #fff;
+    }
+    blockquote {
+      border-left: 4px solid var(--accent);
+      background: rgba(232, 114, 42, 0.05);
+      margin: 1.5rem 0;
+      padding: 1rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .alert-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+    .alert-note { background: #3b82f6; color: #fff; }
+    .alert-tip { background: #10b981; color: #fff; }
+    .alert-warning { background: #f59e0b; color: #fff; }
+    .alert-important { background: #8b5cf6; color: #fff; }
+    .alert-caution { background: #ef4444; color: #fff; }
+    .diagram-img-container {
+      margin-top: 1rem;
+      padding: 1.5rem;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+    }
+    .diagram-img { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Environment Configuration</h1>
+<h2>Proyek: GSI One Mobile Application</h2>
+<hr />
+<h2>1. Environment yang Digunakan</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Environment</th>
+      <th>Tujuan</th>
+      <th>API Base URL</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Development</td>
+      <td>Pengembangan lokal (Emulator)</td>
+      <td><code>http://10.0.2.2:3000</code> (Android emulator)</td>
+    </tr>
+    <tr>
+      <td>Development</td>
+      <td>Pengembangan lokal (Simulator)</td>
+      <td><code>http://localhost:3000</code> (iOS/Web)</td>
+    </tr>
+    <tr>
+      <td>Production</td>
+      <td>Rilis ke Play Store/App Store</td>
+      <td><code>https://grahasurvei.com</code></td>
+    </tr>
+  </tbody>
+</table>
+<p>Perpindahan environment dilakukan melalui <code>APP<em>ENV</code> dan <code>API</em>BASE<em>URL</em>EMULATOR</code>, <code>API<em>BASE</em>URL<em>SIMULATOR</code>, serta <code>API</em>BASE<em>URL</em>PRODUCTION</code>. <code>src/config/api.ts</code> memilih URL secara dinamis: <code>production</code>, <code>simulator</code>, atau default emulator Android.</p>
+<hr />
+<h2>2. Manajemen File Environment Variables</h2>
+<p>Proyek menggunakan dua file <code>.env</code> yang <strong>tidak boleh di-commit ke Git</strong>:</p>
+<h3>Frontend: <code>.env</code> (root project)</h3>
+<p>Berisi variabel konfigurasi yang digunakan oleh aplikasi React Native melalui file <code>src/config/supabase.ts</code>:</p>
+<table>
+  <thead>
+    <tr>
+      <th>Variabel</th>
+      <th>Keterangan</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>SUPABASE_URL</code></td>
+      <td>URL project Supabase Cloud</td>
+    </tr>
+    <tr>
+      <td><code>SUPABASE<em>ANON</em>KEY</code></td>
+      <td>Anon/Public API Key Supabase</td>
+    </tr>
+    <tr>
+      <td><code>APP_ENV</code></td>
+      <td><code>development</code>, <code>simulator</code>, atau <code>production</code></td>
+    </tr>
+    <tr>
+      <td><code>API<em>BASE</em>URL_EMULATOR</code></td>
+      <td>Base URL backend untuk Android emulator</td>
+    </tr>
+    <tr>
+      <td><code>API<em>BASE</em>URL_SIMULATOR</code></td>
+      <td>Base URL backend untuk iOS/Web lokal</td>
+    </tr>
+    <tr>
+      <td><code>API<em>BASE</em>URL_PRODUCTION</code></td>
+      <td>Base URL backend produksi</td>
+    </tr>
+  </tbody>
+</table>
+<h3>Backend: <code>backend/.env</code></h3>
+<p>Berisi variabel konfigurasi server Node.js/Express:</p>
+<table>
+  <thead>
+    <tr>
+      <th>Variabel</th>
+      <th>Keterangan</th>
+      <th>Wajib?</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>JWT_SECRET</code></td>
+      <td>Secret key untuk signing JWT token autentikasi</td>
+      <td>Ya</td>
+    </tr>
+    <tr>
+      <td><code>PORT</code></td>
+      <td>Port server (default: 3000)</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td><code>SUPABASE_URL</code></td>
+      <td>URL Supabase (jika server menggunakan Supabase)</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td><code>SUPABASE<em>SECRET</em>KEY</code></td>
+      <td>Service Role Key Supabase (hanya di backend)</td>
+      <td>Tidak</td>
+    </tr>
+  </tbody>
+</table>
+<blockquote>
+<strong>Perhatian</strong>: Variabel <code>JWT_SECRET</code> bersifat wajib. Server akan menolak start dan mengeluarkan pesan error jika variabel ini tidak diset.
+</blockquote>
+<hr />
+<h2>3. Setup File .env untuk Developer Baru</h2>
+<pre><code class="language-bash"># 1. Salin template frontend
+cp .env.example .env
+
+# 2. Salin template backend
+cp backend/.env.example backend/.env
+
+# 3. Isi nilai yang sesuai di kedua file .env
+# (minta nilai dari Lead Developer atau password manager tim)</code></pre>
+<hr />
+<h2>4. Konfigurasi Android</h2>
+<p>File: <code>android/app/build.gradle</code></p>
+<pre><code class="language-gradle">android {
+    defaultConfig {
+        applicationId "com.gsione"
+        minSdkVersion 21
+        targetSdkVersion 34
+        versionCode 1
+        versionName "1.0.0"
+    }
+}</code></pre>
+<p>Keystore untuk signing release dikelola secara terpisah dan <strong>tidak disimpan di repositori Git</strong>.</p>
+<hr />
+<h2>5. Konfigurasi iOS</h2>
+<p>File: <code>ios/gsione/Info.plist</code></p>
+<ul>
+  <li>Bundle Identifier: <code>com.gsione</code></li>
+  <li>Minimum iOS deployment target: 13.0</li>
+  <li>NSAppTransportSecurity: Dikonfigurasi untuk mengizinkan HTTPS production.</li>
+</ul>
+<hr />
+<h2>6. Aturan Keamanan</h2>
+<ul>
+  <li>File <code>.env</code> dan <code>backend/.env</code> sudah tercantum di <code>.gitignore</code> dan tidak akan ter-commit.</li>
+  <li>Gunakan <code>.env.example</code> dan <code>backend/.env.example</code> sebagai template yang aman untuk di-commit.</li>
+  <li>Tidak boleh ada nilai secret atau API key yang ditulis langsung (hardcode) di file source code.</li>
+  <li>Bucket <code>projects</code> harus tetap privat. Aplikasi memakai anon key untuk meminta signed URL; <code>SUPABASE<em>SECRET</em>KEY</code> hanya boleh berada di backend/secret manager.</li>
+  <li>Untuk generate <code>JWT_SECRET</code> yang aman, jalankan:</li>
+<pre><code class="language-bash">  node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"</code></pre>
+</ul>
+<hr />
+<h2>7. Panduan Migrasi Endpoint: Serverless ke VPS</h2>
+<p>Jika aplikasi berpindah dari arsitektur <strong>Serverless / Supabase Cloud</strong> ke <strong>VPS (Virtual Private Server)</strong>, lakukan langkah-langkah penyesuaian berikut pada berkas <code>src/config/api.ts</code> dan konfigurasi environment:</p>
+<h3>A. Perubahan Variabel Environment (<code>.env</code>)</h3>
+<p>Fungsi <code>getApiBaseUrl()</code> pada <code>src/config/api.ts</code> membaca URL secara dinamis dari variabel environment. Ubah nilai target di <code>.env</code>:</p>
+<ul>
+  <li><code>API<em>BASE</em>URL_PRODUCTION</code>: Ubah ke domain/IP publik VPS (contoh: <code>https://api.domainanda.com</code>).</li>
+  <li><code>API<em>BASE</em>URL_EMULATOR</code>: Sesuaikan ke URL backend lokal/VPS staging saat pengujian emulator (contoh Android: <code>http://10.0.2.2:3000</code> atau port server VPS lokal).</li>
+</ul>
+<h3>B. Penyesuaian Path di <code>API_ENDPOINTS</code></h3>
+<p>Sesuaikan objek <code>API_ENDPOINTS</code> pada <code>src/config/api.ts</code> dengan skema routing server VPS Anda:</p>
+<ul>
+  <li><strong>REST API VPS (Node.js/Express, Laravel, NestJS):</strong></li>
+<pre><code class="language-typescript">  export const API_ENDPOINTS = {
+      BOOKING_MODERN: `${API_BASE_URL}/api/v1/booking`,
+      LOGIN_MODERN: `${API_BASE_URL}/api/v1/auth/login`,
+      REGISTER_MODERN: `${API_BASE_URL}/api/v1/auth/register`
+  };</code></pre>
+  <li><strong>PHP Native:</strong></li>
+<pre><code class="language-typescript">  export const API_ENDPOINTS = {
+      BOOKING: `${API_BASE_URL}/api/booking.php`,
+      LOGIN: `${API_BASE_URL}/api/login.php`,
+      REGISTER: `${API_BASE_URL}/api/register.php`
+  };</code></pre>
+</ul>
+<h3>C. Penyesuaian Pengambilan Data (Service Layer)</h3>
+<ul>
+  <li><strong>Supabase Self-Hosted di VPS:</strong> Jika VPS menjalankan Supabase Self-Hosted, cukup perbarui <code>SUPABASE<em>URL</code> dan <code>SUPABASE</em>ANON_KEY</code> di <code>.env</code>. File <code>src/config/supabase.ts</code> akan otomatis mengarah ke VPS.</li>
+  <li><strong>REST API Custom VPS:</strong> Jika backend diganti total ke REST API VPS, ubah pemanggilan <code>supabase.from(...)</code> pada repository/service layer menjadi HTTP Client (<code>fetch</code>/<code>axios</code>) yang mengarah ke <code>API_ENDPOINTS</code>.</li>
+</ul>
+<h3>D. Persyaratan Keamanan &amp; SSL</h3>
+<ul>
+  <li><strong>HTTPS Mandatory:</strong> Android dan iOS mewajibkan HTTPS untuk koneksi produksi. Pastikan server VPS Anda menggunakan sertifikat SSL aktif (misal Let's Encrypt).</li>
+  <li><strong>JWT Header:</strong> Untuk REST API VPS custom, pastikan menyisipkan header <code>Authorization: Bearer &lt;token&gt;</code> pada setiap request terproteksi.</li>
+</ul>
+<h3>E. Pertimbangan Arsitektur Fitur &amp; Database (Custom REST API vs Supabase Self-Hosted)</h3>
+<p>Saat bermigrasi ke VPS, pertimbangkan kebutuhan pembuatan API untuk fitur-fitur pendukung (Database CRUD, Auth, Upload File, dan Notifikasi):</p>
+<h4>1. Opsi A: Backend Custom REST API (Node.js/Express, Laravel, dll.)</h4>
+<p>Aplikasi mobile <strong>tidak dapat terhubung langsung</strong> ke database di VPS demi alasan keamanan. Semua interaksi harus dibuatkan endpoint REST API:</p>
+<ul>
+  <li><strong>CRUD Database:</strong> Wajib membuat rute &amp; controller API untuk setiap tabel (Proyek, Stages, Bookings, Profiles, Logs). Contoh rute ada pada <code>backend/routes/projectRoutes.js</code> dan <code>bookingRoutes.js</code>.</li>
+  <li><strong>Upload &amp; Storage File:</strong> Wajib membuat API upload (seperti <code>POST /api/files/upload</code>) yang menyimpan file ke disk VPS (folder <code>backend/uploads</code>) atau Cloud Storage eksternal. Contoh di <code>backend/routes/fileRoutes.js</code>.</li>
+  <li><strong>Autentikasi &amp; Autorisasi:</strong> Wajib membuat handler login, register, enkripsi password, dan pembuat JWT token (<code>backend/routes/authRoutes.js</code>).</li>
+  <li><strong>Push Notification:</strong> Wajib membuat endpoint pendaftaran token perangkat dan trigger integrasi FCM.</li>
+</ul>
+<h4>2. Opsi B: Supabase Self-Hosted di VPS (Docker)</h4>
+<p><strong>Tidak perlu membuat REST API manual satu per satu.</strong></p>
+<p>Container Docker Supabase Self-Hosted mengemas:</p>
+<ul>
+  <li><strong>PostgREST:</strong> Otomatis mengubah skema database PostgreSQL menjadi RESTful API.</li>
+  <li><strong>GoTrue:</strong> Mengelola API autentikasi pengguna secara bawaan.</li>
+  <li><strong>Supabase Storage:</strong> Mengelola upload dan izin file secara bawaan.</li>
+  <li><strong>Dampak Frontend:</strong> Kode pada <code>src/services/</code> dan repository layer tidak perlu diubah, cukup perbarui <code>SUPABASE_URL</code> di <code>.env</code> ke domain VPS Anda.</li>
+</ul>
+<h4>Matriks Perbandingan Ringkas</h4>
+<table>
+  <thead>
+    <tr>
+      <th>Fitur / Operasi</th>
+      <th>Custom REST API (Node.js/Express)</th>
+      <th>Supabase Self-Hosted di VPS</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Operasi Database</strong></td>
+      <td>Wajib buat rute &amp; controller API per tabel</td>
+      <td>Otomatis via SDK Supabase / PostgREST</td>
+    </tr>
+    <tr>
+      <td><strong>Autentikasi User</strong></td>
+      <td>Wajib buat handler JWT &amp; enkripsi password</td>
+      <td>Otomatis via Supabase Auth (GoTrue)</td>
+    </tr>
+    <tr>
+      <td><strong>Upload File/Foto</strong></td>
+      <td>Wajib buat API upload (multer/formidable)</td>
+      <td>Otomatis via Supabase Storage</td>
+    </tr>
+    <tr>
+      <td><strong>Pengubahan di Frontend</strong></td>
+      <td>Perlu refactoring dari SDK ke <code>fetch</code>/<code>axios</code></td>
+      <td>Hanya ubah <code>SUPABASE_URL</code> di <code>.env</code></td>
+    </tr>
+  </tbody>
+</table>
+<hr />
+<h2>8. Diagram Alur Jaringan &amp; Keamanan (Network &amp; Security Flow)</h2>
+<pre class="mermaid">
+graph LR
+    subgraph ClientLayer["Klien Device (React Native App)"]
+        Req["HTTP Request (Origin: grahasurvei.com / localhost)"]
+    end
+
+    subgraph SecurityGate["Security &amp; Firewall Layer (Express Server)"]
+        CORS{"CORS Whitelist Check\n(grahasurvei.com, localhost:3000, 10.0.2.2:3000)"}
+        Helmet["Helmet Security Headers\n(X-Content-Type, X-Frame-Options, HSTS)"]
+        AuthCheck{"JWT Bearer Token Check"}
+    end
+
+    subgraph DBLayer["Database Access Control"]
+        RLS{"Supabase PostgreSQL Row Level Security (RLS)"}
+        Result["Data Respon Berhasil (200 OK)"]
+    end
+
+    Req --&gt; CORS
+    CORS --&gt;|Origin Ditolak| Block1["403 Access Denied &amp; Log Audit Warning"]
+    CORS --&gt;|Origin Diizinkan| Helmet
+    Helmet --&gt; AuthCheck
+    AuthCheck --&gt;|Token Invalid/Missing| Block2["401 Unauthorized"]
+    AuthCheck --&gt;|Token Valid| RLS
+    RLS --&gt;|Akses Diterima| Result
+    RLS --&gt;|Akses Ditolak| Block3["403 Forbidden"]
+</pre>
+
+  </div>
+</body>
+</html>

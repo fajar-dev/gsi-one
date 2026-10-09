@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Manual - GSI One Dokumentasi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+  <style>
+    :root {
+      --bg-primary: #0b1329;
+      --bg-card: #111c44;
+      --border: #1e295d;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent: #e8722a;
+    }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    h1, h2, h3, h4 { color: #fff; margin-top: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    h1 { border-bottom: 2px solid var(--accent); }
+    a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    a:hover { text-decoration: underline; }
+    p { margin-bottom: 1.25rem; }
+    code {
+      font-family: monospace;
+      background: rgba(232, 114, 42, 0.1);
+      color: var(--accent);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: #070d19;
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+    pre code {
+      background: none;
+      color: var(--text-primary);
+      padding: 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      text-align: left;
+    }
+    th {
+      background-color: rgba(30, 41, 93, 0.5);
+      color: #fff;
+    }
+    blockquote {
+      border-left: 4px solid var(--accent);
+      background: rgba(232, 114, 42, 0.05);
+      margin: 1.5rem 0;
+      padding: 1rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .alert-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+    .alert-note { background: #3b82f6; color: #fff; }
+    .alert-tip { background: #10b981; color: #fff; }
+    .alert-warning { background: #f59e0b; color: #fff; }
+    .alert-important { background: #8b5cf6; color: #fff; }
+    .alert-caution { background: #ef4444; color: #fff; }
+    .diagram-img-container {
+      margin-top: 1rem;
+      padding: 1.5rem;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+    }
+    .diagram-img { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Panduan Pengguna (User Manual)</h1>
+<h2>Proyek: GSI One Mobile Application</h2>
+<hr />
+<h2>1. Pendahuluan</h2>
+<p>Selamat datang di aplikasi mobile <strong>GSI One</strong> dari PT Graha Survei Indonesia (GSI). Aplikasi ini memberikan kemudahan dalam mengeksplorasi layanan audit struktur, mengajukan survei lokasi, serta memantau progres proyek secara real-time.</p>
+<hr />
+<h2>2. Matriks Fitur per Peran Pengguna (Feature-Role Matrix)</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Fitur / Menu</th>
+      <th>Publik</th>
+      <th>Client</th>
+      <th>Engineer</th>
+      <th>Marketing</th>
+      <th>Admin</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Katalog 6 Layanan GSI</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Ya</td>
+    </tr>
+    <tr>
+      <td>Studi Kasus &amp; Pengalaman</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Ya</td>
+    </tr>
+    <tr>
+      <td>Formulir Book Survey</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>-</td>
+      <td>Ya</td>
+      <td>Ya</td>
+    </tr>
+    <tr>
+      <td>Login / Logout</td>
+      <td>-</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Ya</td>
+    </tr>
+    <tr>
+      <td>Dashboard Ringkasan</td>
+      <td>-</td>
+      <td>Client Dashboard</td>
+      <td>Engineer Dashboard</td>
+      <td>Marketing Dashboard</td>
+      <td>Admin Dashboard</td>
+    </tr>
+    <tr>
+      <td>Lihat Proyek &amp; Progress</td>
+      <td>-</td>
+      <td>Proyek milik sendiri</td>
+      <td>Proyek ditugaskan</td>
+      <td>Semua proyek</td>
+      <td>Semua proyek</td>
+    </tr>
+    <tr>
+      <td>Update Status Tahapan</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Ya</td>
+      <td>-</td>
+      <td>Ya</td>
+    </tr>
+    <tr>
+      <td>Tambah Log Harian</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Ya</td>
+      <td>-</td>
+      <td>Ya</td>
+    </tr>
+    <tr>
+      <td>Upload Foto / Berkas PDF</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Ya</td>
+      <td>-</td>
+      <td>Ya</td>
+    </tr>
+    <tr>
+      <td>Download Berkas Laporan</td>
+      <td>-</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Ya</td>
+    </tr>
+    <tr>
+      <td>Klaim Booking Survei</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Ya</td>
+      <td>Ya</td>
+    </tr>
+    <tr>
+      <td>Approve / Reject Booking</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Ya</td>
+      <td>Ya</td>
+    </tr>
+    <tr>
+      <td>Konversi Booking ke Proyek</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Ya</td>
+      <td>Ya</td>
+    </tr>
+    <tr>
+      <td>Buat Akun Pengguna Baru</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Ya</td>
+    </tr>
+    <tr>
+      <td>Buat Proyek Baru</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Ya</td>
+    </tr>
+    <tr>
+      <td>Hapus Proyek</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>Ya</td>
+    </tr>
+    <tr>
+      <td>Notifikasi In-App</td>
+      <td>-</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Ya</td>
+    </tr>
+  </tbody>
+</table>
+<hr />
+<h2>3. Panduan Fitur Pengunjung Publik</h2>
+<h3>3.1 Eksplorasi Katalog Layanan</h3>
+<ol>
+  <li>Buka aplikasi GSI One.</li>
+  <li>Pilih tab <strong>Layanan Kami</strong> untuk melihat 6 layanan utama (Structural Forensic, Risk Asset Integrity, Repair Design, Natural Hazard Risk, SHMS, EEWS).</li>
+  <li>Ketuk kartu layanan untuk membaca detail penjelasan, risiko, dan manfaatnya.</li>
+</ol>
+<h3>3.2 Mengajukan Survei Lokasi (Book Survey)</h3>
+<ol>
+  <li>Pada layar Detail Layanan atau Beranda, tekan tombol <strong>Pesan Survei</strong>.</li>
+  <li>Isi formulir pengajuan: Nama, Perusahaan, Email, Nomor Telepon, Jenis Layanan, Lokasi, Perkiraan Tanggal, dan Catatan.</li>
+  <li>Tekan <strong>Kirim Booking</strong>.</li>
+  <li>Rangkuman pengajuan akan ditampilkan pada layar konfirmasi sukses.</li>
+</ol>
+<hr />
+<h2>4. Panduan Fitur Klien Terdaftar (Client)</h2>
+<h3>4.1 Login Akun Klien</h3>
+<ol>
+  <li>Buka layar <strong>Login</strong>.</li>
+  <li>Masukkan <strong>Nomor Tiket</strong> atau <strong>Email</strong> beserta Kata Sandi yang diberikan oleh Admin GSI.</li>
+  <li>Tekan <strong>Masuk Log</strong>.</li>
+</ol>
+<h3>4.2 Memantau Progres Proyek</h3>
+<ol>
+  <li>Masuk ke <strong>Client Dashboard</strong>.</li>
+  <li>Lihat persentase kemajuan fisik proyek Anda.</li>
+  <li>Ketuk proyek untuk membuka <strong>Detail Proyek</strong> dan melihat linimasa 4 tahapan.</li>
+  <li>Baca entri log harian insinyur dan tekan tombol <strong>Unduh PDF</strong> pada berkas laporan.</li>
+</ol>
+<hr />
+<h2>5. Panduan Fitur Field Engineer (Insinyur Lapangan)</h2>
+<ol>
+  <li>Login ke aplikasi sebagai Engineer.</li>
+  <li>Buka proyek yang ditugaskan kepada Anda pada <strong>Engineer Dashboard</strong>.</li>
+  <li>Di <strong>Project Detail</strong>, perbarui status tahapan dan persentase kemajuan total.</li>
+  <li>Tekan <strong>Tambah Log Harian</strong> untuk memasukkan aktivitas harian di lokasi inspeksi.</li>
+  <li>Tekan <strong>Unggah Berkas</strong> untuk memilih foto inspeksi atau dokumen laporan PDF.</li>
+</ol>
+<hr />
+<h2>6. Panduan Fitur Staf Marketing</h2>
+<ol>
+  <li>Login ke aplikasi sebagai Marketing.</li>
+  <li>Buka <strong>SurveyRequestsScreen</strong> dari <strong>Marketing Dashboard</strong>.</li>
+  <li>Lihat antrean pengajuan survei publik (<code>pending</code>), lalu tekan <strong>Klaim Permohonan</strong>.</li>
+  <li>Setelah berkomunikasi dengan klien, pilih <strong>Setujui</strong> atau <strong>Tolak</strong>.</li>
+  <li>Untuk permohonan yang disetujui, tekan <strong>Konversi ke Proyek</strong> untuk menginisiasi proyek baru.</li>
+</ol>
+<hr />
+<h2>7. Matriks Status Alur Booking Survei</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Status Awal</th>
+      <th>Aksi</th>
+      <th>Status Akhir</th>
+      <th>Dilakukan Oleh</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>-</td>
+      <td>Kirim Formulir Booking</td>
+      <td><code>pending</code></td>
+      <td>Publik / Client</td>
+    </tr>
+    <tr>
+      <td><code>pending</code></td>
+      <td>Klaim Permohonan</td>
+      <td><code>claimed</code></td>
+      <td>Marketing / Admin</td>
+    </tr>
+    <tr>
+      <td><code>claimed</code></td>
+      <td>Setujui Permohonan</td>
+      <td><code>approved</code></td>
+      <td>Marketing / Admin</td>
+    </tr>
+    <tr>
+      <td><code>claimed</code></td>
+      <td>Tolak Permohonan</td>
+      <td><code>rejected</code></td>
+      <td>Marketing / Admin</td>
+    </tr>
+    <tr>
+      <td><code>approved</code></td>
+      <td>Konversi ke Proyek</td>
+      <td>Proyek Baru Dibuat</td>
+      <td>Marketing / Admin</td>
+    </tr>
+  </tbody>
+</table>
+<hr />
+<h2>8. Matriks Status Alur Proyek &amp; Tahapan</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Status Proyek</th>
+      <th>Deskripsi</th>
+      <th>Transisi Berikutnya</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>pending</code></td>
+      <td>Proyek baru dibuat, menunggu dimulai</td>
+      <td><code>on_progress</code></td>
+    </tr>
+    <tr>
+      <td><code>on_progress</code></td>
+      <td>Proyek sedang dikerjakan</td>
+      <td><code>done</code>, <code>on_hold</code></td>
+    </tr>
+    <tr>
+      <td><code>on_hold</code></td>
+      <td>Proyek ditunda sementara</td>
+      <td><code>on_progress</code></td>
+    </tr>
+    <tr>
+      <td><code>done</code></td>
+      <td>Proyek selesai</td>
+      <td>-</td>
+    </tr>
+  </tbody>
+</table>
+<table>
+  <thead>
+    <tr>
+      <th>Status Stage</th>
+      <th>Deskripsi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>pending</code></td>
+      <td>Tahapan belum dimulai</td>
+    </tr>
+    <tr>
+      <td><code>in_progress</code></td>
+      <td>Tahapan sedang dikerjakan</td>
+    </tr>
+    <tr>
+      <td><code>done</code></td>
+      <td>Tahapan selesai</td>
+    </tr>
+  </tbody>
+</table>
+
+  </div>
+</body>
+</html>

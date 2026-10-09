@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Review Checklist - GSI One Dokumentasi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+  <style>
+    :root {
+      --bg-primary: #0b1329;
+      --bg-card: #111c44;
+      --border: #1e295d;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent: #e8722a;
+    }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    h1, h2, h3, h4 { color: #fff; margin-top: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    h1 { border-bottom: 2px solid var(--accent); }
+    a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    a:hover { text-decoration: underline; }
+    p { margin-bottom: 1.25rem; }
+    code {
+      font-family: monospace;
+      background: rgba(232, 114, 42, 0.1);
+      color: var(--accent);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: #070d19;
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+    pre code {
+      background: none;
+      color: var(--text-primary);
+      padding: 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      text-align: left;
+    }
+    th {
+      background-color: rgba(30, 41, 93, 0.5);
+      color: #fff;
+    }
+    blockquote {
+      border-left: 4px solid var(--accent);
+      background: rgba(232, 114, 42, 0.05);
+      margin: 1.5rem 0;
+      padding: 1rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .alert-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+    .alert-note { background: #3b82f6; color: #fff; }
+    .alert-tip { background: #10b981; color: #fff; }
+    .alert-warning { background: #f59e0b; color: #fff; }
+    .alert-important { background: #8b5cf6; color: #fff; }
+    .alert-caution { background: #ef4444; color: #fff; }
+    .diagram-img-container {
+      margin-top: 1rem;
+      padding: 1.5rem;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+    }
+    .diagram-img { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Code Review Checklist</h1>
+<h2>Proyek: GSI One Mobile Application &amp; Backend Express API</h2>
+<hr />
+<p>Checklist ini wajib diverifikasi oleh reviewer sebelum menyetujui Pull Request.</p>
+<hr />
+<h2>A. Keterbacaan &amp; Maintainability</h2>
+<ul>
+  <li>[ ] Nama variabel, fungsi, dan komponen deskriptif dan mengikuti konvensi (lihat Coding Standard).</li>
+  <li>[ ] Tidak ada kode yang dikomentari tanpa penjelasan (<code>// TODO</code> tanpa tiket dilarang).</li>
+  <li>[ ] Fungsi memiliki single responsibility (tidak melakukan terlalu banyak hal sekaligus).</li>
+  <li>[ ] Tidak ada magic number (angka literal tanpa konstanta bernama).</li>
+</ul>
+<h2>B. Keamanan &amp; Audit System (CORS, RLS, &amp; Headers)</h2>
+<ul>
+  <li>[ ] Tidak ada data sensitif (token, password) yang dicetak di <code>console.log</code>.</li>
+  <li>[ ] Backend Express memverifikasi origin CORS via whitelist resmi (<code>https://grahasurvei.com</code>, <code>http://localhost:3000</code>, <code>http://10.0.2.2:3000</code>).</li>
+  <li>[ ] Integrasi <code>helmet()</code> aktif untuk proteksi XSS, HSTS, dan Framing.</li>
+  <li>[ ] Wajib memeriksa keberadaan <code>JWT_SECRET</code> pada startup backend server.</li>
+  <li>[ ] Tabel database Supabase baru terlindungi oleh Row Level Security (RLS) policies.</li>
+  <li>[ ] Tidak ada API key, secret, URL Supabase, atau JWT secret yang ditulis langsung (hardcode) di source code.</li>
+  <li>[ ] File <code>.env</code> dan <code>backend/.env</code> tidak ikut ter-commit (<code>.gitignore</code>).</li>
+</ul>
+<h2>C. Performa &amp; Resource Optimization</h2>
+<ul>
+  <li>[ ] Tidak ada re-render yang tidak perlu (gunakan <code>useCallback</code>, <code>useMemo</code> bila relevan).</li>
+  <li>[ ] Komponen daftar panjang menggunakan <code>FlatList</code> dengan pagination <code>limit</code>/<code>offset</code>.</li>
+  <li>[ ] File upload dibatasi maksimum 10MB dengan validasi tipe berkas Multer.</li>
+</ul>
+<h2>D. Penanganan Error &amp; Resiliensi</h2>
+<ul>
+  <li>[ ] Semua pemanggilan <code>async/await</code> memiliki blok <code>try/catch</code>.</li>
+  <li>[ ] State loading (<code>isLoading</code>) diatur dengan benar.</li>
+  <li>[ ] Pesan error yang ditampilkan ke pengguna bersifat ramah dan menggunakan helper <code>errorHelpers.ts</code>.</li>
+</ul>
+<h2>E. Pengujian &amp; Automated Testing</h2>
+<ul>
+  <li>[ ] Logika bisnis baru memiliki unit test Jest yang lulus (<code>npm test</code>).</li>
+  <li>[ ] Pengecekan tipe data TypeScript bebas error (<code>npm run typecheck</code>).</li>
+  <li>[ ] Reviewer sudah menguji perubahan secara manual di emulator/device atau Postman API.</li>
+</ul>
+<h2>F. Kesesuaian dengan Requirement</h2>
+<ul>
+  <li>[ ] Perubahan sesuai dengan acceptance criteria yang tercantum di User Story.</li>
+  <li>[ ] Aturan Zero Emoji dipatuhi secara ketat pada komentar dan respons UI.</li>
+</ul>
+
+  </div>
+</body>
+</html>

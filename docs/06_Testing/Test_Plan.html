@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Plan - GSI One Dokumentasi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+  <style>
+    :root {
+      --bg-primary: #0b1329;
+      --bg-card: #111c44;
+      --border: #1e295d;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent: #e8722a;
+    }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    h1, h2, h3, h4 { color: #fff; margin-top: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    h1 { border-bottom: 2px solid var(--accent); }
+    a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    a:hover { text-decoration: underline; }
+    p { margin-bottom: 1.25rem; }
+    code {
+      font-family: monospace;
+      background: rgba(232, 114, 42, 0.1);
+      color: var(--accent);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: #070d19;
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+    pre code {
+      background: none;
+      color: var(--text-primary);
+      padding: 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      text-align: left;
+    }
+    th {
+      background-color: rgba(30, 41, 93, 0.5);
+      color: #fff;
+    }
+    blockquote {
+      border-left: 4px solid var(--accent);
+      background: rgba(232, 114, 42, 0.05);
+      margin: 1.5rem 0;
+      padding: 1rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .alert-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+    .alert-note { background: #3b82f6; color: #fff; }
+    .alert-tip { background: #10b981; color: #fff; }
+    .alert-warning { background: #f59e0b; color: #fff; }
+    .alert-important { background: #8b5cf6; color: #fff; }
+    .alert-caution { background: #ef4444; color: #fff; }
+    .diagram-img-container {
+      margin-top: 1rem;
+      padding: 1.5rem;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+    }
+    .diagram-img { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Test Plan Document</h1>
+<h2>Proyek: GSI One Mobile Application &amp; Express REST API</h2>
+<hr />
+<h2>1. Strategi Pengujian (Testing Strategy)</h2>
+<p>Pengujian perangkat lunak GSI One Mobile dilakukan dalam tiga tingkatan utama:</p>
+<ol>
+  <li><strong>Automated Unit &amp; Integration Testing (Jest)</strong>: Pengujian unit otomatis untuk memverifikasi entitas domain, repositori data, helper terpusat, dan custom hooks.</li>
+  <li><strong>Static Code Analysis (TypeScript Strict Check)</strong>: Pengecekan tipe data menggunakan <code>npx tsc --noEmit</code> dengan target 0 error.</li>
+  <li><strong>Manual Verification &amp; UI Testing</strong>: Pengujian antarmuka visual pada emulator Android (Pixel 9) dan perangkat iOS.</li>
+</ol>
+<hr />
+<h2>2. Matriks Prioritas Pengujian (Risk-Based Testing Priority)</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Prioritas</th>
+      <th>Modul / Fitur</th>
+      <th>Dampak Bisnis</th>
+      <th>Kompleksitas Teknis</th>
+      <th>Jenis Pengujian</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>P1 - Kritis</td>
+      <td>Autentikasi &amp; Login JWT</td>
+      <td>Sangat Tinggi</td>
+      <td>Tinggi</td>
+      <td>Unit + Integration + Manual</td>
+    </tr>
+    <tr>
+      <td>P1 - Kritis</td>
+      <td>CORS Origin Whitelist</td>
+      <td>Sangat Tinggi</td>
+      <td>Sedang</td>
+      <td>Integration + Manual</td>
+    </tr>
+    <tr>
+      <td>P1 - Kritis</td>
+      <td>RLS Policies Database</td>
+      <td>Sangat Tinggi</td>
+      <td>Tinggi</td>
+      <td>Integration (rlsMatrix.test.ts)</td>
+    </tr>
+    <tr>
+      <td>P2 - Tinggi</td>
+      <td>Pengajuan Booking Survei</td>
+      <td>Tinggi</td>
+      <td>Sedang</td>
+      <td>Unit + Manual</td>
+    </tr>
+    <tr>
+      <td>P2 - Tinggi</td>
+      <td>Klaim &amp; Approval Survei</td>
+      <td>Tinggi</td>
+      <td>Sedang</td>
+      <td>Unit + Manual</td>
+    </tr>
+    <tr>
+      <td>P2 - Tinggi</td>
+      <td>Pembuatan Proyek &amp; 4 Stages</td>
+      <td>Tinggi</td>
+      <td>Tinggi</td>
+      <td>Unit + Integration</td>
+    </tr>
+    <tr>
+      <td>P3 - Sedang</td>
+      <td>Update Progress Tahapan</td>
+      <td>Sedang</td>
+      <td>Sedang</td>
+      <td>Unit + Manual</td>
+    </tr>
+    <tr>
+      <td>P3 - Sedang</td>
+      <td>Upload Berkas Inspeksi</td>
+      <td>Sedang</td>
+      <td>Tinggi</td>
+      <td>Unit (storageService.test.ts) + Manual</td>
+    </tr>
+    <tr>
+      <td>P3 - Sedang</td>
+      <td>Notifikasi In-App</td>
+      <td>Sedang</td>
+      <td>Sedang</td>
+      <td>Unit + Manual</td>
+    </tr>
+    <tr>
+      <td>P4 - Rendah</td>
+      <td>Katalog Layanan &amp; Studi Kasus</td>
+      <td>Rendah</td>
+      <td>Rendah</td>
+      <td>Manual</td>
+    </tr>
+    <tr>
+      <td>P4 - Rendah</td>
+      <td>Dashboard Multi-Role</td>
+      <td>Rendah</td>
+      <td>Sedang</td>
+      <td>Manual</td>
+    </tr>
+  </tbody>
+</table>
+<hr />
+<h2>3. Matriks Alat Pengujian (Testing Tools Matrix)</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Jenis Pengujian</th>
+      <th>Alat / Framework</th>
+      <th>Perintah Eksekusi</th>
+      <th>Target</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Unit Testing</td>
+      <td>Jest + React Native Testing Library</td>
+      <td><code>npm test</code></td>
+      <td>Logika bisnis, helpers, entities</td>
+    </tr>
+    <tr>
+      <td>Integration Testing</td>
+      <td>Jest + Supabase Mock</td>
+      <td><code>npm run test:ci</code></td>
+      <td>Alur repository, pagination, RLS</td>
+    </tr>
+    <tr>
+      <td>Type Checking</td>
+      <td>TypeScript Compiler (TSC)</td>
+      <td><code>npm run typecheck</code></td>
+      <td>0 errors strict mode</td>
+    </tr>
+    <tr>
+      <td>Linting</td>
+      <td>ESLint</td>
+      <td><code>npm run lint</code></td>
+      <td>0 errors, &lt; 10 warnings</td>
+    </tr>
+    <tr>
+      <td>Coverage Report</td>
+      <td>Jest Coverage</td>
+      <td><code>npm run test:coverage</code></td>
+      <td>&gt;= 60% logika bisnis inti</td>
+    </tr>
+    <tr>
+      <td>Manual UI Testing</td>
+      <td>Android Emulator / iOS Simulator</td>
+      <td><code>npm run android</code> / <code>npm run ios</code></td>
+      <td>Alur visual end-to-end</td>
+    </tr>
+    <tr>
+      <td>API Testing</td>
+      <td>Postman / cURL</td>
+      <td>Manual</td>
+      <td>Endpoint Express REST API</td>
+    </tr>
+    <tr>
+      <td>Security Testing</td>
+      <td>Manual grep + Helmet audit</td>
+      <td>Manual</td>
+      <td>Hardcoded secrets, headers</td>
+    </tr>
+  </tbody>
+</table>
+<hr />
+<h2>4. Kriteria Kelulusan (Pass / Fail Criteria)</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Kriteria</th>
+      <th>Target</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Seluruh test Jest lulus</td>
+      <td>100% Passed</td>
+      <td>Terpenuhi (15 suites, 74 tests)</td>
+    </tr>
+    <tr>
+      <td>TypeScript Compilation Errors</td>
+      <td>0 Errors</td>
+      <td>Terpenuhi</td>
+    </tr>
+    <tr>
+      <td>ESLint Errors</td>
+      <td>0 Errors</td>
+      <td>Terpenuhi</td>
+    </tr>
+    <tr>
+      <td>Crash / Unhandled Exception pada alur utama</td>
+      <td>0</td>
+      <td>Terpenuhi</td>
+    </tr>
+    <tr>
+      <td>Hardcoded API key / secret di source code</td>
+      <td>0</td>
+      <td>Terpenuhi</td>
+    </tr>
+    <tr>
+      <td>CORS menolak origin tidak terdaftar</td>
+      <td>Ya</td>
+      <td>Terpenuhi</td>
+    </tr>
+    <tr>
+      <td><code>JWT_SECRET</code> wajib ada di env</td>
+      <td>Ya (fatal exit)</td>
+      <td>Terpenuhi</td>
+    </tr>
+  </tbody>
+</table>
+
+  </div>
+</body>
+</html>

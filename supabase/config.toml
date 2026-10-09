@@ -1,0 +1,11 @@
+# Supabase CLI Configuration for GSI One
+project_id = "blysalihwznhzpufocus"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "auth"]
+
+[db]
+port = 54322
+shadow_port = 54320

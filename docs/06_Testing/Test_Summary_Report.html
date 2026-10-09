@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Summary Report - GSI One Dokumentasi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+  <style>
+    :root {
+      --bg-primary: #0b1329;
+      --bg-card: #111c44;
+      --border: #1e295d;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent: #e8722a;
+    }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    h1, h2, h3, h4 { color: #fff; margin-top: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    h1 { border-bottom: 2px solid var(--accent); }
+    a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    a:hover { text-decoration: underline; }
+    p { margin-bottom: 1.25rem; }
+    code {
+      font-family: monospace;
+      background: rgba(232, 114, 42, 0.1);
+      color: var(--accent);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: #070d19;
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+    pre code {
+      background: none;
+      color: var(--text-primary);
+      padding: 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      text-align: left;
+    }
+    th {
+      background-color: rgba(30, 41, 93, 0.5);
+      color: #fff;
+    }
+    blockquote {
+      border-left: 4px solid var(--accent);
+      background: rgba(232, 114, 42, 0.05);
+      margin: 1.5rem 0;
+      padding: 1rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .alert-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+    .alert-note { background: #3b82f6; color: #fff; }
+    .alert-tip { background: #10b981; color: #fff; }
+    .alert-warning { background: #f59e0b; color: #fff; }
+    .alert-important { background: #8b5cf6; color: #fff; }
+    .alert-caution { background: #ef4444; color: #fff; }
+    .diagram-img-container {
+      margin-top: 1rem;
+      padding: 1.5rem;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+    }
+    .diagram-img { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Test Summary Report</h1>
+<h2>Proyek: GSI One Mobile Application &amp; Express Backend API</h2>
+<hr />
+<h2>1. Ringkasan Eksekutif Pengujian</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Metrik</th>
+      <th>Nilai</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Tanggal Pengujian</strong></td>
+      <td>31 Juli 2026</td>
+    </tr>
+    <tr>
+      <td><strong>Status Keseluruhan</strong></td>
+      <td>LULUS (PASSED)</td>
+    </tr>
+    <tr>
+      <td><strong>Total Test Suites</strong></td>
+      <td>15</td>
+    </tr>
+    <tr>
+      <td><strong>Total Tests Passed</strong></td>
+      <td>74</td>
+    </tr>
+    <tr>
+      <td><strong>Total Tests Failed</strong></td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td><strong>Total Tests Skipped</strong></td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td><strong>TypeScript Errors</strong></td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td><strong>Skor Maintainability</strong></td>
+      <td>Grade A (Sangat Baik)</td>
+    </tr>
+  </tbody>
+</table>
+<hr />
+<h2>2. Hasil Per Test Suite (Jest)</h2>
+<table>
+  <thead>
+    <tr>
+      <th>No</th>
+      <th>Test Suite File</th>
+      <th>Komponen yang Diuji</th>
+      <th>Tests</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td><code>authRepository.test.ts</code></td>
+      <td>Login JWT, Lookup Ticket, Admin Create User</td>
+      <td>7</td>
+      <td>PASSED</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td><code>projectEntity.test.ts</code></td>
+      <td>Entitas OOP ProjectEntity, Aturan Bisnis</td>
+      <td>6</td>
+      <td>PASSED</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td><code>surveyRequest.test.ts</code></td>
+      <td>Validasi Form Booking, Status Pipeline</td>
+      <td>6</td>
+      <td>PASSED</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td><code>errorHelpers.test.ts</code></td>
+      <td>Helper Penanganan Error Terpusat</td>
+      <td>5</td>
+      <td>PASSED</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td><code>formatters.test.ts</code></td>
+      <td>Formatting Tanggal, Mata Uang, Kode Proyek</td>
+      <td>8</td>
+      <td>PASSED</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td><code>statusMapper.test.ts</code></td>
+      <td>Pemetaan Warna Badge Status</td>
+      <td>5</td>
+      <td>PASSED</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td><code>useProjectDetail.test.ts</code></td>
+      <td>Custom Hook Project Detail, Log, Files</td>
+      <td>6</td>
+      <td>PASSED</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td><code>useSurveyRequests.test.ts</code></td>
+      <td>Custom Hook Survey Queue, Klaim, Approval</td>
+      <td>6</td>
+      <td>PASSED</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td><code>notificationService.test.ts</code></td>
+      <td>Pengiriman &amp; Status Baca Notifikasi</td>
+      <td>4</td>
+      <td>PASSED</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td><code>projectPagination.test.ts</code></td>
+      <td>Pagination range() proyek &amp; notifikasi</td>
+      <td>4</td>
+      <td>PASSED</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td><code>rlsMatrix.test.ts</code></td>
+      <td>Filter UUID client, marketing, engineer</td>
+      <td>5</td>
+      <td>PASSED</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td><code>storageService.test.ts</code></td>
+      <td>Signed URL &amp; error storage</td>
+      <td>3</td>
+      <td>PASSED</td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td><code>projectFlow.test.ts</code></td>
+      <td>Integration alur daftar proyek &amp; mutasi</td>
+      <td>4</td>
+      <td>PASSED</td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td><code>logger.test.ts</code></td>
+      <td>Structured logging &amp; correlation ID</td>
+      <td>2</td>
+      <td>PASSED</td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td><code>roleRouting.test.ts</code></td>
+      <td>Routing dashboard per role</td>
+      <td>3</td>
+      <td>PASSED</td>
+    </tr>
+  </tbody>
+</table>
+<hr />
+<h2>3. Ringkasan Pengujian Keamanan (Security Audit Summary)</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Item Audit</th>
+      <th>Hasil</th>
+      <th>Catatan</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>CORS Origin Whitelist</td>
+      <td>PASSED</td>
+      <td>Hanya <code>https://grahasurvei.com</code>, <code>localhost:3000</code>, <code>10.0.2.2:3000</code></td>
+    </tr>
+    <tr>
+      <td>Helmet Security Headers</td>
+      <td>PASSED</td>
+      <td><code>X-Content-Type-Options</code>, <code>X-Frame-Options</code>, HSTS aktif</td>
+    </tr>
+    <tr>
+      <td><code>x-powered-by</code> Header</td>
+      <td>PASSED</td>
+      <td>Dinonaktifkan (<code>app.disable</code>)</td>
+    </tr>
+    <tr>
+      <td><code>JWT_SECRET</code> Fatal Check</td>
+      <td>PASSED</td>
+      <td>Server exit(1) jika tidak ada</td>
+    </tr>
+    <tr>
+      <td>Rate Limiting Login</td>
+      <td>PASSED</td>
+      <td>10 percobaan / 15 menit</td>
+    </tr>
+    <tr>
+      <td>Hardcoded Secrets di Source</td>
+      <td>PASSED</td>
+      <td>0 ditemukan</td>
+    </tr>
+    <tr>
+      <td><code>.env</code> di <code>.gitignore</code></td>
+      <td>PASSED</td>
+      <td>File <code>.env</code> dan <code>backend/.env</code> terdaftar</td>
+    </tr>
+    <tr>
+      <td>RLS Policies Supabase</td>
+      <td>PASSED</td>
+      <td>Aktif di 7 tabel utama</td>
+    </tr>
+  </tbody>
+</table>
+<hr />
+<h2>4. Ringkasan Pengujian Manual per Role</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Role</th>
+      <th>Skenario Diuji</th>
+      <th>Hasil</th>
+      <th>Catatan</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Admin</td>
+      <td>Login, Buat Akun, Buat Proyek, Hapus Proyek, Dashboard Stats</td>
+      <td>PASSED</td>
+      <td>Semua alur berjalan lancar</td>
+    </tr>
+    <tr>
+      <td>Marketing</td>
+      <td>Login, Lihat Booking, Klaim, Approve/Reject, Konversi ke Proyek</td>
+      <td>PASSED</td>
+      <td>Status transition benar</td>
+    </tr>
+    <tr>
+      <td>Engineer</td>
+      <td>Login, Lihat Proyek Ditugaskan, Update Stage, Add Log, Upload File</td>
+      <td>PASSED</td>
+      <td>Upload &lt; 10MB berhasil</td>
+    </tr>
+    <tr>
+      <td>Client</td>
+      <td>Login, Lihat Proyek Milik, Lihat Progress, Download PDF</td>
+      <td>PASSED</td>
+      <td>Akses proyek lain ditolak</td>
+    </tr>
+  </tbody>
+</table>
+
+  </div>
+</body>
+</html>

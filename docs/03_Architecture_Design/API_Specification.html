@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Specification - GSI One Dokumentasi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+  <style>
+    :root {
+      --bg-primary: #0b1329;
+      --bg-card: #111c44;
+      --border: #1e295d;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent: #e8722a;
+    }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    h1, h2, h3, h4 { color: #fff; margin-top: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    h1 { border-bottom: 2px solid var(--accent); }
+    a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    a:hover { text-decoration: underline; }
+    p { margin-bottom: 1.25rem; }
+    code {
+      font-family: monospace;
+      background: rgba(232, 114, 42, 0.1);
+      color: var(--accent);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: #070d19;
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+    pre code {
+      background: none;
+      color: var(--text-primary);
+      padding: 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      text-align: left;
+    }
+    th {
+      background-color: rgba(30, 41, 93, 0.5);
+      color: #fff;
+    }
+    blockquote {
+      border-left: 4px solid var(--accent);
+      background: rgba(232, 114, 42, 0.05);
+      margin: 1.5rem 0;
+      padding: 1rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .alert-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+    .alert-note { background: #3b82f6; color: #fff; }
+    .alert-tip { background: #10b981; color: #fff; }
+    .alert-warning { background: #f59e0b; color: #fff; }
+    .alert-important { background: #8b5cf6; color: #fff; }
+    .alert-caution { background: #ef4444; color: #fff; }
+    .diagram-img-container {
+      margin-top: 1rem;
+      padding: 1.5rem;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+    }
+    .diagram-img { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>API &amp; Repository Specification</h1>
+<h2>Proyek: GSI One Mobile Application &amp; Express REST Backend API</h2>
+<hr />
+<h2>1. Konfigurasi Server &amp; Keamanan Endpoint API</h2>
+<h3>1.1 Base URL &amp; Environment</h3>
+<ul>
+  <li><strong>Development (Android Emulator)</strong>: <code>http://10.0.2.2:3000/api</code></li>
+  <li><strong>Development (iOS/Web Simulator)</strong>: <code>http://localhost:3000/api</code></li>
+  <li><strong>Production</strong>: <code>https://grahasurvei.com/api</code></li>
+</ul>
+<h3>1.2 Keamanan HTTP Headers &amp; CORS Audit</h3>
+<ul>
+  <li><strong>CORS Whitelist</strong>: <code>https://grahasurvei.com</code>, <code>http://localhost:3000</code>, <code>http://10.0.2.2:3000</code>. Access Control Allow Credentials diset ke <code>true</code>.</li>
+  <li><strong>Security Headers</strong>: <code>helmet()</code> mengaktifkan <code>X-Content-Type-Options: nosniff</code>, <code>X-Frame-Options: SAMEORIGIN</code>, dan HSTS.</li>
+  <li><strong>X-Powered-By</strong>: Dinonaktifkan (<code>app.disable('x-powered-by')</code>).</li>
+  <li><strong>Autentikasi Header</strong>: <code>Authorization: Bearer &lt;JWT_TOKEN&gt;</code>.</li>
+</ul>
+<hr />
+<h2>2. Daftar Endpoint REST API Backend (<code>/api</code>)</h2>
+<h3>2.1 Auth Routes (<code>backend/routes/authRoutes.js</code>)</h3>
+<ul>
+  <li><code>POST /api/login</code>: Authenticate user, return JWT token and user profile. Rate-limited (10 attempts / 15 mins).</li>
+  <li><code>POST /api/register</code>: Admin-only registration endpoint to create new user accounts (<code>admin</code>, <code>marketing</code>, <code>engineer</code>, <code>client</code>).</li>
+  <li><code>GET /api/me</code>: Retrieve current logged-in user profile from JWT token.</li>
+</ul>
+<h3>2.2 Project Routes (<code>backend/routes/projectRoutes.js</code>)</h3>
+<ul>
+  <li><code>GET /api/projects</code>: Fetch list of projects accessible by the authenticated user (supports role-based filtering).</li>
+  <li><code>GET /api/projects/:id</code>: Fetch detailed project information, stages, updates, and files.</li>
+  <li><code>POST /api/projects</code>: Create a new project (Admin only) with auto-generated stages.</li>
+  <li><code>PUT /api/projects/:id</code>: Update project metadata (code, name, status, dates, assigned engineer).</li>
+  <li><code>DELETE /api/projects/:id</code>: Delete a project and associated records (Admin only).</li>
+  <li><code>PUT /api/projects/stages/:stageId</code>: Update project stage status (<code>pending</code>, <code>in_progress</code>, <code>done</code>).</li>
+  <li><code>POST /api/projects/stages/:stageId/updates</code>: Add a daily log / progress update (<code>stage_updates</code>).</li>
+</ul>
+<h3>2.3 Booking Routes (<code>backend/routes/bookingRoutes.js</code>)</h3>
+<ul>
+  <li><code>POST /api/bookings</code>: Public endpoint for submitting new survey requests.</li>
+  <li><code>GET /api/bookings</code>: Retrieve booking requests (Admin &amp; Marketing only).</li>
+  <li><code>PUT /api/bookings/:id/claim</code>: Claim a survey request (<code>pending</code> -&gt; <code>claimed</code>).</li>
+  <li><code>PUT /api/bookings/:id/status</code>: Update booking status (<code>approved</code> / <code>rejected</code>).</li>
+</ul>
+<h3>2.4 File Routes (<code>backend/routes/fileRoutes.js</code>)</h3>
+<ul>
+  <li><code>POST /api/files/upload</code>: Upload inspection photo or PDF document (uses Multer, max 10MB).</li>
+  <li><code>GET /api/files/project/:projectId</code>: List files attached to a specific project.</li>
+  <li><code>GET /uploads/:filename</code>: Static file streaming with caching header (<code>maxAge: 7d</code>, <code>immutable</code>).</li>
+</ul>
+<h3>2.5 Notification Routes (<code>backend/routes/notificationRoutes.js</code>)</h3>
+<ul>
+  <li><code>GET /api/notifications</code>: Get user notifications by <code>user<em>id</code> or <code>target</em>role</code>.</li>
+  <li><code>PUT /api/notifications/:id/read</code>: Mark a notification as read.</li>
+  <li><code>POST /api/notifications</code>: Internal/System endpoint to dispatch notifications.</li>
+</ul>
+<hr />
+<h2>3. Kontrak Repository Frontend (TypeScript)</h2>
+<h3>3.1 <code>SupabaseProjectRepository</code> (Facade Pattern)</h3>
+<ul>
+  <li><code>ProjectQueryRepository</code>: Memuat kueri proyek dan rincian detail.</li>
+  <li><code>ProjectStageRepository</code>: Mengelola pembaruan status stage dan log harian.</li>
+  <li><code>ProjectFileRepository</code>: Mengelola unggahan dokumen &amp; penanganan MIME type.</li>
+  <li><code>ProjectCommandRepository</code>: Menangani pemrosesan mutasi (create/update/delete).</li>
+</ul>
+<h3>3.2 <code>SupabaseSurveyRepository</code></h3>
+<ul>
+  <li><code>submitSurveyRequest()</code>: Mengirim formulir booking survei.</li>
+  <li><code>getSurveyRequests()</code>: Memuat daftar booking dengan filter status.</li>
+  <li><code>claimSurveyRequest()</code>: Mengubah klaim permohonan survei.</li>
+  <li><code>updateSurveyStatus()</code>: Memperbarui status persetujuan survei.</li>
+</ul>
+
+  </div>
+</body>
+</html>

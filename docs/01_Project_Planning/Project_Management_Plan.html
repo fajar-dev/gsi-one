@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Management Plan - GSI One Dokumentasi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+  <style>
+    :root {
+      --bg-primary: #0b1329;
+      --bg-card: #111c44;
+      --border: #1e295d;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent: #e8722a;
+    }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    h1, h2, h3, h4 { color: #fff; margin-top: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    h1 { border-bottom: 2px solid var(--accent); }
+    a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    a:hover { text-decoration: underline; }
+    p { margin-bottom: 1.25rem; }
+    code {
+      font-family: monospace;
+      background: rgba(232, 114, 42, 0.1);
+      color: var(--accent);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: #070d19;
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+    pre code {
+      background: none;
+      color: var(--text-primary);
+      padding: 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      text-align: left;
+    }
+    th {
+      background-color: rgba(30, 41, 93, 0.5);
+      color: #fff;
+    }
+    blockquote {
+      border-left: 4px solid var(--accent);
+      background: rgba(232, 114, 42, 0.05);
+      margin: 1.5rem 0;
+      padding: 1rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .alert-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+    .alert-note { background: #3b82f6; color: #fff; }
+    .alert-tip { background: #10b981; color: #fff; }
+    .alert-warning { background: #f59e0b; color: #fff; }
+    .alert-important { background: #8b5cf6; color: #fff; }
+    .alert-caution { background: #ef4444; color: #fff; }
+    .diagram-img-container {
+      margin-top: 1rem;
+      padding: 1.5rem;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+    }
+    .diagram-img { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Project Management Plan</h1>
+<h2>Proyek: GSI One Mobile Application &amp; Backend Infrastructure</h2>
+<hr />
+<h2>1. Milestone Utama Proyek</h2>
+<table>
+  <thead>
+    <tr>
+      <th>No</th>
+      <th>Milestone</th>
+      <th>Target Tanggal</th>
+      <th>Status</th>
+      <th>Catatan Audit / Scope</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>Project Charter Disetujui</td>
+      <td>2026-01-15</td>
+      <td>Selesai</td>
+      <td>Scope awal &amp; otorisasi tim</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Requirements Specification Final</td>
+      <td>2026-02-07</td>
+      <td>Selesai</td>
+      <td>Spesifikasi 4 Role &amp; Alur Bisnis</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Architecture Design Disetujui</td>
+      <td>2026-02-28</td>
+      <td>Selesai</td>
+      <td>Dual-DB (SQLite Dev &amp; Supabase Prod)</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Backend Express &amp; Security API</td>
+      <td>2026-04-15</td>
+      <td>Selesai</td>
+      <td>CORS audit, Helmet, Rate Limiting, JWT Auth</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>MVP Build Pertama (Alpha)</td>
+      <td>2026-05-09</td>
+      <td>Selesai</td>
+      <td>React Native Mobile &amp; Web</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>Internal &amp; Security Audit</td>
+      <td>2026-06-06</td>
+      <td>Selesai</td>
+      <td>Audit RLS Supabase &amp; CORS Whitelist</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>UAT &amp; Testing per Role</td>
+      <td>2026-06-30</td>
+      <td>Selesai</td>
+      <td>Admin, Marketing, Engineer, Client</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>Production Release v1.0</td>
+      <td>2026-07-13</td>
+      <td>Selesai</td>
+      <td>Live App &amp; REST API</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>Phase 2: Offline Sync &amp; Advanced Jobs</td>
+      <td>2026-10-31</td>
+      <td>Terencana</td>
+      <td>Peningkatan background sync &amp; offline cache</td>
+    </tr>
+  </tbody>
+</table>
+<hr />
+<h2>2. Resource Plan &amp; Alokasi Peran</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Peran</th>
+      <th>Jumlah</th>
+      <th>Alokasi</th>
+      <th>Tanggung Jawab Utama</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Project Manager</td>
+      <td>1</td>
+      <td>20%</td>
+      <td>Pengawasan milestone, jadwal, dan komunikasi stakeholder</td>
+    </tr>
+    <tr>
+      <td>Lead Developer</td>
+      <td>1</td>
+      <td>100%</td>
+      <td>Arsitektur backend Express, Supabase RLS, dan integrasi API</td>
+    </tr>
+    <tr>
+      <td>Mobile Developer</td>
+      <td>2</td>
+      <td>100%</td>
+      <td>Frontend React Native (Android, iOS, Web) &amp; Zustand Store</td>
+    </tr>
+    <tr>
+      <td>QA &amp; Security Eng</td>
+      <td>1</td>
+      <td>50%</td>
+      <td>Audit CORS, Helmet security headers, dan pengujian Jest</td>
+    </tr>
+    <tr>
+      <td>UI/UX Designer</td>
+      <td>1</td>
+      <td>50%</td>
+      <td>Design tokens terpusat &amp; sistem warna berbasis role</td>
+    </tr>
+  </tbody>
+</table>
+<hr />
+<h2>3. Scope &amp; Komponen Teknologi Terintegrasi</h2>
+<ol>
+  <li><strong>Frontend Mobile &amp; Web</strong>:</li>
+</ol>
+<ul>
+  <li>React Native 0.83, TypeScript, <code>@react-navigation</code> (Native Stack &amp; Bottom Tabs).</li>
+  <li>Zustand untuk manajemen state global (<code>authStore</code>, <code>projectStore</code>).</li>
+  <li>Client Supabase SDK &amp; HTTP REST Client (<code>src/config/api.ts</code>).</li>
+</ul>
+<ol>
+  <li><strong>Backend API &amp; Sub-Sistem Keamanan</strong>:</li>
+</ol>
+<ul>
+  <li>Node.js &amp; Express.js server (<code>server.js</code>).</li>
+  <li>Modul Rute: Auth (<code>authRoutes</code>), Projects (<code>projectRoutes</code>), Bookings (<code>bookingRoutes</code>), Files (<code>fileRoutes</code>), Notifications (<code>notificationRoutes</code>).</li>
+  <li>Keamanan: Penguncian CORS Origin (<code>https://grahasurvei.com</code>, <code>http://localhost:3000</code>, <code>http://10.0.2.2:3000</code>), <code>helmet()</code> HTTP security headers, JWT secret verification, rate-limiting.</li>
+</ul>
+<ol>
+  <li><strong>Database Dual-Layer</strong>:</li>
+</ol>
+<ul>
+  <li>SQLite (<code>gsi_one.db</code>) via <code>backend/database.js</code> untuk isolasi pengujian lokal.</li>
+  <li>Supabase PostgreSQL Cloud via <code>backend/supabase<em>schema.sql</code> dengan 7 tabel utama (<code>users</code>, <code>bookings</code>, <code>projects</code>, <code>project</em>stages</code>, <code>stage<em>updates</code>, <code>project</em>files</code>, <code>notifications</code>) yang dilindungi Row Level Security (RLS).</li>
+</ul>
+<hr />
+<h2>4. Manajemen Risiko Utama</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Risiko</th>
+      <th>Dampak</th>
+      <th>Probabilitas</th>
+      <th>Mitigasi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Penolakan Request CORS</td>
+      <td>Tinggi</td>
+      <td>Sedang</td>
+      <td>Menambahkan whitelist origin resmi dan mekanisme error callback terisolasi</td>
+    </tr>
+    <tr>
+      <td>Kegagalan Akses File Storage</td>
+      <td>Tinggi</td>
+      <td>Rendah</td>
+      <td>Implementasi Signed URL Supabase Storage dengan durasi kadaluarsa aman</td>
+    </tr>
+    <tr>
+      <td>Kebocoran JWT Secret</td>
+      <td>Tinggi</td>
+      <td>Rendah</td>
+      <td>Validasi wajib <code>JWT_SECRET</code> pada startup server <code>server.js</code></td>
+    </tr>
+    <tr>
+      <td>Sinkronisasi Nama Pengguna</td>
+      <td>Sedang</td>
+      <td>Sedang</td>
+      <td>Database Trigger <code>sync<em>user</em>name_changes</code> pada tabel PostgreSQL</td>
+    </tr>
+  </tbody>
+</table>
+<hr />
+<h2>5. Proses Manajemen Perubahan (Change Control Process)</h2>
+<p>Setiap perubahan scope, endpoint API, atau skema database wajib melalui:</p>
+<ol>
+  <li>Pengajuan Change Request (CR) tertulis.</li>
+  <li>Impact Analysis oleh Lead Developer dan QA (memeriksa kompatibilitas RLS &amp; CORS).</li>
+  <li>Evaluasi dan persetujuan Project Manager sebelum deploy ke environment produksi.</li>
+</ol>
+<hr />
+<h2>6. Diagram Timeline Milestone (Gantt Chart)</h2>
+<pre class="mermaid">
+gantt
+    dateFormat  YYYY-MM-DD
+    title Timeline Pengembangan GSI One Mobile &amp; Backend
+
+    section Inisiasi &amp; Planning
+    Project Charter &amp; Kickoff     :done,    des1, 2026-01-01, 2026-01-15
+    Feasibility Study &amp; Cost Plan :done,    des2, 2026-01-16, 2026-01-31
+
+    section Requirement &amp; Architecture
+    SRS &amp; 4 Peran Specification   :done,    req1, 2026-02-01, 2026-02-07
+    Clean Architecture &amp; Dual DB  :done,    arch1, 2026-02-08, 2026-02-28
+
+    section Development
+    Backend REST API &amp; Routes     :done,    dev1, 2026-03-01, 2026-04-15
+    React Native Mobile &amp; Web MVP :done,    dev2, 2026-04-16, 2026-05-09
+
+    section Security Audit &amp; QA
+    CORS Audit &amp; Helmet Headers   :done,    sec1, 2026-05-10, 2026-06-06
+    Jest Testing Suite (74 tests) :done,    qa1,  2026-06-07, 2026-06-30
+
+    section Deployment &amp; Phase 2
+    Production Release v1.0       :done,    dep1, 2026-07-01, 2026-07-13
+    Phase 2 Offline Sync &amp; Jobs   :active,  p2,   2026-07-14, 2026-10-31
+</pre>
+
+  </div>
+</body>
+</html>

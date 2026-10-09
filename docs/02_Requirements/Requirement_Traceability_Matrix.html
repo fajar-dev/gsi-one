@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Requirement Traceability Matrix - GSI One Dokumentasi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+  <style>
+    :root {
+      --bg-primary: #0b1329;
+      --bg-card: #111c44;
+      --border: #1e295d;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent: #e8722a;
+    }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    h1, h2, h3, h4 { color: #fff; margin-top: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    h1 { border-bottom: 2px solid var(--accent); }
+    a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    a:hover { text-decoration: underline; }
+    p { margin-bottom: 1.25rem; }
+    code {
+      font-family: monospace;
+      background: rgba(232, 114, 42, 0.1);
+      color: var(--accent);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: #070d19;
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+    pre code {
+      background: none;
+      color: var(--text-primary);
+      padding: 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      text-align: left;
+    }
+    th {
+      background-color: rgba(30, 41, 93, 0.5);
+      color: #fff;
+    }
+    blockquote {
+      border-left: 4px solid var(--accent);
+      background: rgba(232, 114, 42, 0.05);
+      margin: 1.5rem 0;
+      padding: 1rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+    }
+    .alert-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+    .alert-note { background: #3b82f6; color: #fff; }
+    .alert-tip { background: #10b981; color: #fff; }
+    .alert-warning { background: #f59e0b; color: #fff; }
+    .alert-important { background: #8b5cf6; color: #fff; }
+    .alert-caution { background: #ef4444; color: #fff; }
+    .diagram-img-container {
+      margin-top: 1rem;
+      padding: 1.5rem;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+    }
+    .diagram-img { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Requirement Traceability Matrix (RTM)</h1>
+<h2>Proyek: GSI One Mobile Application</h2>
+<hr />
+<h2>Matriks Penelusuran Persyaratan (RTM)</h2>
+<table>
+  <thead>
+    <tr>
+      <th>ID Kebutuhan (FR)</th>
+      <th>Deskripsi Kebutuhan</th>
+      <th>User Story</th>
+      <th>Use Case</th>
+      <th>Komponen Kode / Screen</th>
+      <th>Tes Automasi Jest</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>FR-AUTH-01</strong></td>
+      <td>Login via Nomor Tiket / Email</td>
+      <td>US-CLI-01</td>
+      <td>UC-02</td>
+      <td><code>LoginScreen.tsx</code>, <code>authStore.ts</code></td>
+      <td><code>authRepository.test.ts</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-AUTH-02</strong></td>
+      <td>Pendaftaran Akun Terpusat (Admin)</td>
+      <td>US-ADM-01</td>
+      <td>UC-01</td>
+      <td><code>AdminRegisterModal.tsx</code></td>
+      <td><code>adminUserCreation.test.ts</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-AUTH-03</strong></td>
+      <td>Persistensi Sesi AsyncStorage</td>
+      <td>US-CLI-01</td>
+      <td>UC-02</td>
+      <td><code>useAuthStore.ts</code></td>
+      <td><code>sessionPersistence.test.ts</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-PUBLIC-01</strong></td>
+      <td>Katalog 6 Layanan GSI</td>
+      <td>US-PUB-01</td>
+      <td>-</td>
+      <td><code>LayananKamiScreen.tsx</code></td>
+      <td><code>services.test.ts</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-PUBLIC-02</strong></td>
+      <td>Detail Layanan &amp; Risk Card</td>
+      <td>US-PUB-01</td>
+      <td>-</td>
+      <td><code>LayananDetailScreen.tsx</code></td>
+      <td><code>serviceDetail.test.ts</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-BOOK-01</strong></td>
+      <td>Form Pengajuan Survei</td>
+      <td>US-PUB-03</td>
+      <td>UC-03</td>
+      <td><code>BookSurveyScreen.tsx</code></td>
+      <td><code>surveyRequest.test.ts</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-SURVEY-01</strong></td>
+      <td>Klaim &amp; Approval Permohonan</td>
+      <td>US-MKT-01, US-MKT-03</td>
+      <td>UC-04</td>
+      <td><code>SurveyRequestsScreen.tsx</code></td>
+      <td><code>surveyStatus.test.ts</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-SURVEY-02</strong></td>
+      <td>Konversi Permohonan ke Proyek</td>
+      <td>US-MKT-04, US-ADM-02</td>
+      <td>UC-05</td>
+      <td><code>CreateProjectScreen.tsx</code></td>
+      <td><code>surveyConversion.test.ts</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-PROJ-01</strong></td>
+      <td>Pembuatan Proyek &amp; 4 Tahapan</td>
+      <td>US-ADM-02</td>
+      <td>UC-05</td>
+      <td><code>CreateProjectScreen.tsx</code></td>
+      <td><code>projectEntity.test.ts</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-PROJ-02</strong></td>
+      <td>Linimasa Tahapan &amp; Progres %</td>
+      <td>US-ENG-02, US-CLI-02</td>
+      <td>UC-06</td>
+      <td><code>ProjectDetailScreen.tsx</code></td>
+      <td><code>projectStage.test.ts</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-LOG-01</strong></td>
+      <td>Catatan Harian Pekerjaan Lapangan</td>
+      <td>US-ENG-03</td>
+      <td>UC-06</td>
+      <td><code>AddLogModal.tsx</code></td>
+      <td><code>dailyLog.test.ts</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-DOC-01</strong></td>
+      <td>Manajemen PDF Laporan &amp; Foto</td>
+      <td>US-ENG-04, US-CLI-03</td>
+      <td>UC-07</td>
+      <td><code>UploadFileModal.tsx</code></td>
+      <td><code>documentUpload.test.ts</code></td>
+    </tr>
+    <tr>
+      <td><strong>FR-DASH-01</strong></td>
+      <td>Multi-Role Dynamic Dashboard</td>
+      <td>ALL</td>
+      <td>UC-01 s/d UC-07</td>
+      <td><code>Dashboard/index.tsx</code></td>
+      <td><code>roleRouting.test.ts</code></td>
+    </tr>
+  </tbody>
+</table>
+<hr />
+<h2>Matriks Hak Akses per Role (RBAC Permission Matrix)</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Modul / Fitur</th>
+      <th>Admin</th>
+      <th>Marketing</th>
+      <th>Engineer</th>
+      <th>Client</th>
+      <th>Publik</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Login via Email / Nomor Tiket</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td>Buat Akun Pengguna Baru (Register)</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td>Lihat Dashboard Statistik Global</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td>Lihat Katalog Layanan &amp; Studi Kasus</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Ya</td>
+    </tr>
+    <tr>
+      <td>Ajukan Booking Survei Lokasi</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+      <td>Ya</td>
+      <td>Ya</td>
+    </tr>
+    <tr>
+      <td>Klaim Permohonan Survei (<code>claimed</code>)</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td>Setujui / Tolak Booking (<code>approved</code>/<code>rejected</code>)</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td>Konversi Booking ke Proyek Baru</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td>Buat Proyek Baru</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td>Lihat Semua Proyek</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td>Lihat Proyek yang Ditugaskan / Dimiliki</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td>Update Status Tahapan Proyek (Stages)</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td>Tambah Log Harian (<code>stage_updates</code>)</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td>Upload Berkas / Foto Inspeksi</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td>Download Berkas Laporan PDF</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td>Terima Notifikasi In-App</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td>Hapus Proyek</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td>Kelola RLS &amp; Database Trigger</td>
+      <td>Ya</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+      <td>Tidak</td>
+    </tr>
+  </tbody>
+</table>
+<hr />
+<h2>Matriks Keterlacakan Endpoint API ke Modul Kode Backend</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Endpoint REST API</th>
+      <th>HTTP Method</th>
+      <th>File Route Backend</th>
+      <th>Auth Required</th>
+      <th>Rate Limited</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>/api/login</code></td>
+      <td>POST</td>
+      <td><code>authRoutes.js</code></td>
+      <td>Tidak</td>
+      <td>Ya (10/15min)</td>
+    </tr>
+    <tr>
+      <td><code>/api/register</code></td>
+      <td>POST</td>
+      <td><code>authRoutes.js</code></td>
+      <td>Tidak</td>
+      <td>Tidak (Disabled 403)</td>
+    </tr>
+    <tr>
+      <td><code>/api/auth/lookup-ticket</code></td>
+      <td>POST</td>
+      <td><code>authRoutes.js</code></td>
+      <td>Tidak</td>
+      <td>Ya (10/15min)</td>
+    </tr>
+    <tr>
+      <td><code>/api/admin/create-user</code></td>
+      <td>POST</td>
+      <td><code>authRoutes.js</code></td>
+      <td>Ya (Admin)</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td><code>/api/users/role/:role</code></td>
+      <td>GET</td>
+      <td><code>authRoutes.js</code></td>
+      <td>Ya</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td><code>/api/dashboard/stats</code></td>
+      <td>GET</td>
+      <td><code>projectRoutes.js</code></td>
+      <td>Ya</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td><code>/api/projects</code></td>
+      <td>GET</td>
+      <td><code>projectRoutes.js</code></td>
+      <td>Ya</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td><code>/api/projects/:id</code></td>
+      <td>GET</td>
+      <td><code>projectRoutes.js</code></td>
+      <td>Ya</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td><code>/api/projects/:id</code></td>
+      <td>PUT</td>
+      <td><code>projectRoutes.js</code></td>
+      <td>Ya</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td><code>/api/projects/:id</code></td>
+      <td>DELETE</td>
+      <td><code>projectRoutes.js</code></td>
+      <td>Ya (Admin)</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td><code>/api/stages/:id</code></td>
+      <td>PUT</td>
+      <td><code>projectRoutes.js</code></td>
+      <td>Ya</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td><code>/api/stages/:id/details</code></td>
+      <td>PUT</td>
+      <td><code>projectRoutes.js</code></td>
+      <td>Ya</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td><code>/api/stages/:id</code></td>
+      <td>DELETE</td>
+      <td><code>projectRoutes.js</code></td>
+      <td>Ya</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td><code>/api/stages/:id/updates</code></td>
+      <td>POST</td>
+      <td><code>projectRoutes.js</code></td>
+      <td>Ya</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td><code>/api/booking</code></td>
+      <td>POST</td>
+      <td><code>bookingRoutes.js</code></td>
+      <td>Ya</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td><code>/api/projects/:id/files</code></td>
+      <td>POST</td>
+      <td><code>fileRoutes.js</code></td>
+      <td>Ya</td>
+      <td>Tidak</td>
+    </tr>
+    <tr>
+      <td><code>/api/notifications</code></td>
+      <td>POST</td>
+      <td><code>notificationRoutes.js</code></td>
+      <td>Ya</td>
+      <td>Tidak</td>
+    </tr>
+  </tbody>
+</table>
+
+  </div>
+</body>
+</html>

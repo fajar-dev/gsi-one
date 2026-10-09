@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GSI One - Dokumentasi Aplikasi</title>
+  
+  <!-- Google Fonts - Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Mermaid.js for diagrams -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      securityLevel: 'loose',
+      flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
+    });
+  </script>
+  
+  <!-- Pre-compiled docs data database -->
+  <script src="docs_data.js"></script>
+</head>
+
+  <style>
+    /* Design Tokens */
+    :root {
+      --bg-primary: #0b0f19;
+      --bg-secondary: #111827;
+      --bg-card: #1f2937;
+      --text-primary: #f3f4f6;
+      --text-secondary: #9ca3af;
+      --accent: #e8722a;
+      --accent-hover: #f38d4e;
+      --border: #374151;
+      --code-bg: #1e1e2e;
+      --sidebar-width: 300px;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    [data-theme="light"] {
+      --bg-primary: #f3f4f6;
+      --bg-secondary: #ffffff;
+      --bg-card: #ffffff;
+      --text-primary: #1f2937;
+      --text-secondary: #4b5563;
+      --accent: #e8722a;
+      --accent-hover: #d25f19;
+      --border: #e5e7eb;
+      --code-bg: #f8f9fa;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    /* Reset & Base Style */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: var(--transition);
+    }
+
+    /* Sidebar Navigation */
+    aside {
+      width: var(--sidebar-width);
+      background-color: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 2rem 1.5rem;
+      transition: var(--transition);
+      overflow-y: auto;
+    }
+
+    /* Premium Custom Scrollbar for Sidebar */
+    aside::-webkit-scrollbar {
+      width: 5px;
+    }
+    aside::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    aside::-webkit-scrollbar-thumb {
+      background: rgba(232, 114, 42, 0.2);
+      border-radius: 10px;
+    }
+    aside::-webkit-scrollbar-thumb:hover {
+      background: var(--accent);
+    }
+
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 3rem;
+    }
+
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), #f97316);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: white;
+      font-size: 1.25rem;
+      box-shadow: 0 4px 10px rgba(232, 114, 42, 0.3);
+    }
+
+    .brand-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+    }
+
+    .brand-name span {
+      color: var(--accent);
+    }
+
+    .menu {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      flex-grow: 1;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 0.85rem 1rem;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: var(--transition);
+      border-left: 3px solid transparent;
+    }
+
+    .menu-item:hover {
+      background-color: rgba(232, 114, 42, 0.08);
+      color: var(--text-primary);
+    }
+
+    .menu-item.active {
+      background-color: rgba(232, 114, 42, 0.12);
+      color: var(--accent);
+      font-weight: 600;
+      border-left-color: var(--accent);
+    }
+
+    .menu-icon {
+      margin-right: 0.75rem;
+      font-size: 1.1rem;
+    }
+
+    .sidebar-footer {
+      border-top: 1px solid var(--border);
+      padding-top: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .theme-toggle-btn {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background-color: var(--bg-card);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: var(--transition);
+    }
+
+    .theme-toggle-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .copyright {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 1rem;
+      text-align: center;
+    }
+
+    /* Main Content Area */
+    main {
+      margin-left: var(--sidebar-width);
+      flex-grow: 1;
+      min-width: 0;
+      padding: 3rem 4rem;
+      max-width: 1200px;
+    }
+
+    .doc-section {
+      display: none;
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    .doc-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Document Typography */
+    h1, h2, h3, h4 {
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      line-height: 1.2;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 1rem;
+      margin-top: 0;
+      margin-bottom: 2rem;
+      background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    h2 {
+      font-size: 1.75rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+      margin-top: 3rem;
+    }
+
+    h3 {
+      font-size: 1.35rem;
+      margin-top: 2rem;
+    }
+
+    p {
+      margin-bottom: 1.25rem;
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+    }
+
+    strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* Lists */
+    ul, ol {
+      margin-bottom: 1.5rem;
+      padding-left: 1.5rem;
+      color: var(--text-secondary);
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+      font-size: 1.025rem;
+    }
+
+    li::marker {
+      color: var(--accent);
+    }
+
+    /* Dividers */
+    hr {
+      border: 0;
+      height: 1px;
+      background-color: var(--border);
+      margin: 3rem 0;
+    }
+
+    /* Links */
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    a:hover {
+      color: var(--accent-hover);
+      text-decoration: underline;
+    }
+
+    /* Alerts */
+    .alert {
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      border-left: 4px solid transparent;
+      background-color: var(--bg-card);
+    }
+
+    .alert-note {
+      border-left-color: #3b82f6;
+      background-color: rgba(59, 130, 246, 0.05);
+    }
+
+    .alert-important {
+      border-left-color: var(--accent);
+      background-color: rgba(232, 114, 42, 0.05);
+    }
+
+    .alert-warning {
+      border-left-color: #f59e0b;
+      background-color: rgba(245, 158, 11, 0.05);
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      box-shadow: var(--shadow);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 0.9rem 1.2rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background-color: var(--bg-secondary);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:nth-child(even) {
+      background-color: rgba(255, 255, 255, 0.015);
+    }
+
+    [data-theme="light"] tr:nth-child(even) {
+      background-color: rgba(0, 0, 0, 0.015);
+    }
+
+    /* Code Blocks */
+    code {
+      font-family: Consolas, Monaco, "Andale Mono", monospace;
+      font-size: 0.9rem;
+      background-color: var(--code-bg);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      color: #f43f5e;
+      transition: var(--transition);
+    }
+
+    pre code {
+      color: inherit;
+      padding: 0;
+      background-color: transparent;
+    }
+
+    pre {
+      background-color: var(--code-bg);
+      padding: 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--border);
+      position: relative;
+    }
+
+    .code-header {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      display: flex;
+      gap: 0.5rem;
+      opacity: 0;
+      transition: var(--transition);
+      z-index: 5;
+    }
+
+    pre:hover .code-header {
+      opacity: 1;
+    }
+
+    .copy-btn {
+      padding: 0.35rem 0.6rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .copy-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--accent);
+      background-color: rgba(232, 114, 42, 0.1);
+    }
+
+    /* Mermaid Diagrams Wrapper */
+    .mermaid {
+      background-color: var(--bg-card) !important;
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    /* Dynamic Hierarchical Menu */
+    .menu-category {
+      margin-bottom: 0.5rem;
+    }
+    .menu-category-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: var(--transition);
+      user-select: none;
+    }
+    .menu-category-title:hover {
+      background-color: rgba(255, 255, 255, 0.03);
+      color: var(--text-primary);
+    }
+    .menu-category-title .arrow {
+      font-size: 0.65rem;
+      transition: transform 0.3s ease;
+    }
+    .menu-category.collapsed .menu-category-title .arrow {
+      transform: rotate(-90deg);
+    }
+    .menu-category-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 0 0.5rem;
+      overflow: hidden;
+      max-height: 1000px;
+      transition: max-height 0.4s cubic-bezier(0, 1, 0, 1);
+    }
+    .menu-category.collapsed .menu-category-list {
+      max-height: 0;
+    }
+    .menu-item-sub {
+      display: flex;
+      align-items: center;
+      padding: 0.6rem 1rem 0.6rem 1.5rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border-radius: 6px;
+      transition: var(--transition);
+      cursor: pointer;
+      border-left: 2px solid transparent;
+    }
+    .menu-item-sub:hover {
+      color: var(--text-primary);
+      background-color: rgba(232, 114, 42, 0.05);
+    }
+    .menu-item-sub.active {
+      color: var(--text-primary);
+      background-color: rgba(232, 114, 42, 0.1);
+      border-left-color: var(--accent);
+      font-weight: 600;
+    }
+    
+    /* Viewer Tab System */
+    .viewer-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .viewer-tabs {
+      display: flex;
+      gap: 0.5rem;
+      background: var(--bg-primary);
+      padding: 0.25rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+    .vtab {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .vtab:hover {
+      color: var(--text-primary);
+    }
+    .vtab.active {
+      color: #fff;
+      background: var(--accent);
+    }
+    .viewer-links {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .vlink-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    .vlink-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--accent);
+    }
+
+    /* Pricing Grid & Cards */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(265px, 1fr));
+      gap: 1.5rem;
+      margin: 2.5rem 0;
+    }
+    .pricing-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: var(--transition);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .pricing-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent);
+    }
+    .pricing-card.featured {
+      border: 2px solid var(--accent);
+    }
+    .pricing-card.featured::before {
+      content: "REKOMENDASI";
+      position: absolute;
+      top: 15px;
+      right: -35px;
+      background: var(--accent);
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.25rem 2.5rem;
+      transform: rotate(45deg);
+      letter-spacing: 0.05em;
+    }
+    .pricing-header h3 {
+      margin-top: 0;
+      font-size: 1.25rem;
+      color: var(--text-primary);
+    }
+    .pricing-cost {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin: 1rem 0;
+    }
+    .pricing-cost span {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+    .pricing-features {
+      list-style: none;
+      padding-left: 0;
+      margin: 1.5rem 0;
+      flex-grow: 1;
+    }
+    .pricing-features li {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .pricing-features li::marker {
+      content: none;
+    }
+    .pricing-features li.check::before {
+      content: "[Y]";
+      color: #10b981;
+      font-weight: bold;
+      font-size: 0.85rem;
+    }
+    .pricing-features li.cross::before {
+      content: "[N]";
+      color: #ef4444;
+      font-weight: bold;
+      font-size: 0.85rem;
+    }
+    .pricing-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 4px;
+      background: rgba(232, 114, 42, 0.1);
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 960px) {
+      aside {
+        transform: translateX(-100%);
+      }
+      main {
+        margin-left: 0;
+        padding: 2rem;
+      }
+      aside.open {
+
+        transform: translateX(0);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar Menu -->
+  <aside id="sidebar">
+    <div class="brand">
+      <div class="brand-logo">G1</div>
+      <div class="brand-name">GSI<span>One</span> Docs</div>
+    </div>
+    
+    <ul class="menu" id="dynamic-menu">
+      <!-- Diisi secara dinamis dari docs_data.js -->
+    </ul>
+
+
+    <div class="sidebar-footer">
+      <button class="theme-toggle-btn" onclick="toggleTheme()">
+        <span id="theme-btn-text">Switch Light Mode</span>
+      </button>
+      <div class="copyright">
+        &copy; 2026 PT Graha Survei Indonesia
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content Wrapper -->
+    <main>
+    <section id="doc-viewer" class="doc-section active">
+      <!-- Top Action Bar for Viewer Modes & Links -->
+      <div class="viewer-header-bar" id="viewer-controls" style="display: none;">
+        <!-- Left: HTML vs MD Tabs -->
+        <div class="viewer-tabs">
+          <button class="vtab active" id="tab-html" onclick="setViewerMode('html')">Versi HTML</button>
+          <button class="vtab" id="tab-md" onclick="setViewerMode('md')">Versi Markdown (MD)</button>
+        </div>
+        <!-- Right: Links to open raw files -->
+        <div class="viewer-links">
+          <a class="vlink-btn" id="link-html" href="#" target="_blank">Buka HTML Mandiri</a>
+          <a class="vlink-btn" id="link-md" href="#" target="_blank">Buka MD Asli</a>
+        </div>
+      </div>
+
+      <!-- Main Reader Area -->
+      <div id="viewer-container">
+        <!-- Default Landing Content (Overview) -->
+        <div id="overview-content">
+          <h1>Dokumentasi GSI One</h1>
+          <p>Selamat datang di penampil dokumentasi interaktif untuk aplikasi mobile <strong>GSI One</strong>. Halaman ini dirancang untuk memudahkan developer, QA, dan stakeholder proyek dalam menjelajahi spesifikasi teknis dan non-teknis aplikasi secara offline.</p>
+          
+          <p>Aplikasi <strong>GSI One</strong> adalah platform mobile berbasis React Native yang dikembangkan untuk <strong>PT Graha Survei Indonesia (GSI)</strong>. Aplikasi ini membantu pengguna memantau kondisi kesehatan struktur secara real-time, mempelajari detail layanan teknik sipil GSI, serta mengajukan janji temu survei lapangan.</p>
+
+          <h2>Business Case &amp; Rencana Pricing Deployment</h2>
+          <p>Berdasarkan spesifikasi proyek dengan estimasi <strong>40 hingga 80 klien per tahun</strong> (ukuran database <strong>1-2 GB per proyek</strong>), berikut adalah perbandingan arsitektur penempatan (deployment) antara <strong>Supabase Cloud</strong> dan <strong>VPS Self-Hosted</strong>:</p>
+
+          <table class="pricing-table">
+            <thead>
+              <tr>
+                <th>Penyedia &amp; Model Deployment</th>
+                <th>Spesifikasi Teknis (CPU/RAM/Storage)</th>
+                <th>40 Klien (Total ~60 GB DB)</th>
+                <th>80 Klien (Total ~120 GB DB)</th>
+                <th>Kelebihan &amp; Kekurangan</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Supabase Cloud (Multi-Tenant)</strong></td>
+                <td>Shared Compute, 8 GB DB limit + Overage $0.125/GB</td>
+                <td>~$31.50/bulan<br><small>(~Rp 510.000)</small></td>
+                <td>~$39.00/bulan<br><small>(~Rp 630.000)</small></td>
+                <td>[Kelebihan] Zero maintenance, uptime tinggi.<br>[Kekurangan] Data klien tergabung dalam satu DB.</td>
+              </tr>
+              <tr style="background-color: rgba(232, 114, 42, 0.05);">
+                <td><strong>VPS Hetzner (Multi-Tenant/Schema)</strong></td>
+                <td>4-8 vCPU, 8-16 GB RAM, 160-240 GB SSD (Dedicated Resource)</td>
+                <td>~$22.00/bulan<br><small>(~Rp 350.000)</small></td>
+                <td>~$40.50/bulan<br><small>(~Rp 650.000)</small></td>
+                <td>[Kelebihan] Sangat murah, performa dedicated, kapasitas disk besar.<br>[Kekurangan] Butuh maintenance &amp; setup backup mandiri.</td>
+              </tr>
+              <tr>
+                <td><strong>Biznet Gio NEO Lite (Standard VPS)</strong></td>
+                <td>4-8 vCPU, 8-16 GB RAM, 160-240 GB SSD (Lokal Indonesia)</td>
+                <td>~Rp 469.000/bulan<br><small>(Promo + Vol 100 GB)</small></td>
+                <td>~Rp 1.299.000/bulan<br><small>(Normal + Vol 150 GB)</small></td>
+                <td>[Kelebihan] Latency sangat rendah, bandwidth gratis 10 Gbps, server di Indonesia.<br>[Kekurangan] Butuh setup backup &amp; OS maintenance.</td>
+              </tr>
+              <tr>
+                <td><strong>Biznet Gio NEO Lite Pro (High Performance)</strong></td>
+                <td>4-8 vCPU, 8-16 GB RAM, 180-240 GB NVMe SSD (AMD EPYC)</td>
+                <td>~Rp 1.199.000/bulan<br><small>(Normal + Vol 100 GB)</small></td>
+                <td>~Rp 2.099.000/bulan<br><small>(Normal + Vol 150 GB)</small></td>
+                <td>[Kelebihan] Performa database sangat tinggi (High IOPS NVMe AMD EPYC).<br>[Kekurangan] Harga relatif lebih mahal dibanding VPS luar.</td>
+              </tr>
+              <tr>
+                <td><strong>VPS DigitalOcean (Premium Intel/AMD)</strong></td>
+                <td>4-8 vCPU, 8-16 GB RAM, 210-320 GB Premium SSD</td>
+                <td>~$61.00/bulan<br><small>(~Rp 980.000)</small></td>
+                <td>~$112.00/bulan<br><small>(~Rp 1.800.000)</small></td>
+                <td>[Kelebihan] Infrastruktur cloud global stabil &amp; mudah digunakan.<br>[Kekurangan] Biaya cukup tinggi untuk database besar.</td>
+              </tr>
+              <tr style="background-color: rgba(239, 68, 68, 0.05);">
+                <td><strong>Supabase Cloud (Single-Tenant/Terpisah)</strong></td>
+                <td>Terisolasi penuh (1 proyek per klien), Compute Micro $10/proyek</td>
+                <td>~$415.00/bulan<br><small>(~Rp 6.700.000)</small></td>
+                <td>~$815.00/bulan<br><small>(~Rp 13.200.000)</small></td>
+                <td>[Kelebihan] Isolasi data total antar klien, sangat aman.<br>[Kekurangan] Biaya sangat mahal karena dikalikan jumlah klien.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="alert alert-important">
+            <strong>Rekomendasi Utama Pemilihan Infrastruktur:</strong><br>
+            * <strong>Untuk Kepatuhan Regulasi &amp; Latensi Rendah (Server Lokal):</strong> Menggunakan <strong>Biznet Gio NEO Lite (Standard)</strong> adalah opsi terbaik (~Rp 469.000/bulan) karena data disimpan di Indonesia dan memiliki latensi minimal.<br>
+            * **Untuk Efisiensi Biaya Terbesar (Global):** Menggunakan **VPS Hetzner** dengan skema multi-tenant memberikan spesifikasi tertinggi dengan harga termurah (~Rp 350.000/bulan).<br>
+            * **Untuk Tanpa Maintenance Server:** Menggunakan **Supabase Cloud (Multi-Tenant)** dengan pemisahan database menggunakan PostgreSQL schema terpisah (~Rp 510.000/bulan).
+          </div>
+
+          <h2>Daftar Dokumen Utama</h2>
+          <ul>
+            <li><strong>Software Requirements Specification (SRS)</strong>: Merinci cakupan fungsional dan non-fungsional aplikasi menggunakan standar adaptasi IEEE 830.</li>
+            <li><strong>Arsitektur Sistem &amp; Alur Kerja SDLC</strong>: Menjelaskan daur hidup pengembangan sistem dan interaksi antara lapisan presentasi (React Native UI), state global (Zustand), penyimpanan sesi (AsyncStorage), dan RESTful API backend.</li>
+            <li><strong>Spesifikasi Kontrak API</strong>: Menyediakan rincian endpoint login, register, dan booking beserta validasi isian formulir.</li>
+            <li><strong>Project Tracking (Fase Berikutnya)</strong>: Spesifikasi teknis fitur manajemen proyek berbasis timeline node, mencakup skema 5 tabel Supabase PostgreSQL, struktur penyimpanan file (Supabase Storage), peran pengguna, diagram ERD, dan alur penggunaan sistem.</li>
+            <li><strong>Struktur Dokumentasi SDLC</strong>: Tabel lengkap 10 fase SDLC standar internasional ISO/IEC/IEEE beserta modul-modul panduannya.</li>
+          </ul>
+
+          <h2>Panduan Memulai Dokumentasi</h2>
+          <p>Gunakan sidebar menu di sebelah kiri untuk menelusuri dokumentasi secara terstruktur berdasarkan fase pengembangan. Anda dapat:</p>
+          <ol>
+            <li>Memilih kategori folder untuk membuka daftar file dokumen di dalamnya.</li>
+            <li>Memilih dokumen tertentu untuk memuat kontennya secara instan di panel pembaca ini.</li>
+            <li>Beralih versi antara <strong>Versi HTML</strong> (untuk tampilan web berformat rapi) dan <strong>Versi Markdown</strong> (untuk melihat kode sumber dokumen).</li>
+            <li>Membuka link dokumen secara terpisah di tab browser baru menggunakan tombol pintasan yang disediakan.</li>
+          </ol>
+        </div>
+
+        <!-- Rendered Document Target -->
+        <div id="viewer-content"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Global state for document viewer
+    let currentDocKey = null;
+    let currentMode = 'html'; // 'html' or 'md'
+
+    // Theme Toggle Logic
+    function toggleTheme() {
+      const html = document.documentElement;
+      const themeBtnText = document.getElementById('theme-btn-text');
+      
+      if (html.getAttribute('data-theme') === 'dark') {
+        html.setAttribute('data-theme', 'light');
+        themeBtnText.innerText = "Switch Dark Mode";
+      } else {
+        html.setAttribute('data-theme', 'dark');
+        themeBtnText.innerText = "Switch Light Mode";
+      }
+    }
+
+    // Show default landing page overview content
+    function showOverview() {
+      currentDocKey = null;
+      document.getElementById('overview-content').style.display = 'block';
+      document.getElementById('viewer-controls').style.display = 'none';
+      document.getElementById('viewer-content').innerHTML = '';
+
+      // Update sidebar active states
+      document.querySelectorAll('.menu-item-sub').forEach(el => {
+        el.classList.remove('active');
+      });
+      const homeItem = document.getElementById('home-menu-item');
+      if (homeItem) homeItem.classList.add('active');
+    }
+
+    // Toggle Sidebar Folder Categories (Accordion)
+    function toggleCategory(catId) {
+      const catEl = document.getElementById('cat-' + catId);
+      if (catEl) {
+        catEl.classList.toggle('collapsed');
+      }
+    }
+
+    // Load selected document content
+    function loadDoc(key) {
+      currentDocKey = key;
+      const doc = window.GSI_DOCS_DATA[key];
+      if (!doc) return;
+
+      // Hide landing page default content
+      document.getElementById('overview-content').style.display = 'none';
+      // Show viewer controller options
+      document.getElementById('viewer-controls').style.display = 'flex';
+
+      // Update external links
+      // Relative links from docs/ folder
+      const htmlPath = key.replace(/\.md$/, '.html');
+      document.getElementById('link-html').href = htmlPath;
+      document.getElementById('link-md').href = key;
+
+      // Render content based on active mode
+      renderCurrentContent();
+
+      // Update sidebar active states
+      document.querySelectorAll('.menu-item-sub').forEach(el => {
+        el.classList.remove('active');
+        if (el.getAttribute('data-key') === key) {
+          el.classList.add('active');
+        }
+      });
+
+      // Scroll reader pane to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Set reading mode (HTML or Markdown)
+    function setViewerMode(mode) {
+      currentMode = mode;
+      
+      // Update tab UI active states
+      document.querySelectorAll('.vtab').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + mode).classList.add('active');
+
+      renderCurrentContent();
+    }
+
+    // Render the content depending on the view mode
+    function renderCurrentContent() {
+      if (!currentDocKey) return;
+      const doc = window.GSI_DOCS_DATA[currentDocKey];
+      const viewer = document.getElementById('viewer-content');
+
+      if (currentMode === 'html') {
+        viewer.innerHTML = doc.contentHtml;
+        
+        // Re-run Mermaid rendering on loaded charts
+        if (typeof mermaid !== 'undefined') {
+          mermaid.run({ nodes: viewer.querySelectorAll('.mermaid') });
+        }
+      } else {
+        // Render raw markdown code
+        let escapedMd = doc.content
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+        viewer.innerHTML = `<h1>Source Code: ${doc.title} (${doc.fileName})</h1><pre><code>${escapedMd}</code></pre>`;
+      }
+    }
+
+    // Initialize Dynamic Sidebar Menu from window.GSI_DOCS_DATA
+    document.addEventListener("DOMContentLoaded", () => {
+      const menu = document.getElementById('dynamic-menu');
+      const data = window.GSI_DOCS_DATA || {};
+
+      // 1. Home / Overview Link
+      const homeLi = document.createElement('li');
+      homeLi.innerHTML = `<a class="menu-item-sub active" id="home-menu-item" style="padding-left: 1rem;" onclick="showOverview()"><span class="menu-icon">[Beranda]</span> Ringkasan</a>`;
+      menu.appendChild(homeLi);
+
+      // Structure directories data
+      const categoriesMap = {};
+      const generalItems = [];
+
+      Object.keys(data).forEach(key => {
+        const doc = data[key];
+        if (doc.categoryId === 'general') {
+          generalItems.push({ key, ...doc });
+        } else {
+          if (!categoriesMap[doc.categoryId]) {
+            categoriesMap[doc.categoryId] = {
+              name: doc.category,
+              items: []
+            };
+          }
+          categoriesMap[doc.categoryId].items.push({ key, ...doc });
+        }
+      });
+
+      // 2. Render Core / General Documents (Top Level)
+      if (generalItems.length > 0) {
+        const generalCategory = document.createElement('li');
+        generalCategory.className = 'menu-category';
+        generalCategory.id = 'cat-general';
+        
+        let htmlStr = `
+          <div class="menu-category-title" onclick="toggleCategory('general')">
+            <span>Dokumen Inti</span>
+            <span class="arrow">▼</span>
+          </div>
+          <ul class="menu-category-list">
+        `;
+        generalItems.forEach(item => {
+          htmlStr += `<li><a class="menu-item-sub" data-key="${item.key}" onclick="loadDoc('${item.key}')">${item.title}</a></li>`;
+        });
+        htmlStr += `</ul>`;
+        generalCategory.innerHTML = htmlStr;
+        menu.appendChild(generalCategory);
+      }
+
+      // 3. Render Folder Categories recursively
+      Object.keys(categoriesMap).sort().forEach(catId => {
+        const category = categoriesMap[catId];
+        const catLi = document.createElement('li');
+        catLi.className = 'menu-category collapsed'; // Collapsed by default
+        catLi.id = 'cat-' + catId;
+
+        // Group folder title icon
+        let folderIcon = '';
+        if (catId.includes('Planning')) folderIcon = '[Rencana]';
+        else if (catId.includes('Requirements')) folderIcon = '[Kebutuhan]';
+        else if (catId.includes('Architecture')) folderIcon = '[Arsitektur]';
+        else if (catId.includes('Development')) folderIcon = '[Pengembangan]';
+        else if (catId.includes('Quality')) folderIcon = '[Kualitas]';
+        else if (catId.includes('Testing')) folderIcon = '[Pengujian]';
+        else if (catId.includes('Deployment')) folderIcon = '[Penyebaran]';
+        else if (catId.includes('Maintenance')) folderIcon = '[Pemeliharaan]';
+        else if (catId.includes('User')) folderIcon = '[Pengguna]';
+        else if (catId.includes('Model')) folderIcon = '[Model]';
+
+        let htmlStr = `
+          <div class="menu-category-title" onclick="toggleCategory('${catId}')">
+            <span>${folderIcon} ${category.name}</span>
+            <span class="arrow">▼</span>
+          </div>
+          <ul class="menu-category-list">
+        `;
+        category.items.sort((a, b) => a.title.localeCompare(b.title)).forEach(item => {
+          htmlStr += `<li><a class="menu-item-sub" data-key="${item.key}" onclick="loadDoc('${item.key}')">${item.title}</a></li>`;
+        });
+        htmlStr += `</ul>`;
+        catLi.innerHTML = htmlStr;
+        menu.appendChild(catLi);
+      });
+    });
+  </script>
+</body>
+</html>
