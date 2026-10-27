@@ -5,6 +5,7 @@ import {
     Image,
     TouchableOpacity,
     StyleSheet,
+    Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -58,11 +59,18 @@ const Header = memo(() => {
                     </TouchableOpacity>
 
                     <View style={styles.actionContainer}>
-                        <TouchableOpacity style={styles.iconButton} activeOpacity={0.7}>
+                        <TouchableOpacity style={styles.iconButton} activeOpacity={0.7}
+                            accessibilityLabel="Notifikasi"
+                            onPress={() => navigation.navigate(user ? 'Notifications' : 'Login')}>
                             <Icon name="bell" size={scale(20)} color="#FFF" />
-                            <View style={styles.notificationDot} />
+
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.iconButton} activeOpacity={0.7}>
+                        <TouchableOpacity style={styles.iconButton} activeOpacity={0.7}
+                            accessibilityLabel="Bantuan"
+                            onPress={() => Alert.alert('Bantuan GSI One', 'Masuk memakai email atau nomor tiket dari administrator. Untuk meminta survei, pilih Ajukan Survei. Anda dapat meminta bantuan melalui menu Konsultasi.', [
+                                { text: 'Tutup', style: 'cancel' },
+                                { text: 'Ajukan Survei', onPress: () => navigation.navigate('BookSurvey') },
+                            ])}>
                             <Icon name="help-circle" size={scale(20)} color="#FFF" />
                         </TouchableOpacity>
                         {user ? (

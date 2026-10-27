@@ -92,7 +92,7 @@ export interface Database {
       stage_updates: {
         Row: {
           id: number;
-          stage_id: string;
+          stage_id: string | null;
           project_id: string | null;
           description: string;
           progress: number | null;
@@ -101,7 +101,7 @@ export interface Database {
         };
         Insert: {
           id?: number;
-          stage_id: string;
+          stage_id: string | null;
           project_id?: string | null;
           description: string;
           progress?: number | null;
@@ -110,7 +110,7 @@ export interface Database {
         };
         Update: {
           id?: number;
-          stage_id?: string;
+          stage_id?: string | null;
           project_id?: string | null;
           description?: string;
           progress?: number | null;

@@ -157,7 +157,7 @@ export function useProjectDetail(projectId: string) {
     const handleDeleteStage = (stageId: string, stageTitle: string) => {
         Alert.alert(
             'Hapus Tahapan',
-            `Apakah Anda yakin ingin menghapus tahapan "${stageTitle}"? Seluruh log harian & berkas terkait akan terhapus.`,
+            `Apakah Anda yakin ingin menghapus tahapan "${stageTitle}"? Catatan dan berkas tetap tersedia di bagian Catatan Proyek dan Berkas Proyek.`,
             [
                 { text: 'Batal', style: 'cancel' },
                 {

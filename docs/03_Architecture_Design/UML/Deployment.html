@@ -113,66 +113,21 @@
 <body>
   <div class="container">
     <h1>UML: Deployment Diagram</h1>
-<h2>Proyek: GSI One Mobile Application &amp; Backend Infrastructure</h2>
-<p>Menggambarkan penyebaran fisik komponen sistem pada infrastruktur produksi.</p>
 <pre class="mermaid">
-graph TB
-    subgraph ClientDevices["Perangkat Pengguna (Client Devices)"]
-        AndroidDevice["Android Mobile Device\n(GSI One APK / AAB)"]
-        iOSDevice["iOS Mobile Device\n(GSI One IPA / TestFlight)"]
-        WebBrowser["Web Browser Client\n(React Native Web)"]
-    end
-
-    subgraph DistributionStore["Distribusi Aplikasi"]
-        PlayStore["Google Play Console Track"]
-        AppStore["Apple App Store Connect"]
-    end
-
-    subgraph VPSProduction["VPS Production Server (api.grahasurvei.com)"]
-        NginxProxy["Nginx Reverse Proxy / SSL TLS 1.3"]
-        
-        subgraph PM2Cluster["PM2 Process Manager"]
-            ExpressNode["Express.js Server (Node.js v20+)\n(server.js - Port 3000)"]
-            HelmetModule["Helmet Security Headers"]
-            CorsModule["CORS Origin Whitelist Filter"]
-            RateLimitModule["Auth Rate Limiter Middleware"]
-        end
-
-        LocalDB[("SQLite Database\n(gsi_one.db) - Dev/Fallback")]
-        LocalStorageDir["Local Disk Uploads\n(backend/uploads/)"]
-    end
-
-    subgraph SupabaseCloudProd["Supabase Cloud Platform (Managed Services)"]
-        SupaGateway["Supabase API Gateway / Kong"]
-        PostgreSQLDB[("PostgreSQL Database\n(7 Tabel &amp; RLS Policies)")]
-        StorageBucket["Supabase Storage Bucket Privat\n('projects/')"]
-        RealtimeEngine["WebSocket Realtime Service"]
-        AuthEngine["GoTrue Auth Service"]
-    end
-
-    PlayStore --&gt;|Install| AndroidDevice
-    AppStore --&gt;|Install| iOSDevice
-
-    AndroidDevice --&gt;|"HTTPS REST (Port 443)"| NginxProxy
-    iOSDevice --&gt;|"HTTPS REST (Port 443)"| NginxProxy
-    WebBrowser --&gt;|"HTTPS REST (Port 443)"| NginxProxy
-
-    NginxProxy --&gt; ExpressNode
-    ExpressNode --&gt; HelmetModule
-    ExpressNode --&gt; CorsModule
-    ExpressNode --&gt; RateLimitModule
-    ExpressNode --&gt; LocalDB
-    ExpressNode --&gt; LocalStorageDir
-
-    AndroidDevice --&gt;|"HTTPS / WSS (Supabase SDK)"| SupaGateway
-    iOSDevice --&gt;|"HTTPS / WSS (Supabase SDK)"| SupaGateway
-    WebBrowser --&gt;|"HTTPS / WSS (Supabase SDK)"| SupaGateway
-
-    SupaGateway --&gt; PostgreSQLDB
-    SupaGateway --&gt; StorageBucket
-    SupaGateway --&gt; RealtimeEngine
-    SupaGateway --&gt; AuthEngine
+flowchart TB
+    Play[Google Play / APK] --&gt; Android[Perangkat Android]
+    Store[App Store / TestFlight] --&gt; IOS[Perangkat iOS]
+    Hosting[Hosting bundle web] --&gt; Web[Browser]
+    Android --&gt; Cloud[Supabase Cloud melalui HTTPS / WSS]
+    IOS --&gt; Cloud
+    Web --&gt; Cloud
+    Cloud --&gt; Auth[Auth]
+    Cloud --&gt; DB[PostgreSQL / RLS]
+    Cloud --&gt; Storage[Storage]
+    Cloud --&gt; Realtime[Realtime]
+    Cloud --&gt; Functions[Edge Functions]
 </pre>
+<p>Aplikasi tidak memerlukan proses server lokal tambahan. Prosedur deployment mencakup migrasi Supabase, Edge Function, konfigurasi environment client, serta distribusi bundle mobile/web.</p>
 
   </div>
 </body>

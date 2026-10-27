@@ -62,6 +62,7 @@ export class SupabaseSurveyRepository implements ISurveyRepository {
             .from('bookings')
             .update(claimData)
             .eq('id', bookingId)
+            .eq('status', 'pending')
             .select();
 
         if (error) {
@@ -69,7 +70,7 @@ export class SupabaseSurveyRepository implements ISurveyRepository {
         }
 
         if (!data || data.length === 0) {
-            throw new Error('Gagal memperbarui database. Akses update ditolak oleh RLS atau booking tidak ditemukan.');
+            throw new Error('Pengajuan sudah diambil pengguna lain, tidak ditemukan, atau akses Anda ditolak.');
         }
     }
 

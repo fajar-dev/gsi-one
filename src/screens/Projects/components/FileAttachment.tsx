@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Linking, Alert } from 'react-
 import { ProjectFile } from '../../../services/projectService';
 import { colors } from '../../../../assets/styles/Colors';
 import Icon from 'react-native-vector-icons/Feather';
+import { storageService } from '../../../services/storageService';
 
 const FILE_TYPE_ICONS: Record<string, string> = {
     image: 'image',
@@ -34,9 +35,10 @@ function FileAttachment({ file }: FileAttachmentProps): React.ReactElement {
 
     const handleOpen = async () => {
         try {
-            await Linking.openURL(file.file_url);
-        } catch {
-            Alert.alert('Error', 'Tidak dapat membuka tautan berkas');
+            const url = await storageService.openProjectFile(file.file_url);
+            await Linking.openURL(url);
+        } catch (err) {
+            Alert.alert('Error', err instanceof Error ? err.message : 'Tidak dapat membuka tautan berkas');
         }
     };
 

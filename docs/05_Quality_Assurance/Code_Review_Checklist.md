@@ -1,48 +1,24 @@
 # Code Review Checklist
-## Proyek: GSI One Mobile Application & Backend Express API
 
----
+## Implementasi
 
-Checklist ini wajib diverifikasi oleh reviewer sebelum menyetujui Pull Request.
+- [ ] Perubahan memenuhi kebutuhan pengguna dan mempertahankan kontrak aplikasi.
+- [ ] Logika UI, state, service, dan repository memiliki tanggung jawab jelas.
+- [ ] Error Supabase dan hasil mutasi yang tersaring RLS ditangani dengan benar.
+- [ ] State loading dan kegagalan tidak menampilkan data pengguna/proyek sebelumnya.
 
----
+## Supabase
 
-## A. Keterbacaan & Maintainability
+- [ ] Policy RLS dan kontrol UI diperiksa sebagai dua lapisan berbeda.
+- [ ] Edge Function memverifikasi sesi dan role sebelum operasi privileged.
+- [ ] Origin web yang dibutuhkan tercakup pada Edge Function.
+- [ ] Service-role key dan password database tidak masuk bundle atau log.
+- [ ] Upload Storage dan metadata database tetap konsisten saat ada kegagalan.
+- [ ] Migrasi baru diuji pada skema dan data yang relevan.
 
-- [ ] Nama variabel, fungsi, dan komponen deskriptif dan mengikuti konvensi (lihat Coding Standard).
-- [ ] Tidak ada kode yang dikomentari tanpa penjelasan (`// TODO` tanpa tiket dilarang).
-- [ ] Fungsi memiliki single responsibility (tidak melakukan terlalu banyak hal sekaligus).
-- [ ] Tidak ada magic number (angka literal tanpa konstanta bernama).
+## Verifikasi
 
-## B. Keamanan & Audit System (CORS, RLS, & Headers)
-
-- [ ] Tidak ada data sensitif (token, password) yang dicetak di `console.log`.
-- [ ] Backend Express memverifikasi origin CORS via whitelist resmi (`https://grahasurvei.com`, `http://localhost:3000`, `http://10.0.2.2:3000`).
-- [ ] Integrasi `helmet()` aktif untuk proteksi XSS, HSTS, dan Framing.
-- [ ] Wajib memeriksa keberadaan `JWT_SECRET` pada startup backend server.
-- [ ] Tabel database Supabase baru terlindungi oleh Row Level Security (RLS) policies.
-- [ ] Tidak ada API key, secret, URL Supabase, atau JWT secret yang ditulis langsung (hardcode) di source code.
-- [ ] File `.env` dan `backend/.env` tidak ikut ter-commit (`.gitignore`).
-
-## C. Performa & Resource Optimization
-
-- [ ] Tidak ada re-render yang tidak perlu (gunakan `useCallback`, `useMemo` bila relevan).
-- [ ] Komponen daftar panjang menggunakan `FlatList` dengan pagination `limit`/`offset`.
-- [ ] File upload dibatasi maksimum 10MB dengan validasi tipe berkas Multer.
-
-## D. Penanganan Error & Resiliensi
-
-- [ ] Semua pemanggilan `async/await` memiliki blok `try/catch`.
-- [ ] State loading (`isLoading`) diatur dengan benar.
-- [ ] Pesan error yang ditampilkan ke pengguna bersifat ramah dan menggunakan helper `errorHelpers.ts`.
-
-## E. Pengujian & Automated Testing
-
-- [ ] Logika bisnis baru memiliki unit test Jest yang lulus (`npm test`).
-- [ ] Pengecekan tipe data TypeScript bebas error (`npm run typecheck`).
-- [ ] Reviewer sudah menguji perubahan secara manual di emulator/device atau Postman API.
-
-## F. Kesesuaian dengan Requirement
-
-- [ ] Perubahan sesuai dengan acceptance criteria yang tercantum di User Story.
-- [ ] Aturan Zero Emoji dipatuhi secara ketat pada komentar dan respons UI.
+- [ ] `npm run lint`, `npm run typecheck`, dan `npm run test:ci` lulus.
+- [ ] Alur yang berubah diuji pada platform yang relevan.
+- [ ] Perubahan dokumentasi dirender ulang dengan `node docs/generate_docs.js`.
+- [ ] `.env` dan signing key tetap tidak dilacak Git.

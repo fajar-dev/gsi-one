@@ -6,12 +6,18 @@ import { supabase } from '../config/supabase';
 import { getErrorMessage } from '../utils/errorHelpers';
 
 const USER_KEY = 'auth_user';
+let authVersion = 0;
+
+export function invalidateAuthInitialization(): void {
+  ++authVersion;
+}
 
 interface AuthState {
   user: AuthUser | null;
   token: string | null;
   isLoading: boolean;
   isInitialized: boolean;
+  isPasswordRecovery: boolean;
   error: string | null;
 
   initialize: () => Promise<void>;
@@ -42,67 +48,54 @@ export const useAuthStore = create<AuthState>((set) => ({
   token: null,
   isLoading: false,
   isInitialized: false,
+  isPasswordRecovery: false,
   error: null,
 
   initialize: async () => {
+    const version = ++authVersion;
     try {
       const { data: { session } } = await supabase.auth.getSession();
 
       if (session?.user) {
-        let user: AuthUser | null = null;
-        try {
-          const userJson = await AsyncStorage.getItem(USER_KEY);
-          const cached = userJson ? sanitizeAuthUser(JSON.parse(userJson)) : null;
-          if (cached && cached.id === session.user.id) {
-            user = cached;
-          }
-        } catch {
-          user = null;
+        const { data: profile, error: profileError } = await supabase
+          .from('users').select('name, role, ticket_number')
+          .eq('id', session.user.id).maybeSingle();
+        let user: AuthUser | null = profile ? {
+          id: session.user.id,
+          email: session.user.email || '',
+          full_name: profile.name || 'User GSI',
+          role: normalizeAuthRole(profile.role),
+          ticket_number: profile.ticket_number || undefined,
+        } : null;
+        if (!user && profileError) {
+          const cachedJson = await AsyncStorage.getItem(USER_KEY);
+          const cached = cachedJson ? sanitizeAuthUser(JSON.parse(cachedJson)) : null;
+          if (cached?.id === session.user.id) user = cached;
         }
+        if (!user) throw new Error('Profil pengguna tidak ditemukan. Silakan login kembali.');
 
-        if (!user) {
-          const meta = session.user.user_metadata || {};
-          let fullName = meta.full_name || meta.name || '';
-          let role = meta.role;
-          let ticketNumber = meta.ticket_number;
-
-          if (!fullName || !role) {
-            const { data: profile } = await supabase
-              .from('users')
-              .select('name, role, ticket_number')
-              .eq('id', session.user.id)
-              .maybeSingle();
-
-            if (profile) {
-              fullName = profile.name || fullName;
-              role = profile.role || role;
-              ticketNumber = profile.ticket_number || ticketNumber;
-            }
-          }
-
-          user = {
-            id: session.user.id,
-            email: session.user.email || '',
-            full_name: fullName || 'User Baru',
-            role: normalizeAuthRole(role),
-            ticket_number: ticketNumber,
-          };
-        }
-
+        if (version !== authVersion) return;
         await AsyncStorage.setItem(USER_KEY, JSON.stringify(user));
-        set({ user, token: session.access_token, isInitialized: true });
+        const isPasswordRecovery = await AsyncStorage.getItem('auth_password_recovery') === 'true';
+        if (version !== authVersion) return;
+        set({ user, token: session.access_token, isInitialized: true, isPasswordRecovery });
       } else {
+        if (version !== authVersion) return;
         await AsyncStorage.removeItem(USER_KEY);
+        if (version !== authVersion) return;
         set({ user: null, token: null, isInitialized: true });
       }
     } catch {
+      if (version !== authVersion) return;
       await AsyncStorage.removeItem(USER_KEY);
+      if (version !== authVersion) return;
       set({ user: null, token: null, isInitialized: true });
     }
   },
 
   login: async (email, password) => {
-    set({ user: null, token: null, isLoading: true, error: null });
+    ++authVersion;
+    set({ user: null, token: null, isLoading: true, error: null, isPasswordRecovery: false });
     try {
       const result = await authService.login({ email, password });
       await AsyncStorage.setItem(USER_KEY, JSON.stringify(result.user));
@@ -114,8 +107,10 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   logout: async () => {
+    ++authVersion;
     await AsyncStorage.removeItem(USER_KEY).catch(() => {});
-    set({ user: null, token: null, isLoading: true, error: null });
+    await AsyncStorage.removeItem('auth_password_recovery').catch(() => {});
+    set({ user: null, token: null, isLoading: true, error: null, isPasswordRecovery: false });
     try {
       await authService.logout();
     } finally {
@@ -152,7 +147,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
     set({ isLoading: true, error: null });
     try {
-      const createdUser = await authService.adminCreateUser(name, email, password, role, token);
+      const createdUser = await authService.adminCreateUser(name, email, password, role);
       set({ isLoading: false });
       return createdUser;
     } catch (err: unknown) {

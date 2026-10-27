@@ -12,6 +12,7 @@ import { RootStackParamList } from '../../types/navigation';
 import { colors } from '../../../assets/styles/Colors';
 import { scale, fontScale } from '../../utils/responsive';
 import StatusBadge from './components/StatusBadge';
+import FileAttachment from './components/FileAttachment';
 import StageTimeline from './components/StageTimeline';
 import { useProjectDetail } from '../../hooks/useProjectDetail';
 import { canManageStagesRole } from '../../domain/enums/UserRole';
@@ -105,7 +106,7 @@ function ProjectDetailScreen(): JSX.Element {
 
             {isLoadingDetail ? (
                 <ActivityIndicator color="#0F9F67" style={styles.loader} />
-            ) : !project ? (
+            ) : !project || String(project.id) !== String(projectId) ? (
                 <View style={styles.errorState}>
                     <Icon name="alert-circle" size={40} color="#BDBDBD" />
                     <Text style={styles.errorText}>
@@ -163,7 +164,18 @@ function ProjectDetailScreen(): JSX.Element {
                         </View>
                     </View>
 
-                    {}
+                    {!!project.files?.length && (
+                        <View style={styles.timelineCard}>
+                            <Text style={styles.timelineTitle}>Berkas Proyek</Text>
+                            {project.files.map(file => <FileAttachment key={file.id} file={file} />)}
+                        </View>
+                    )}
+                    {!!project.updates?.length && (
+                        <View style={styles.timelineCard}>
+                            <Text style={styles.timelineTitle}>Catatan Proyek</Text>
+                            {project.updates.map(note => <Text key={note.id} style={styles.infoValue}>{note.description} ({note.progress}%)</Text>)}
+                        </View>
+                    )}
                     <View style={styles.timelineCard}>
                         <View style={styles.timelineHeader}>
                             <View style={styles.timelineTitleRow}>

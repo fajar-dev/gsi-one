@@ -112,84 +112,21 @@
 </head>
 <body>
   <div class="container">
-    <h1>C4 Architecture Model Specification</h1>
-<h2>Proyek: GSI One Mobile Application &amp; Express Backend API</h2>
-<h2>Standar: C4 Model (Context &amp; Container Levels)</h2>
-<hr />
-<h2>1. C4 Level 1: System Context Diagram</h2>
-<p>Diagram System Context memvisualisasikan batas ekosistem perangkat lunak GSI One, aktor yang terlibat, serta sistem eksternal yang terhubung.</p>
+    <h1>C4 Model</h1>
+<h2>Konteks dan container</h2>
+<p>GSI One melayani admin, marketing, engineer, dan klien melalui Android, iOS, serta web. Data bisnis berada di Supabase.</p>
 <pre class="mermaid">
-graph TB
-    subgraph Users["Aktor Pengguna (Users)"]
-        PublicUser["Pengunjung Publik\n(Calon Klien)"]
-        ClientUser["Client Terdaftar\n(Pemilik Proyek)"]
-        EngineerUser["Field Engineer\n(Insinyur Lapangan)"]
-        MarketingUser["Staf Marketing\n(Pengelola Booking)"]
-        AdminUser["System Administrator\n(Pengelola Akun &amp; Proyek)"]
-    end
-
-    subgraph SystemBoundary["Batas Sistem GSI One (System Boundary)"]
-        GSISystem["GSI One System\n(Mobile App, Web App, &amp; REST API)\nMenyediakan katalog layanan, booking survei,\ntracking 4 tahapan proyek, &amp; manajemen berkas."]
-    end
-
-    subgraph ExternalSystems["Sistem Eksternal (External Systems)"]
-        SupabaseCloud["Supabase Cloud Platform\n(PostgreSQL DB, Auth, Realtime WS, Storage)"]
-        AppDistribution["Store Distribution\n(Google Play Store &amp; Apple App Store)"]
-        NotificationGateway["Push / Email Notification Gateway\n(Notifikasi In-App &amp; Event Alert)"]
-    end
-
-    PublicUser --&gt;|"Lihat katalog &amp; kirim booking survei"| GSISystem
-    ClientUser --&gt;|"Pantau progress realtime &amp; download laporan PDF"| GSISystem
-    EngineerUser --&gt;|"Update status stage, input log harian, &amp; upload file"| GSISystem
-    MarketingUser --&gt;|"Klaim, approve/reject booking, &amp; konversi proyek"| GSISystem
-    AdminUser --&gt;|"Buat akun terpusat, buat proyek, &amp; kelola sistem"| GSISystem
-
-    GSISystem &lt;--&gt;|"Kueri DB, Auth RLS, WebSocket, &amp; File Storage"| SupabaseCloud
-    GSISystem --&gt;|"Distribusi biner APK/AAB &amp; IPA"| AppDistribution
-    GSISystem --&gt;|"Pengiriman alert &amp; notifikasi"| NotificationGateway
+flowchart LR
+    User[Pengguna] --&gt; App[Aplikasi React Native / Web]
+    App --&gt; Auth[Supabase Auth]
+    App --&gt; DB[PostgreSQL / PostgREST / RLS]
+    App --&gt; Files[Supabase Storage]
+    App --&gt; Events[Supabase Realtime]
+    App --&gt; Admin[Edge Function admin-create-user]
+    Admin --&gt; Auth
+    Admin --&gt; DB
 </pre>
-<hr />
-<h2>2. C4 Level 2: Container Diagram</h2>
-<p>Diagram Container memvisualisasikan arsitektur kontainer internal aplikasi (Mobile React Native, Web App, Express REST Backend, Supabase Auth, PostgreSQL DB, dan Storage Bucket).</p>
-<pre class="mermaid">
-graph TB
-    subgraph Users["Aktor Pengguna"]
-        ClientUser["Client &amp; Publik"]
-        EngineerUser["Field Engineer"]
-        AdminMktUser["Admin &amp; Marketing"]
-    end
-
-    subgraph FrontendContainers["Kontainer Klien (Frontend Application)"]
-        MobileApp["React Native Mobile App\n[Container: JavaScript/TypeScript]\nAplikasi Android &amp; iOS berbasis React Native 0.83.\nZustand State, Custom Hooks, Repository Pattern."]
-        WebApp["React Native Web App\n[Container: React Web]\nDashboard web browser untuk akses desktop."]
-    end
-
-    subgraph BackendContainers["Kontainer Server (Backend Application)"]
-        ExpressAPI["Express REST API Server\n[Container: Node.js / Express]\nServer backend di VPS (server.js).\nCORS Audit, Helmet Headers, Rate Limiter, JWT Auth."]
-        LocalSQLite["SQLite Database\n[Container: SQLite3]\nDatabase lokal untuk development &amp; fallback testing."]
-    end
-
-    subgraph SupabaseContainers["Kontainer Cloud (Supabase Managed BaaS)"]
-        SupaAuth["Supabase Auth Engine\n[Container: GoTrue Service]\nAutentikasi JWT &amp; Manajemen Sesi Pengguna."]
-        SupaPostgres[("Supabase PostgreSQL DB\n[Container: PostgreSQL 15]\n7 Tabel Utama, RLS Policies, Triggers, &amp; Indices.")]
-        SupaStorage["Supabase Object Storage\n[Container: S3 Compatible Storage]\nBucket Privat 'projects/' untuk foto &amp; laporan PDF."]
-        SupaRealtime["Supabase Realtime Service\n[Container: Elixir/Phoenix WebSocket]\nPropagasi event stage update per proyek secara realtime."]
-    end
-
-    ClientUser &amp; EngineerUser &amp; AdminMktUser --&gt;|"Menggunakan"| MobileApp &amp; WebApp
-    MobileApp &amp; WebApp --&gt;|"HTTP Request / JSON (Bearer JWT)"| ExpressAPI
-    MobileApp &amp; WebApp --&gt;|"HTTPS REST / WebSocket (Anon Key)"| SupaGateway
-
-    subgraph SupaGateway["Supabase Gateway"]
-        SupaAuth
-        SupaPostgres
-        SupaStorage
-        SupaRealtime
-    end
-
-    ExpressAPI --&gt;|"Direct DB Queries (SQLite Dev)"| LocalSQLite
-    ExpressAPI --&gt;|"Service Role Key (Admin Auth &amp; Notif Dispatch)"| SupaPostgres
-</pre>
+<p>Kredensial privileged hanya digunakan pada Edge Function. Repository dan service aplikasi memakai sesi pengguna. Migrasi dan seed disimpan di <code>supabase/</code>.</p>
 
   </div>
 </body>

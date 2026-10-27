@@ -144,7 +144,7 @@
     <tr>
       <td>Konstanta global</td>
       <td>SCREAMING_SNAKE</td>
-      <td><code>API<em>BASE</em>URL</code>, <code>USER_KEY</code></td>
+      <td><code>SUPABASE<em>URL</code>, <code>USER</em>KEY</code></td>
     </tr>
     <tr>
       <td>Interface TypeScript</td>
@@ -314,7 +314,7 @@ const headerColor = isMarketing ? '#0F9F67' : '#4A90A4';</code></pre>
     </tr>
     <tr>
       <td><code>src/config/</code></td>
-      <td>Konfigurasi (api.ts, supabase.ts)</td>
+      <td>Konfigurasi Supabase dan adapter platform</td>
       <td>TypeScript</td>
     </tr>
     <tr>
@@ -326,36 +326,6 @@ const headerColor = isMarketing ? '#0F9F67' : '#4A90A4';</code></pre>
       <td><code>src/theme/</code></td>
       <td>Design tokens &amp; role theme</td>
       <td>TypeScript</td>
-    </tr>
-    <tr>
-      <td><code>backend/server.js</code></td>
-      <td>Entry point Express server</td>
-      <td>JavaScript</td>
-    </tr>
-    <tr>
-      <td><code>backend/database.js</code></td>
-      <td>Inisialisasi SQLite database &amp; helper (run, get, all)</td>
-      <td>JavaScript</td>
-    </tr>
-    <tr>
-      <td><code>backend/routes/</code></td>
-      <td>Route handlers (auth, projects, bookings, files, notifications)</td>
-      <td>JavaScript</td>
-    </tr>
-    <tr>
-      <td><code>backend/middlewares/</code></td>
-      <td>Middleware (authenticateToken JWT)</td>
-      <td>JavaScript</td>
-    </tr>
-    <tr>
-      <td><code>backend/helpers/</code></td>
-      <td>Backend helpers (projectHelpers)</td>
-      <td>JavaScript</td>
-    </tr>
-    <tr>
-      <td><code>backend/config/</code></td>
-      <td>Backend config (supabase.js, multer.js)</td>
-      <td>JavaScript</td>
     </tr>
     <tr>
       <td><code>_<em>tests</em>_/</code></td>
@@ -370,58 +340,6 @@ const headerColor = isMarketing ? '#0F9F67' : '#4A90A4';</code></pre>
   </tbody>
 </table>
 <hr />
-<h2>8. Tabel Konvensi Penamaan Backend (Node.js / Express)</h2>
-<table>
-  <thead>
-    <tr>
-      <th>Elemen</th>
-      <th>Konvensi</th>
-      <th>Contoh</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>File route</td>
-      <td>camelCase.js</td>
-      <td><code>authRoutes.js</code>, <code>projectRoutes.js</code></td>
-    </tr>
-    <tr>
-      <td>File middleware</td>
-      <td>camelCase.js</td>
-      <td><code>authMiddleware.js</code></td>
-    </tr>
-    <tr>
-      <td>File helper</td>
-      <td>camelCase.js</td>
-      <td><code>projectHelpers.js</code></td>
-    </tr>
-    <tr>
-      <td>Variabel / fungsi</td>
-      <td>camelCase</td>
-      <td><code>authenticateToken</code>, <code>recalculateProjectStatus</code></td>
-    </tr>
-    <tr>
-      <td>Konstanta environment</td>
-      <td>SCREAMING_SNAKE</td>
-      <td><code>JWT<em>SECRET</code>, <code>SUPABASE</em>URL</code></td>
-    </tr>
-    <tr>
-      <td>Route path</td>
-      <td>kebab-case / RESTful</td>
-      <td><code>/api/projects/:id</code>, <code>/api/admin/create-user</code></td>
-    </tr>
-    <tr>
-      <td>Tabel database</td>
-      <td>snake_case</td>
-      <td><code>project<em>stages</code>, <code>stage</em>updates</code>, <code>project_files</code></td>
-    </tr>
-    <tr>
-      <td>Kolom database</td>
-      <td>snake_case</td>
-      <td><code>client<em>id</code>, <code>created</em>at</code>, <code>project_code</code></td>
-    </tr>
-  </tbody>
-</table>
 
   </div>
 </body>

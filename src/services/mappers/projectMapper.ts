@@ -40,7 +40,7 @@ export const projectMapper = {
   mapStageUpdateRowToEntity: (row: Partial<StageUpdateRow>): StageUpdate => {
     return {
       id: String(row.id || ''),
-      stage_id: String(row.stage_id || ''),
+      stage_id: row.stage_id ? String(row.stage_id) : null,
       description: row.description || '',
       progress: Number(row.progress || 0),
       created_by: row.created_by || '',

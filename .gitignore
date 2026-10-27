@@ -34,8 +34,7 @@ local.properties
 *.keystore
 !debug.keystore
 .kotlin/
-# gradle.properties berisi keystore password - jangan commit ke Git
-android/gradle.properties
+# Simpan password keystore di ~/.gradle/gradle.properties atau environment CI.
 
 # node.js
 #
@@ -48,7 +47,6 @@ yarn-error.log
 .env.local
 .env.development
 .env.production
-backend/.env
 
 # fastlane
 #
@@ -88,11 +86,6 @@ dist/
 scratch/
 screenshot_*.png
 screencap*.png
-
-# SQLite Databases & Local Database Files (JANGAN commit ke Git - berisi data lokal & hash)
-*.db
-*.sqlite
-backend/*.db
 
 # Supabase CLI Temporary Files
 supabase/.temp/

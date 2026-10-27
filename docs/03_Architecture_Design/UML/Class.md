@@ -1,6 +1,6 @@
 
 # UML: Class Diagram
-## Proyek: GSI One Mobile Application & Express Backend API
+## Proyek: GSI One Mobile Application & Supabase
 
 Menggambarkan struktur kelas OOP Domain Entities, Repositories, Facades, Mappers, dan Zustand Stores.
 

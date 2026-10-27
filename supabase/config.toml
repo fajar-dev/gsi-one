@@ -9,3 +9,11 @@ schemas = ["public", "storage", "auth"]
 [db]
 port = 54322
 shadow_port = 54320
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
+[auth]
+site_url = "gsione://reset-password"
+additional_redirect_urls = ["gsione://reset-password", "http://localhost:8080/reset-password", "http://127.0.0.1:8080/reset-password", "https://grahasurvei.com/reset-password"]

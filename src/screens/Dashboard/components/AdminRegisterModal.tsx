@@ -100,7 +100,7 @@ const AdminRegisterModal: React.FC<AdminRegisterModalProps> = ({ visible, onClos
             onClose();
 
             let successMessage = `Akun ${newUserName} [${
-                newUserRole === 'client' ? 'Klien' : newUserRole === 'marketing' ? 'Marketing' : 'Engineer'
+                newUserRole === 'client' ? 'Klien' : newUserRole === 'marketing' ? 'Marketing' : newUserRole === 'admin' ? 'Administrator' : 'Engineer'
             }] berhasil dibuat.`;
 
             if (newUserRole === 'client' && createdUser?.ticket_number) {

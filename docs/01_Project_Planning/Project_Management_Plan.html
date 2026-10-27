@@ -113,7 +113,7 @@
 <body>
   <div class="container">
     <h1>Project Management Plan</h1>
-<h2>Proyek: GSI One Mobile Application &amp; Backend Infrastructure</h2>
+<h2>Proyek: GSI One Mobile Application &amp; Supabase</h2>
 <hr />
 <h2>1. Milestone Utama Proyek</h2>
 <table>
@@ -146,14 +146,14 @@
       <td>Architecture Design Disetujui</td>
       <td>2026-02-28</td>
       <td>Selesai</td>
-      <td>Dual-DB (SQLite Dev &amp; Supabase Prod)</td>
+      <td>PostgreSQL Supabase dan RLS</td>
     </tr>
     <tr>
       <td>4</td>
-      <td>Backend Express &amp; Security API</td>
+      <td>Supabase dan akses data</td>
       <td>2026-04-15</td>
       <td>Selesai</td>
-      <td>CORS audit, Helmet, Rate Limiting, JWT Auth</td>
+      <td>Supabase Auth, RLS, dan Edge Functions</td>
     </tr>
     <tr>
       <td>5</td>
@@ -214,7 +214,7 @@
       <td>Lead Developer</td>
       <td>1</td>
       <td>100%</td>
-      <td>Arsitektur backend Express, Supabase RLS, dan integrasi API</td>
+      <td>Arsitektur Supabase, RLS, dan Edge Functions</td>
     </tr>
     <tr>
       <td>Mobile Developer</td>
@@ -226,7 +226,7 @@
       <td>QA &amp; Security Eng</td>
       <td>1</td>
       <td>50%</td>
-      <td>Audit CORS, Helmet security headers, dan pengujian Jest</td>
+      <td>Audit RLS, Edge Functions, dan pengujian Jest</td>
     </tr>
     <tr>
       <td>UI/UX Designer</td>
@@ -244,22 +244,19 @@
 <ul>
   <li>React Native 0.83, TypeScript, <code>@react-navigation</code> (Native Stack &amp; Bottom Tabs).</li>
   <li>Zustand untuk manajemen state global (<code>authStore</code>, <code>projectStore</code>).</li>
-  <li>Client Supabase SDK &amp; HTTP REST Client (<code>src/config/api.ts</code>).</li>
+  <li>Client Supabase SDK &amp; HTTP REST Client (<code>src/config/supabase.ts</code>).</li>
 </ul>
 <ol>
-  <li><strong>Backend API &amp; Sub-Sistem Keamanan</strong>:</li>
+  <li><strong>Supabase &amp; Sub-Sistem Keamanan</strong>:</li>
 </ol>
 <ul>
-  <li>Node.js &amp; Express.js server (<code>server.js</code>).</li>
-  <li>Modul Rute: Auth (<code>authRoutes</code>), Projects (<code>projectRoutes</code>), Bookings (<code>bookingRoutes</code>), Files (<code>fileRoutes</code>), Notifications (<code>notificationRoutes</code>).</li>
-  <li>Keamanan: Penguncian CORS Origin (<code>https://grahasurvei.com</code>, <code>http://localhost:3000</code>, <code>http://10.0.2.2:3000</code>), <code>helmet()</code> HTTP security headers, JWT secret verification, rate-limiting.</li>
+  <li>Supabase Auth, PostgREST/RLS, Storage, Realtime, dan Edge Function <code>admin-create-user</code>.</li>
 </ul>
 <ol>
-  <li><strong>Database Dual-Layer</strong>:</li>
+  <li><strong>Database PostgreSQL</strong>:</li>
 </ol>
 <ul>
-  <li>SQLite (<code>gsi_one.db</code>) via <code>backend/database.js</code> untuk isolasi pengujian lokal.</li>
-  <li>Supabase PostgreSQL Cloud via <code>backend/supabase<em>schema.sql</code> dengan 7 tabel utama (<code>users</code>, <code>bookings</code>, <code>projects</code>, <code>project</em>stages</code>, <code>stage<em>updates</code>, <code>project</em>files</code>, <code>notifications</code>) yang dilindungi Row Level Security (RLS).</li>
+  <li>PostgreSQL Supabase dengan migrasi pada <code>supabase/migrations/</code> dengan 7 tabel utama (<code>users</code>, <code>bookings</code>, <code>projects</code>, <code>project<em>stages</code>, <code>stage</em>updates</code>, <code>project_files</code>, <code>notifications</code>) yang dilindungi Row Level Security (RLS).</li>
 </ul>
 <hr />
 <h2>4. Manajemen Risiko Utama</h2>
@@ -286,12 +283,6 @@
       <td>Implementasi Signed URL Supabase Storage dengan durasi kadaluarsa aman</td>
     </tr>
     <tr>
-      <td>Kebocoran JWT Secret</td>
-      <td>Tinggi</td>
-      <td>Rendah</td>
-      <td>Validasi wajib <code>JWT_SECRET</code> pada startup server <code>server.js</code></td>
-    </tr>
-    <tr>
       <td>Sinkronisasi Nama Pengguna</td>
       <td>Sedang</td>
       <td>Sedang</td>
@@ -312,7 +303,7 @@
 <pre class="mermaid">
 gantt
     dateFormat  YYYY-MM-DD
-    title Timeline Pengembangan GSI One Mobile &amp; Backend
+    title Timeline Pengembangan GSI One Mobile &amp; Supabase
 
     section Inisiasi &amp; Planning
     Project Charter &amp; Kickoff     :done,    des1, 2026-01-01, 2026-01-15
@@ -320,14 +311,14 @@ gantt
 
     section Requirement &amp; Architecture
     SRS &amp; 4 Peran Specification   :done,    req1, 2026-02-01, 2026-02-07
-    Clean Architecture &amp; Dual DB  :done,    arch1, 2026-02-08, 2026-02-28
+    Clean Architecture &amp; Supabase  :done,    arch1, 2026-02-08, 2026-02-28
 
     section Development
-    Backend REST API &amp; Routes     :done,    dev1, 2026-03-01, 2026-04-15
+    Supabase SDK &amp; Repository     :done,    dev1, 2026-03-01, 2026-04-15
     React Native Mobile &amp; Web MVP :done,    dev2, 2026-04-16, 2026-05-09
 
     section Security Audit &amp; QA
-    CORS Audit &amp; Helmet Headers   :done,    sec1, 2026-05-10, 2026-06-06
+    Audit RLS dan Edge Function   :done,    sec1, 2026-05-10, 2026-06-06
     Jest Testing Suite (74 tests) :done,    qa1,  2026-06-07, 2026-06-30
 
     section Deployment &amp; Phase 2

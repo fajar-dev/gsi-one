@@ -113,7 +113,7 @@
 <body>
   <div class="container">
     <h1>Risk Register</h1>
-<h2>Proyek: GSI One Mobile Application &amp; Backend Infrastructure</h2>
+<h2>Proyek: GSI One Mobile Application &amp; Supabase</h2>
 <hr />
 <h2>Skala Penilaian</h2>
 <ul>
@@ -140,42 +140,12 @@
     <tr>
       <td>R-001</td>
       <td>Teknis</td>
-      <td>API backend timeout / kegagalan koneksi DB</td>
+      <td>Kegagalan koneksi Supabase</td>
       <td>3</td>
       <td>2</td>
       <td>6</td>
       <td>Mitigated</td>
-      <td>Error handling terpusat di <code>errorHelpers.ts</code>, retry logic &amp; fallback lokal</td>
-    </tr>
-    <tr>
-      <td>R-002</td>
-      <td>Keamanan</td>
-      <td>Akses CORS dari domain tidak dikenal / unauthorized</td>
-      <td>3</td>
-      <td>2</td>
-      <td>6</td>
-      <td>Mitigated</td>
-      <td>Whitelist terisolasi di <code>server.js</code> (<code>allowedOrigins</code>), log audit origin</td>
-    </tr>
-    <tr>
-      <td>R-003</td>
-      <td>Keamanan</td>
-      <td>Header HTTP rentan terhadap serangan XSS/Clickjacking</td>
-      <td>3</td>
-      <td>1</td>
-      <td>3</td>
-      <td>Mitigated</td>
-      <td>Penggunaan <code>helmet()</code> middleware &amp; penyembunyian <code>x-powered-by</code></td>
-    </tr>
-    <tr>
-      <td>R-004</td>
-      <td>Operasional</td>
-      <td><code>JWT_SECRET</code> tidak didefinisikan di environment server</td>
-      <td>3</td>
-      <td>1</td>
-      <td>3</td>
-      <td>Mitigated</td>
-      <td>Penghentian fatal server (<code>process.exit(1)</code>) jika <code>JWT_SECRET</code> belum diset</td>
+      <td>Error handling terpusat di <code>errorHelpers.ts</code>, tampilan kegagalan dan pemuatan ulang manual</td>
     </tr>
     <tr>
       <td>R-005</td>
@@ -196,16 +166,6 @@
       <td>4</td>
       <td>Mitigated</td>
       <td>Trigger otomatis <code>sync<em>user</em>name_changes</code> di PostgreSQL</td>
-    </tr>
-    <tr>
-      <td>R-007</td>
-      <td>Teknis</td>
-      <td>Upload file berukuran besar melampaui batas server</td>
-      <td>2</td>
-      <td>2</td>
-      <td>4</td>
-      <td>Mitigated</td>
-      <td>Batas <code>express.json({ limit: '10mb' })</code> &amp; validasi Multer</td>
     </tr>
     <tr>
       <td>R-008</td>

@@ -44,6 +44,12 @@ export function normalizeAuthRole(role: unknown): AuthRole {
     : 'client';
 }
 
+export function getPasswordResetRedirect(): string {
+  const origin = (globalThis as unknown as { location?: { origin: string } }).location?.origin;
+  return origin && ['http://localhost:8080', 'http://127.0.0.1:8080', 'https://grahasurvei.com'].includes(origin)
+    ? `${origin}/reset-password` : 'gsione://reset-password';
+}
+
 export const authService = {
   login: async (credentials: LoginCredentials): Promise<LoginResult> => {
     let emailToAuth = credentials.email.trim();
@@ -139,7 +145,7 @@ export const authService = {
     await AsyncStorage.removeItem('auth_user').catch(() => {});
 
     try {
-      await supabase.auth.signOut();
+      await supabase.auth.signOut({ scope: 'local' });
     } catch (err) {
       if (__DEV__) { console.warn('Supabase signOut error:', err); }
     }
@@ -147,7 +153,7 @@ export const authService = {
 
   sendPasswordResetEmail: async (email: string): Promise<void> => {
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: 'gsione://reset-password',
+      redirectTo: getPasswordResetRedirect(),
     });
     if (error) {
       throw new Error(error.message || 'Gagal mengirim email reset password');
@@ -158,9 +164,10 @@ export const authService = {
     name: string,
     email: string,
     password: string,
-    role: CreateUserRole,
-    adminToken: string
+    role: CreateUserRole
   ): Promise<AuthUser | undefined> => {
+    if (!name.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) throw new Error('Nama dan email harus valid.');
+    if (password.length < 8) throw new Error('Password minimal 8 karakter.');
     const generatedTicket = role === 'client' ? generateClientTicketNumber() : undefined;
 
     let createdUser: AuthUser | undefined;
@@ -203,22 +210,11 @@ export const authService = {
       }
     }
 
-    // Edge Function adalah satu-satunya jalur. Fallback ke backend Express dihapus
-    // karena backend itu menunjuk project Supabase mati dan tidak pernah bisa berhasil.
+    // Pembuatan akun hanya melalui Edge Function yang memverifikasi role admin.
     if (!createdUser) {
       throw new Error('Gagal mendaftarkan pengguna baru: layanan admin tidak merespons.');
     }
 
-    if (createdUser && generatedTicket) {
-      createdUser.ticket_number = generatedTicket;
-      try {
-        await supabase
-          .from('users')
-          .update({ ticket_number: generatedTicket })
-          .eq('id', createdUser.id);
-      } catch {
-      }
-    }
 
     return createdUser;
   },

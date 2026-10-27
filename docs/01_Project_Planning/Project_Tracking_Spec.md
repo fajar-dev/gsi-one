@@ -37,9 +37,7 @@
    - Mengorganisasi modul frontend ke dalam registry terpusat di `src/features/` (`auth`, `projects`, `notifications`).
 3. **Storage Security & Signed URL (`storageService.ts`)**:
    - Mengunci Storage Bucket `projects` (`public = false`) dan menyediakan Signed URL berbatas waktu via `storageService.ts`.
-4. **Fix Login Tiket Klien & Auto-Repair (`authRoutes.js` & `20260730000004_fix_ticket_number_trigger_and_rls.sql`)**:
    - Memperbarui trigger `handle_new_user()` dan RLS `users_update_policy` agar `ticket_number` langsung tersimpan otomatis.
-   - Menambahkan auto-repair fallback pada `/api/auth/lookup-ticket` untuk merepair data tiket Klien lama.
 
 ### Pembaruan Logika Pembuatan Proyek & Survey Claim (2026-07-29)
 1. **Pencegahan Pembuatan Proyek Tanpa Akun Klien Resmi**:

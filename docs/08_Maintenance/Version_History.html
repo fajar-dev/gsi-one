@@ -113,7 +113,7 @@
 <body>
   <div class="container">
     <h1>Version History</h1>
-<h2>Proyek: GSI One Mobile Application &amp; Backend Infrastructure</h2>
+<h2>Proyek: GSI One Mobile Application &amp; Supabase</h2>
 <hr />
 <h2>Riwayat Versi &amp; Pembaruan Codebase</h2>
 <table>
@@ -130,7 +130,7 @@
       <td><strong>v3.0.0</strong></td>
       <td>31 Juli 2026</td>
       <td>Major</td>
-      <td>Audit keamanan CORS &amp; Helmet, pembaruan dokumentasi 12 folder, penambahan tabel ISO 25010 &amp; RBAC, regenerasi HTML Viewer</td>
+      <td>Audit keamanan RLS dan Edge Function, pembaruan dokumentasi 12 folder, penambahan tabel ISO 25010 &amp; RBAC, regenerasi HTML Viewer</td>
     </tr>
     <tr>
       <td><strong>v2.1.0</strong></td>
@@ -163,18 +163,6 @@
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <td>Keamanan</td>
-      <td>Audit CORS whitelist enforcement di <code>server.js</code> (3 origin terdaftar)</td>
-    </tr>
-    <tr>
-      <td>Keamanan</td>
-      <td>Integrasi <code>helmet()</code> untuk HTTP security headers</td>
-    </tr>
-    <tr>
-      <td>Keamanan</td>
-      <td>Validasi fatal <code>JWT_SECRET</code> pada startup backend server</td>
-    </tr>
     <tr>
       <td>Dokumentasi</td>
       <td>Pembaruan 12 folder docs dengan tabel RACI, RBAC, RTM, ISO 25010, SLO, Test Cases</td>
@@ -223,7 +211,7 @@
   <tbody>
     <tr>
       <td>Database</td>
-      <td>Migrasi dari SQLite-only ke Supabase PostgreSQL Cloud dengan RLS</td>
+      <td>PostgreSQL Supabase Cloud dengan RLS</td>
     </tr>
     <tr>
       <td>Auth</td>
@@ -251,10 +239,6 @@
     <tr>
       <td>Frontend</td>
       <td>Katalog 6 Layanan, Studi Kasus, Booking Survei</td>
-    </tr>
-    <tr>
-      <td>Backend</td>
-      <td>Express REST API, SQLite database lokal</td>
     </tr>
     <tr>
       <td>Auth</td>

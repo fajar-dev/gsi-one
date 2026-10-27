@@ -1,6 +1,5 @@
 import { supabase } from '../../../config/supabase';
 import { ProjectFileType } from '../../projectService';
-import { notificationService } from '../../notificationService';
 
 export class ProjectFileRepository {
     public async uploadFile(
@@ -19,9 +18,16 @@ export class ProjectFileRepository {
             throw new Error('Berkas yang akan diunggah tidak memiliki URI lokal. Metadata file tidak disimpan.');
         }
 
-        let fileBody: ArrayBuffer;
+        let fileBody: ArrayBuffer | FormData;
         try {
-            if (fileUri.startsWith('data:')) {
+            if (/^(file|content):/.test(fileUri)) {
+                // RN sends local URIs through its native multipart transport.
+                // storage-js requires has(), which RN FormData does not implement.
+                const body = new FormData() as FormData & { has?: (name: string) => boolean; getAll: (name: string) => unknown[] };
+                body.append('file', { uri: fileUri, name: fileName, type: this.getMimeType(fileExt) });
+                if (!body.has) body.has = name => body.getAll(name).length > 0;
+                fileBody = body;
+            } else if (fileUri.startsWith('data:')) {
                 fileBody = this.dataUriToArrayBuffer(fileUri);
             } else {
                 const fetchResponse = await fetch(fileUri);
@@ -31,12 +37,7 @@ export class ProjectFileRepository {
                 fileBody = await fetchResponse.arrayBuffer();
             }
 
-            const size = fileBody.byteLength;
-            if (__DEV__) {
-                console.log('[UPLOAD DEBUG] file size:', size, 'uri scheme:', fileUri.split(':')[0]);
-            }
-
-            if (size === 0) {
+            if (fileBody instanceof ArrayBuffer && fileBody.byteLength === 0) {
                 throw new Error('Berkas kosong (0 bytes) - gagal membaca konten dari URI lokal');
             }
         } catch (fetchErr) {
@@ -63,11 +64,7 @@ export class ProjectFileRepository {
         }
 
 
-        const publicUrlData = supabase.storage
-            .from('projects')
-            .getPublicUrl(storagePath);
-
-        const fileUrl = publicUrlData.data.publicUrl;
+        const fileUrl = storagePath;
 
         const { error: dbError } = await supabase
             .from('project_files')
@@ -83,37 +80,11 @@ export class ProjectFileRepository {
             ]);
 
         if (dbError) {
-            throw new Error(dbError.message || 'Gagal mencatat metadata berkas ke database');
-        }
-
-        try {
-            const { data: projData } = await supabase
-                .from('projects')
-                .select('project_name, client_id')
-                .eq('id', projectId)
-                .maybeSingle();
-
-            const projName = projData?.project_name || 'Proyek';
-
-            if (projData?.client_id) {
-                notificationService.createNotification({
-                    userId: projData.client_id,
-                    title: 'Dokumen Baru Diunggah',
-                    message: `Dokumen "${fileName}" telah diunggah pada proyek "${projName}".`,
-                    type: 'file_uploaded',
-                    referenceId: projectId,
-                });
+            const { error: cleanupError } = await supabase.storage.from('projects').remove([storagePath]);
+            if (cleanupError) {
+                throw new Error(`Metadata gagal disimpan dan berkas belum dibersihkan: ${dbError.message}. ${cleanupError.message}`);
             }
-
-            notificationService.createNotification({
-                targetRole: 'marketing',
-                title: 'Update Dokumentasi Proyek',
-                message: `Dokumen "${fileName}" diunggah pada proyek "${projName}".`,
-                type: 'file_uploaded',
-                referenceId: projectId,
-            });
-        } catch (notifErr) {
-            if (__DEV__) { console.warn('[NOTIFICATION ERROR] uploadFile:', notifErr instanceof Error ? notifErr.message : notifErr); }
+            throw new Error(dbError.message || 'Gagal mencatat metadata berkas ke database');
         }
     }
 

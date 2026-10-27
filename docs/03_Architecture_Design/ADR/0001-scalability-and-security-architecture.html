@@ -112,140 +112,19 @@
 </head>
 <body>
   <div class="container">
-    <h1>ADR 0001: Scalability and Security Architecture Enhancements</h1>
+    <h1>ADR 0001: Supabase sebagai layanan data aplikasi</h1>
 <h2>Status</h2>
-<p>Accepted</p>
-<h2>Context</h2>
-<p>Aplikasi GSI One mengalami audit teknis pada 30 Juli 2026 dan diperbarui pada 31 Juli 2026. Audit menemukan perlunya pengetatan Row-Level Security (RLS) notifikasi, penambahan CORS whitelist origin backend, proteksi HTTP security headers (<code>helmet()</code>), penanganan fatal env startup check (<code>JWT_SECRET</code>), penambahan indeks database relasional, serta pengarsipan dual-DB architecture (SQLite lokal dev &amp; Supabase PostgreSQL cloud prod).</p>
-<h2>Decisions</h2>
-<h3>1. Strict Owner &amp; Role-based RLS Policies</h3>
-<ul>
-  <li>Seluruh policy <code>notifications</code> diubah menjadi berbasis <code>user<em>id = auth.uid()</code> dan <code>target</em>role</code>.</li>
-  <li>Direct client <code>INSERT</code> ditutup; notifikasi dibuat via Database Trigger <code>SECURITY DEFINER</code> atau Backend REST API terproteksi.</li>
-  <li>Seluruh RLS policy proyek (<code>projects</code>, <code>project<em>stages</code>, <code>stage</em>updates</code>, <code>project<em>files</code>) dialihkan dari string matching ke UUID <code>client</em>id</code>, <code>engineer<em>id</code>, dan <code>marketing</em>id</code>.</li>
-</ul>
-<h3>2. Backend Security &amp; CORS Whitelist Enforcement</h3>
-<ul>
-  <li>Backend Express (<code>server.js</code>) membatasi origin HTTP request hanya ke domain terdaftar (<code>https://grahasurvei.com</code>, <code>http://localhost:3000</code>, <code>http://10.0.2.2:3000</code>) dengan audit logging callback.</li>
-  <li>Integrasi middleware <code>helmet()</code> untuk menyertakan <code>X-Content-Type-Options: nosniff</code>, <code>X-Frame-Options: SAMEORIGIN</code>, dan HSTS.</li>
-  <li>Validasi wajib <code>JWT_SECRET</code> pada startup server. Jika tidak ada, server akan keluar dengan error fatal.</li>
-</ul>
-<h3>3. High-Performance Relational Indexing &amp; Pagination</h3>
-<ul>
-  <li>Penambahan indeks terukur pada <code>projects(client<em>id, created</em>at DESC)</code>, <code>projects(marketing<em>id)</code>, <code>projects(engineer</em>id)</code>, <code>projects(status)</code>, <code>project<em>stages(project</em>id, sequence)</code>, <code>stage<em>updates(stage</em>id)</code>, dan <code>notifications(user<em>id, created</em>at DESC)</code>.</li>
-  <li>Penambahan kolom <code>project<em>id</code> pada <code>stage</em>updates</code> dengan trigger otomatis untuk mendukung penyaringan Supabase Realtime per proyek.</li>
-  <li>Penerapan <code>.range(offset, offset + limit - 1)</code> pada query list proyek dan notifikasi.</li>
-</ul>
-<h3>4. Pure DTO Mapping Layer &amp; Clean Architecture</h3>
-<ul>
-  <li>Pembuatan <code>projectMapper.ts</code> untuk konversi eksplisit dari Supabase Row types ke domain entities tanpa casting <code>as unknown as</code>.</li>
-  <li>Pemisahan sub-repository facade (<code>ProjectQueryRepository</code>, <code>ProjectStageRepository</code>, <code>ProjectFileRepository</code>, <code>ProjectCommandRepository</code>).</li>
-</ul>
-<h2>Consequences</h2>
-<ul>
-  <li>Keamanan data terjamin antar-peran dan antar-klien.</li>
-  <li>Performa query database tetap tinggi seiring bertambahnya data proyek.</li>
-  <li>backend aman dari serangan cross-origin dan header hijacking.</li>
-</ul>
-<hr />
-<h2>Tabel Ringkasan Architecture Decision Records (ADR)</h2>
-<table>
-  <thead>
-    <tr>
-      <th>ADR ID</th>
-      <th>Judul Keputusan</th>
-      <th>Status</th>
-      <th>Tanggal</th>
-      <th>Dampak Utama</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>ADR-01</td>
-      <td>Gunakan React Native &amp; TypeScript</td>
-      <td>Accepted</td>
-      <td>Jan 2026</td>
-      <td>Cross-platform Android &amp; iOS, strict type safety</td>
-    </tr>
-    <tr>
-      <td>ADR-02</td>
-      <td>Gunakan Zustand untuk State Management</td>
-      <td>Accepted</td>
-      <td>Jan 2026</td>
-      <td>Ringan, tanpa boilerplate Redux</td>
-    </tr>
-    <tr>
-      <td>ADR-03</td>
-      <td>Gunakan Supabase BaaS</td>
-      <td>Accepted</td>
-      <td>Jan 2026</td>
-      <td>PostgreSQL + Auth + Realtime + Storage terintegrasi</td>
-    </tr>
-    <tr>
-      <td>ADR-04</td>
-      <td>Admin-Only Registration (tanpa signup publik)</td>
-      <td>Accepted</td>
-      <td>Mar 2026</td>
-      <td>Keamanan data proyek terjaga</td>
-    </tr>
-    <tr>
-      <td>ADR-05</td>
-      <td>Centralized Design Tokens &amp; Role Theme</td>
-      <td>Accepted</td>
-      <td>Apr 2026</td>
-      <td>Konsistensi visual otomatis 4 role</td>
-    </tr>
-    <tr>
-      <td>ADR-06</td>
-      <td>Repository Pattern &amp; Sub-Repository Facade</td>
-      <td>Accepted</td>
-      <td>Jun 2026</td>
-      <td>Maintainability skor A, DTO mapping terisolasi</td>
-    </tr>
-    <tr>
-      <td>ADR-07</td>
-      <td>Strict RLS Policies berbasis UUID</td>
-      <td>Accepted</td>
-      <td>Jul 2026</td>
-      <td>Data proyek terisolasi per role/user</td>
-    </tr>
-    <tr>
-      <td>ADR-08</td>
-      <td>CORS Whitelist Enforcement di Express</td>
-      <td>Accepted</td>
-      <td>Jul 2026</td>
-      <td>Hanya 3 origin terdaftar diizinkan</td>
-    </tr>
-    <tr>
-      <td>ADR-09</td>
-      <td>Helmet HTTP Security Headers</td>
-      <td>Accepted</td>
-      <td>Jul 2026</td>
-      <td>Proteksi XSS, clickjacking, HSTS</td>
-    </tr>
-    <tr>
-      <td>ADR-10</td>
-      <td>Fatal <code>JWT_SECRET</code> Startup Check</td>
-      <td>Accepted</td>
-      <td>Jul 2026</td>
-      <td>Server tidak bisa jalan tanpa secret</td>
-    </tr>
-    <tr>
-      <td>ADR-11</td>
-      <td>Dual-Database (SQLite Dev &amp; Supabase Prod)</td>
-      <td>Accepted</td>
-      <td>Jul 2026</td>
-      <td>Isolasi pengujian lokal tanpa cloud dependency</td>
-    </tr>
-    <tr>
-      <td>ADR-12</td>
-      <td>Pagination &amp; Project-Scoped Realtime</td>
-      <td>Accepted</td>
-      <td>Jul 2026</td>
-      <td>Efisiensi memori pada list besar</td>
-    </tr>
-  </tbody>
-</table>
+<p>Accepted; diperbarui 26 Oktober 2026.</p>
+<h2>Keputusan</h2>
+<p>Aplikasi mengakses Supabase langsung melalui service dan repository. PostgreSQL menyimpan data bisnis dan menegakkan RLS. Auth menangani sesi; Storage menyimpan berkas; Realtime meneruskan perubahan proyek. Operasi pembuatan pengguna dilakukan oleh Edge Function <code>admin-create-user</code> yang memvalidasi role admin dari database.</p>
+<h2>Batas akses</h2>
+<p>Filter UI dan query daftar bukan pengganti RLS. Policy saat ini mengizinkan staf membaca lintas proyek dan melakukan sejumlah mutasi yang lebih luas daripada kontrol UI. Klien mengakses proyek melalui UUID pemilik/pembuat.</p>
+<p>Client tidak membuat notifikasi langsung. Trigger database membuat notifikasi booking; notifikasi untuk operasi proyek membutuhkan implementasi trigger tambahan.</p>
+<h2>Performa dan pemetaan</h2>
+<p>Indeks meliputi penugasan proyek, status, urutan tahapan, serta waktu catatan dan notifikasi. <code>stage<em>updates.project</em>id</code> diisi trigger agar subscription dapat difilter per proyek. Pagination tersedia pada repository, tetapi belum sepenuhnya diteruskan oleh service daftar proyek.</p>
+<p><code>projectMapper.ts</code> menormalkan row daftar proyek; jalur detail masih memakai casting dan perlu dipertimbangkan pada refactoring selanjutnya.</p>
+<h2>Konsekuensi</h2>
+<p>Satu sumber data bisnis berada di PostgreSQL Supabase. Operasi privileged terisolasi di Edge Function dan database. Perubahan akses perlu diuji di database dengan akun tiap peran; kelulusan test mock tidak membuktikan policy cloud.</p>
 
   </div>
 </body>

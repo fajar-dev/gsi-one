@@ -112,66 +112,32 @@
 </head>
 <body>
   <div class="container">
-    <h1>Deployment Guide &amp; SDLC Release Strategy</h1>
-<h2>Proyek: GSI One Mobile Application &amp; Express Backend Infrastructure</h2>
-<hr />
-<h2>1. Prasyarat &amp; Quality Gates Deployment</h2>
-<p>Sebelum rilis ke lingkungan produksi (<em>production environment</em>), seluruh kriteria <em>Quality Gates</em> berikut wajib terpenuhi:</p>
-<ul>
-  <li>[x] <strong>TypeScript Strict Check</strong>: <code>npm run typecheck</code> menghasilkan <strong>0 Errors</strong>.</li>
-  <li>[x] <strong>Automated Testing Suite</strong>: <code>npm run test:ci</code> atau <code>npm test</code> menghasilkan <strong>0 Failures</strong> (15 Test Suites Passed).</li>
-  <li>[x] <strong>Security Audit</strong>: Backend Express terverifikasi mengaktifkan <code>helmet()</code>, CORS whitelist origin (<code>https://grahasurvei.com</code>), dan validasi startup <code>JWT_SECRET</code>.</li>
-  <li>[x] <strong>Database RLS Policies</strong>: Seluruh tabel Supabase (<code>projects</code>, <code>bookings</code>, <code>project<em>stages</code>, <code>stage</em>updates</code>, <code>project_files</code>, <code>notifications</code>, <code>users</code>) telah mengaktifkan Row Level Security (RLS).</li>
-  <li>[x] <strong>Keystore &amp; Signing Config</strong>: Keystore rilis Android telah siap dan terkonfigurasi di <code>android/app/build.gradle</code>.</li>
-</ul>
-<hr />
-<h2>2. Deployment Backend Express REST API</h2>
-<h3>2.1 SSH &amp; Direct Setup di Server VPS</h3>
-<pre><code class="language-bash"># 1. SSH ke VPS Server
-ssh admin@api.grahasurvei.com
-
-# 2. Clone / Pull kode backend terbaru
-cd /var/www/gsi-one/backend
-git pull origin main
-
-# 3. Install dependensi backend
-npm ci --production
-
-# 4. Pastikan file backend/.env sudah diisi:
-# PORT=3000
-# JWT_SECRET=super_secret_jwt_key
-# SUPABASE_URL=https://&lt;your-project&gt;.supabase.co
-# SUPABASE_SECRET_KEY=service_role_key
-
-# 5. Jalankan server backend menggunakan PM2
-pm2 start server.js --name "gsi-one-backend"
-pm2 save</code></pre>
-<hr />
-<h2>3. Build &amp; Bundle Android Release (APK / AAB)</h2>
-<pre><code class="language-bash"># 1. Masuk ke folder android
-cd android
-
-# 2. Bersihkan sisa build terdahulu
-./gradlew clean
-
-# 3. Build Production AAB (Untuk Google Play Console Track Pengujian Tertutup / Closed Testing)
+    <h1>Deployment Guide</h1>
+<h2>Quality gates</h2>
+<p>Jalankan <code>npm ci</code>, <code>npm run lint</code>, <code>npm run typecheck</code>, dan <code>npm run test:ci</code>. Verifikasi login serta operasi tiap peran di lingkungan pengujian; test dengan mock tidak menggantikan pemeriksaan RLS pada database.</p>
+<h2>Supabase</h2>
+<ol>
+  <li>Pilih project yang sesuai dan terapkan migrasi dari <code>supabase/migrations/</code> secara berurutan.</li>
+  <li>Deploy <code>supabase/functions/admin-create-user/</code> dan verifikasi konfigurasi server serta daftar origin web.</li>
+  <li>Pastikan Auth, policy database, bucket <code>projects</code>, dan publikasi realtime sesuai kebutuhan aplikasi.</li>
+  <li>Isi <code>.env</code> aplikasi dengan <code>SUPABASE<em>URL</code> dan <code>SUPABASE</em>ANON_KEY</code> project tersebut.</li>
+  <li>Data demo tersedia di <code>supabase/seed.sql</code>; jalankan hanya bila data demo dibutuhkan.</li>
+</ol>
+<h2>Build Android</h2>
+<p>Siapkan SDK/JDK dan signing key rilis sebelum menjalankan:</p>
+<pre><code class="language-bash">cd android
 ./gradlew bundleRelease
-
-# 4. Build Production APK (Untuk Instalasi Langsung / Internal HP Testing)
 ./gradlew assembleRelease</code></pre>
-<p><strong>Lokasi Berkas Biner Hasil Build:</strong></p>
+<p>AAB: <code>android/app/build/outputs/bundle/release/app-release.aab</code>.</p>
+<p>APK: <code>android/app/build/outputs/apk/release/app-release.apk</code>.</p>
+<h2>Verifikasi rilis</h2>
 <ul>
-  <li><strong>Android App Bundle (AAB)</strong>: <code>android/app/build/outputs/bundle/release/app-release.aab</code></li>
-  <li><strong>Android Package (APK)</strong>: <code>android/app/build/outputs/apk/release/app-release.apk</code></li>
+  <li>Login admin, marketing, engineer, dan klien.</li>
+  <li>Pembuatan akun melalui Edge Function.</li>
+  <li>Booking, daftar proyek, mutasi tahapan, catatan, upload, dan pembukaan berkas.</li>
+  <li>Realtime pada detail proyek dan isolasi data antar-klien.</li>
 </ul>
-<hr />
-<h2>4. Verifikasi Pasca-Deployment (Smoke Test Checklist)</h2>
-<ul>
-  <li>[ ] <strong>Download &amp; Install</strong>: Aplikasi dapat diinstal dengan lancar dari Google Play / APK.</li>
-  <li>[ ] <strong>CORS Verification</strong>: Endpoint REST API menolak origin yang tidak terdaftar dan melayani request domain <code>https://grahasurvei.com</code>.</li>
-  <li>[ ] <strong>Authentication</strong>: Login dengan akun Client, Marketing, Engineer, dan Admin berhasil.</li>
-  <li>[ ] <strong>Realtime Sync &amp; Storage</strong>: Pembaruan status proyek tersinkronisasi dan file tersimpan aman di Supabase Storage privat.</li>
-</ul>
+<p>Tidak ada proses server aplikasi terpisah untuk di-deploy. Distribusi iOS memakai Xcode/App Store Connect; web memakai bundle React Native Web.</p>
 
   </div>
 </body>

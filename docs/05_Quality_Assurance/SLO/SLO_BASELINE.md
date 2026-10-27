@@ -12,11 +12,11 @@ Dokumen ini menetapkan target Service Level Objective (SLO) awal untuk sistem GS
 
 | Endpoint Group | Target Availability | Measurement Window |
 |---|---|---|
-| Auth (`/api/login`, `/api/auth/*`) | >= 99.5% | Rolling 30 hari |
-| Projects (`/api/projects`, `/api/stages/*`) | >= 99.0% | Rolling 30 hari |
-| Bookings (`/api/bookings/*`) | >= 99.0% | Rolling 30 hari |
-| Notifications (`/api/notifications`) | >= 99.0% | Rolling 30 hari |
-| File Upload (`/api/files/upload`) | >= 98.0% | Rolling 30 hari |
+| Supabase Auth dan RPC tiket | >= 99.5% | Rolling 30 hari |
+| PostgREST proyek dan tahapan | >= 99.0% | Rolling 30 hari |
+| PostgREST bookings | >= 99.0% | Rolling 30 hari |
+| PostgREST notifications | >= 99.0% | Rolling 30 hari |
+| Supabase Storage upload | >= 98.0% | Rolling 30 hari |
 
 **Definisi tersedia**: Endpoint mengembalikan respons HTTP dalam 5 detik dengan status bukan 5xx.
 
@@ -47,4 +47,4 @@ Alert harus diaktifkan ketika salah satu kondisi berikut terpenuhi selama window
 | **Upload Failure Spike** | Error rate upload > 10% |
 | **CORS Audit Warning Spike** | Penolakan origin CORS > 50 request per menit |
 | **Realtime Channel Failure** | Lebih dari 5 kegagalan koneksi channel per menit |
-| **Login Brute Force** | Rate limiter authLimiter aktif lebih dari 20x per IP dalam 15 menit |
+| **Login Brute Force** | Lonjakan kegagalan login pada log Supabase Auth; threshold mengikuti konfigurasi Auth |

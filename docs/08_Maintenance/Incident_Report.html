@@ -160,30 +160,6 @@ Tindakan Pencegahan:
       <th>Status</th>
     </tr>
   </thead>
-  <tbody>
-    <tr>
-      <td>INC-001</td>
-      <td>2026-07-30</td>
-      <td>Medium</td>
-      <td>CORS Backend</td>
-      <td>Request dari origin tidak terdaftar muncul berulang di log audit</td>
-      <td>Bot/crawler mengirim request ke API</td>
-      <td>Validasi callback CORS sudah menolak origin; log monitoring ditambahkan</td>
-      <td>&lt; 1 jam</td>
-      <td>Closed</td>
-    </tr>
-    <tr>
-      <td>INC-002</td>
-      <td>2026-07-28</td>
-      <td>Low</td>
-      <td>Database SQLite</td>
-      <td>Kolom <code>client_id</code> belum ada di tabel <code>projects</code> pada instance dev lama</td>
-      <td>Migrasi <code>ALTER TABLE</code> menggunakan <code>try/catch(e){}</code> tanpa logging</td>
-      <td>Eksekusi manual <code>fix<em>project</em>client_ids.sql</code></td>
-      <td>&lt; 30 menit</td>
-      <td>Closed</td>
-    </tr>
-  </tbody>
 </table>
 <hr />
 <h2>Tabel Klasifikasi Severity Insiden</h2>

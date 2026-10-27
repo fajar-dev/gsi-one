@@ -134,7 +134,7 @@
   <li>Catat hasil SLO dan regression test.</li>
   <li>Promosikan rilis yang disetujui ke Google Play/App Store.</li>
 </ol>
-<p>Jangan menyertakan service-role key, JWT secret, atau keystore dalam workflow atau artefak build.</p>
+<p>Jangan menyertakan service-role key, password database, atau keystore dalam workflow atau artefak build.</p>
 <hr />
 <h2>3. Diagram Alur Kerja CI/CD Pipeline (GitHub Actions Flow)</h2>
 <pre class="mermaid">
@@ -158,7 +158,7 @@ flowchart LR
 
     subgraph CDJobs["Prosedur Release &amp; Deployment (CD)"]
         BuildAndroid["Build Release AAB/APK (Gradle)"]
-        DeployBackend["Deploy Backend Express ke VPS (PM2)"]
+        DeploySupabase["Terapkan migrasi dan deploy Edge Function"]
         PlayStore["Rollout Google Play Closed Testing"]
     end
 
@@ -171,7 +171,7 @@ flowchart LR
 
     Result --&gt;|Gagal| Block[Block Merge / Notify Dev]
     Result --&gt;|Lulus| Merge[Merge PR ke main]
-    Merge --&gt; BuildAndroid &amp; DeployBackend
+    Merge --&gt; BuildAndroid &amp; DeploySupabase
     BuildAndroid --&gt; PlayStore
 </pre>
 

@@ -113,7 +113,7 @@
 <body>
   <div class="container">
     <h1>Known Issues</h1>
-<h2>Proyek: GSI One Mobile Application &amp; Backend Infrastructure</h2>
+<h2>Proyek: GSI One Mobile Application &amp; Supabase</h2>
 <hr />
 <p>Daftar masalah yang sudah diketahui dan status penanganannya.</p>
 <hr />
@@ -190,26 +190,6 @@
       <td>Klien tidak mendapat notifikasi instan</td>
       <td>Tim GSI menghubungi klien via telepon/email</td>
       <td>v4.0.0</td>
-      <td>Open</td>
-    </tr>
-    <tr>
-      <td>KI-007</td>
-      <td>Keamanan</td>
-      <td>Rate limiter login dilewati untuk <code>localhost</code> / <code>127.0.0.1</code></td>
-      <td>Low</td>
-      <td>Potensi brute-force di environment dev</td>
-      <td>Hanya berlaku di localhost, tidak di production</td>
-      <td>Accepted</td>
-      <td>Accepted</td>
-    </tr>
-    <tr>
-      <td>KI-008</td>
-      <td>Database</td>
-      <td>Migrasi kolom SQLite menggunakan <code>try/catch(e){}</code> silent error</td>
-      <td>Low</td>
-      <td>Error migrasi kolom terlewat tanpa log</td>
-      <td>Periksa manual skema SQLite setelah inisialisasi</td>
-      <td>v3.1.0</td>
       <td>Open</td>
     </tr>
   </tbody>

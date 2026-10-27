@@ -77,7 +77,7 @@ export const AdminRegisterUserModal: React.FC<AdminRegisterUserModalProps> = ({
                         <Text style={styles.fieldLabel}>Password *</Text>
                         <TextInput
                             style={styles.input}
-                            placeholder="Minimal 6 karakter"
+                            placeholder="Minimal 8 karakter"
                             placeholderTextColor="#9E9E9E"
                             value={newUserPassword}
                             onChangeText={setNewUserPassword}

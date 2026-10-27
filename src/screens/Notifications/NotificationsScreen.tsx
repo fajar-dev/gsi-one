@@ -71,6 +71,7 @@ function NotificationsScreen(): JSX.Element {
     notifications,
     unreadCount,
     isLoading,
+    error,
     fetchNotifications,
     markAsRead,
     markAllAsRead,
@@ -222,6 +223,10 @@ function NotificationsScreen(): JSX.Element {
         </TouchableOpacity>
       </View>
 
+      {!!error && <TouchableOpacity onPress={handleRefresh} style={styles.emptyContainer}>
+        <Text style={styles.emptyTitle}>Notifikasi belum dimuat</Text>
+        <Text style={styles.emptySubtitle}>{error} Ketuk untuk mencoba lagi.</Text>
+      </TouchableOpacity>}
       {isLoading && notifications.length === 0 ? (
         <View style={styles.loadingWrapper}>
           <ActivityIndicator size="large" color={colors.secondary} />

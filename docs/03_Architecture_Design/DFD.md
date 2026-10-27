@@ -1,5 +1,5 @@
 # Data Flow Diagram (DFD) Specification
-## Proyek: GSI One Mobile Application & Express Backend API
+## Proyek: GSI One Mobile Application & Supabase
 
 ---
 
@@ -18,7 +18,7 @@ graph TB
     end
 
     subgraph Process0["Sistem Utama GSI One (Process 0)"]
-        System0["0. Sistem Informasi GSI One\n(Mobile App & Backend REST API)"]
+        System0["0. Sistem Informasi GSI One\n(Mobile App & Supabase)"]
     end
 
     Public -->|"Formulir Book Survey"| System0

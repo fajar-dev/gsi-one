@@ -113,73 +113,32 @@
 <body>
   <div class="container">
     <h1>Developer Guide</h1>
-<h2>Proyek: GSI One Mobile Application &amp; Express Backend Server</h2>
-<hr />
-<h2>1. Persiapan Lingkungan Pengembangan (Development Setup)</h2>
-<h3>1.1 Persyaratan Sistem</h3>
+<h2>Lingkungan</h2>
 <ul>
-  <li>Node.js v20+ &amp; npm / yarn</li>
-  <li>Android Studio &amp; Android SDK (API Level 21+)</li>
-  <li>Xcode (khusus macOS untuk pengembangan iOS)</li>
-  <li>React Native CLI (v0.83+)</li>
-  <li>SQLite3 (untuk database lokal backend)</li>
+  <li>Node.js 20 atau lebih baru dan npm.</li>
+  <li>JDK 17, Android SDK Platform 36, Build Tools 36.0.0, dan NDK 27.1.12297006 untuk Android.</li>
+  <li>Xcode dan CocoaPods untuk iOS.</li>
+  <li>Project Supabase yang telah dikonfigurasi dengan migrasi dan Edge Function.</li>
 </ul>
-<h3>1.2 Langkah Instalasi &amp; Menjalankan Frontend</h3>
-<ol>
-  <li>Clone repositori proyek GSI One.</li>
-  <li>Install dependensi frontend:</li>
-<pre><code class="language-bash">   npm ci</code></pre>
-  <li>Buat file <code>.env</code> di root proyek:</li>
-<pre><code class="language-env">   SUPABASE_URL=https://your-supabase-url.supabase.co
-   SUPABASE_ANON_KEY=your-anon-key
-   APP_ENV=development
-   API_BASE_URL_EMULATOR=http://10.0.2.2:3000
-   API_BASE_URL_SIMULATOR=http://localhost:3000
-   API_BASE_URL_PRODUCTION=https://grahasurvei.com</code></pre>
-  <li>Jalankan aplikasi pada Emulator / Simulator:</li>
-<pre><code class="language-bash">   # Android
-   npm run android
-
-   # iOS
-   npm run ios
-
-   # Web
-   npm run web</code></pre>
-</ol>
-<h3>1.3 Langkah Instalasi &amp; Menjalankan Backend Server</h3>
-<ol>
-  <li>Masuk ke direktori <code>backend/</code>:</li>
-<pre><code class="language-bash">   cd backend
-   npm ci</code></pre>
-  <li>Buat file <code>backend/.env</code>:</li>
-<pre><code class="language-env">   PORT=3000
-   JWT_SECRET=rahasia_jwt_secret_gsi_one_2026_super_secure
-   SUPABASE_URL=https://your-supabase-url.supabase.co
-   SUPABASE_SECRET_KEY=your-service-role-key</code></pre>
-  <li>Menjalankan server backend Express (otomatis menginisialisasi SQLite <code>gsi_one.db</code>):</li>
-<pre><code class="language-bash">   npm start</code></pre>
-</ol>
-<h3>1.4 Pengujian &amp; Validasi Kualitas Kode</h3>
-<pre><code class="language-bash"># Jalankan unit test Jest
-npm test
-
-# Jalankan coverage test
-npm run test:coverage
-
-# Pengecekan tipe data TypeScript
+<pre><code class="language-bash">npm ci
+cp .env.example .env</code></pre>
+<p>Isi <code>SUPABASE<em>URL</code> dan <code>SUPABASE</em>ANON_KEY</code> pada <code>.env</code>.</p>
+<h2>Menjalankan aplikasi</h2>
+<pre><code class="language-bash">npm start</code></pre>
+<p>Pada terminal lain:</p>
+<pre><code class="language-bash">npm run android</code></pre>
+<p>Untuk perangkat Android lewat USB, pastikan USB debugging aktif dan pasang koneksi Metro:</p>
+<pre><code class="language-bash">adb devices
+adb reverse tcp:8081 tcp:8081</code></pre>
+<p>iOS menggunakan <code>npm run ios</code>; web menggunakan <code>npm run web</code> pada port 8080. Komunikasi data langsung menuju Supabase.</p>
+<h2>Database dan akun demo</h2>
+<p><code>supabase/migrations/</code> berisi perubahan skema, trigger, dan RLS. <code>supabase/seed.sql</code> mengisi 4 akun, 3 proyek, 10 tahapan, 2 catatan, dan 1 metadata foto. Jalankan di SQL Editor setelah migrasi pada project yang dituju. Password akun baru adalah <code>password123</code>; akun lama tidak direset oleh seed.</p>
+<p>Pendaftaran akun aplikasi memakai Edge Function <code>admin-create-user</code> yang memverifikasi sesi dan role admin sebelum memakai Auth Admin API.</p>
+<h2>Pemeriksaan</h2>
+<pre><code class="language-bash">npm run lint
 npm run typecheck
-
-# Pengujian kualitas linting
-npm run lint</code></pre>
-<hr />
-<h2>2. Aturan Pengkodingan (Coding Guidelines)</h2>
-<ul>
-  <li><strong>Clean Architecture</strong>: Selalu pisahkan UI dari logika data menggunakan Custom Hooks dan Repository Pattern.</li>
-  <li><strong>Strict TypeScript</strong>: Selalu tentukan tipe data pada fungsi dan variabel. Dilarang menggunakan <code>any</code>.</li>
-  <li><strong>Zero Emoji Rule</strong>: Seluruh dokumen, respon sistem, dan komentar kode wajib bersih dari penggunaan emoji.</li>
-  <li><strong>Error Handling</strong>: Gunakan <code>getErrorMessage</code> dari <code>src/utils/errorHelpers.ts</code> untuk menangkap kesalahan secara konsisten.</li>
-  <li><strong>Security Awareness</strong>: Selalu gunakan <code>helmet()</code>, validasi CORS origin, dan RLS Supabase saat menambah endpoint atau tabel baru.</li>
-</ul>
+npm run test:ci</code></pre>
+<p>Pisahkan UI, hook/store, service, dan repository. Gunakan helper error bersama serta periksa hasil mutasi agar penolakan RLS tidak dilaporkan sebagai keberhasilan.</p>
 
   </div>
 </body>

@@ -49,7 +49,7 @@ function ForgotPasswordScreen(): React.ReactElement {
                     </Text>
                     <Text style={styles.emailHighlight}>{email}</Text>
                     <Text style={styles.successNote}>
-                        Periksa kotak masuk atau folder spam Anda. Tautan berlaku selama 60 menit.
+                        Periksa kotak masuk atau folder spam Anda. Gunakan tautan terbaru sebelum kedaluwarsa.
                     </Text>
                     <TouchableOpacity
                         style={styles.button}

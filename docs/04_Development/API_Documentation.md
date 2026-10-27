@@ -43,4 +43,4 @@ export function SurveyRequestsContainer() {
 ```
 
 Dokumen spesifikasi API lengkap dapat diakses pada:
-[API_SPECIFICATION.md](file:///d:/GSI%20One%20-%20Copy/docs/API_SPECIFICATION.md)
+[API_SPECIFICATION.md](../03_Architecture_Design/API_SPECIFICATION_Full.md)

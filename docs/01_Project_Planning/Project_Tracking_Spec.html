@@ -200,13 +200,7 @@
 </ol>
 <ul>
   <li>Mengunci Storage Bucket <code>projects</code> (<code>public = false</code>) dan menyediakan Signed URL berbatas waktu via <code>storageService.ts</code>.</li>
-</ul>
-<ol>
-  <li><strong>Fix Login Tiket Klien &amp; Auto-Repair (<code>authRoutes.js</code> &amp; <code>20260730000004<em>fix</em>ticket<em>number</em>trigger<em>and</em>rls.sql</code>)</strong>:</li>
-</ol>
-<ul>
   <li>Memperbarui trigger <code>handle<em>new</em>user()</code> dan RLS <code>users<em>update</em>policy</code> agar <code>ticket_number</code> langsung tersimpan otomatis.</li>
-  <li>Menambahkan auto-repair fallback pada <code>/api/auth/lookup-ticket</code> untuk merepair data tiket Klien lama.</li>
 </ul>
 <h3>Pembaruan Logika Pembuatan Proyek &amp; Survey Claim (2026-07-29)</h3>
 <ol>

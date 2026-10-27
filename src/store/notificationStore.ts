@@ -5,6 +5,8 @@ interface NotificationState {
   notifications: AppNotification[];
   unreadCount: number;
   isLoading: boolean;
+  ownerId: string | null;
+  error: string | null;
 
   fetchNotifications: (userId?: string | null, role?: string | null) => Promise<void>;
   markAsRead: (notificationId: string) => Promise<void>;
@@ -17,20 +19,25 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
   notifications: [],
   unreadCount: 0,
   isLoading: false,
+  ownerId: null,
+  error: null,
 
   fetchNotifications: async (userId, role) => {
     if (!userId && !role) return;
-    set({ isLoading: true });
+    set({ isLoading: true, ownerId: userId || null, error: null });
     try {
       const data = await notificationService.getNotifications(userId, role);
+      if (get().ownerId !== (userId || null)) return;
       const unreadCount = data.filter((n) => !n.is_read).length;
       set({ notifications: data, unreadCount, isLoading: false });
-    } catch {
-      set({ isLoading: false });
+    } catch (err) {
+      if (get().ownerId !== (userId || null)) return;
+      set({ isLoading: false, error: err instanceof Error ? err.message : 'Gagal memuat notifikasi.' });
     }
   },
 
   markAsRead: async (notificationId) => {
+    const ownerId = get().ownerId;
     const previousList = get().notifications;
     const previousUnread = get().unreadCount;
 
@@ -43,11 +50,12 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     try {
       await notificationService.markAsRead(notificationId);
     } catch {
-      set({ notifications: previousList, unreadCount: previousUnread });
+      if (get().ownerId === ownerId) set({ notifications: previousList, unreadCount: previousUnread, error: 'Perubahan notifikasi belum tersimpan. Silakan coba lagi.' });
     }
   },
 
   markAllAsRead: async (userId, role) => {
+    const ownerId = get().ownerId;
     const previousList = get().notifications;
     const previousUnread = get().unreadCount;
 
@@ -57,11 +65,12 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     try {
       await notificationService.markAllAsRead(userId, role);
     } catch {
-      set({ notifications: previousList, unreadCount: previousUnread });
+      if (get().ownerId === ownerId) set({ notifications: previousList, unreadCount: previousUnread, error: 'Perubahan notifikasi belum tersimpan. Silakan coba lagi.' });
     }
   },
 
   deleteNotification: async (notificationId) => {
+    const ownerId = get().ownerId;
     const previousList = get().notifications;
     const previousUnread = get().unreadCount;
 
@@ -72,7 +81,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     try {
       await notificationService.deleteNotification(notificationId);
     } catch {
-      set({ notifications: previousList, unreadCount: previousUnread });
+      if (get().ownerId === ownerId) set({ notifications: previousList, unreadCount: previousUnread, error: 'Perubahan notifikasi belum tersimpan. Silakan coba lagi.' });
     }
   },
 

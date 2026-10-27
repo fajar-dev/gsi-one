@@ -50,7 +50,7 @@ Aplikasi dibangun menganut pola **Clean Architecture & Layered Domain Design (OO
     [ Repository Layer (Façade & Sub-repos) ]
                    │
                    ▼
- [ Data Sources: Supabase SDK / Express API ]
+ [ Data Sources: Supabase SDK / Edge Functions ]
 ```
 
 ### Lapisan Utama Codebase:
@@ -79,7 +79,7 @@ Berikut peta navigasi direktori proyek:
 d:\GSI One - Copy\
 ├── __tests__/               -- Automated Unit Test Suites (Jest)
 ├── assets/                  -- Image assets, icons, dan Design Tokens (Colors.tsx)
-├── backend/                 -- Express REST API, SQLite DB, RLS SQL scripts
+├── supabase/                -- Migrasi, seed, dan Edge Functions
 ├── docs/                    -- Dokumentasi teknis lengkap & generator dokumen HTML
 ├── src/
 │   ├── components/          -- Shared UI components (ScreenHeader, SupportCard, SkeletonBox, dll)
@@ -120,15 +120,13 @@ d:\GSI One - Copy\
    ```
 
 3. **Pengaturan Berkas Konfigurasi (`.env`)**:
-   Salin `.env.example` ke `.env` di root folder dan di folder `backend/`:
+   Salin `.env.example` ke `.env` di root folder:
    ```powershell
    cp .env.example .env
-   cp .env.example backend/.env
    ```
    Pastikan variabel berikut terisi dengan benar:
-   - `EXPO_PUBLIC_SUPABASE_URL` / `SUPABASE_URL`
-   - `EXPO_PUBLIC_SUPABASE_ANON_KEY` / `SUPABASE_ANON_KEY`
-   - `EXPO_PUBLIC_API_URL` (misal: `http://localhost:5000/api` atau IP jaringan lokal)
+   - `SUPABASE_URL`
+   - `SUPABASE_ANON_KEY`
 
 4. **Menjalankan Dev Server Metro**:
    ```powershell
@@ -140,84 +138,21 @@ d:\GSI One - Copy\
    npm run android
    ```
 
-6. **Menjalankan Backend Server (Opsional untuk Local Dev)**:
-   ```powershell
-   cd backend
-   node server.js
-   ```
-
 ---
 
-## 5. Backend, Database & Supabase Integration
+## 5. Integrasi Supabase
 
-### 5.1 Arsitektur Supabase & Keamanan
-- **PostgreSQL Database**:
-  - Tabel utama: `users`, `projects`, `project_stages`, `project_notes`, `project_files`, `survey_requests`, dan `notifications`.
-  - Definisi skema lengkap berada di `backend/supabase_schema.sql`.
-- **Row Level Security (RLS)**:
-  - Hak akses data dibatasi langsung di tingkat database PostgreSQL.
-  - Role `client`: Hanya dapat mengakses proyek di mana `client_id = auth.uid()` atau `client_name` yang cocok.
-  - Role `engineer`: Hanya dapat melihat proyek di mana `engineer_id = auth.uid()` atau `created_by = auth.uid()`.
-  - Role `admin` & `marketing`: Memiliki akses luas untuk pembuatan dan klaim survey.
-- **PostgreSQL Trigger Utama**:
-  - `sync_user_name_changes`: Memastikan ketika `users.name` diubah di profil, nilai `projects.client_name` otomatis ter-update sehingga akses RLS tidak terputus.
-  - Skrip SQL terkait: `backend/update_rls_policies.sql`, `backend/add_delete_policies.sql`, `backend/fix_project_client_ids.sql`, dan `backend/fix_booking_notifications.sql`.
-- **Supabase Storage Bucket**:
-  - Bucket `projects` dikonfigurasi sebagai bucket privat.
-  - Pengaksesan berkas teknis dan foto menggunakan Signed URL sementara (`storageService.ts`).
+Data aplikasi berada di PostgreSQL Supabase. Tabel utama: `users`, `projects`, `project_stages`, `stage_updates`, `project_files`, `bookings`, dan `notifications`.
 
----
+- Skema, policy RLS, indeks, dan trigger berada di `supabase/migrations/`.
+- Login memakai Supabase Auth; pembuatan akun oleh admin melalui `supabase/functions/admin-create-user/`.
+- `supabase/seed.sql` berisi data demo mandiri dan tidak menghapus data.
+- Detail proyek berlangganan perubahan proyek, tahapan, serta catatan melalui `useProjectRealtime`.
+- Upload mengirim data langsung ke bucket `projects` dan menyimpan metadata di PostgreSQL. Migrasi terbaru memakai bucket publik; UI membuka URL tersimpan.
+- Notifikasi booking dibuat trigger database. Pemanggilan notifikasi dari client merupakan no-op.
 
-### 5.2 Status Fitur Backend & Supabase (Sudah Selesai vs Belum Selesai)
+Lihat [spesifikasi API](docs/03_Architecture_Design/API_SPECIFICATION_Full.md) untuk kontrak aktif. RLS dapat memberi akses staf yang lebih luas daripada kontrol UI; uji kedua lapisan saat mengubah hak akses.
 
-#### A. Yang Sudah Selesai (Completed Features)
-
-1. **Otentikasi & Manajemen Pengguna (Auth & RBAC)**:
-   - Integrasi Supabase Auth (email/password login, pendaftaran pengguna baru, dan reset password).
-   - Skema peran (`admin`, `marketing`, `engineer`, `client`) dengan kontrol akses di aplikasi dan RLS database.
-   - Pendaftaran akun baru oleh Admin melalui modal `AdminRegisterModal.tsx` dan endpoint auth server.
-
-2. **Skema PostgreSQL & Kebijakan Keamanan (RLS & Triggers)**:
-   - SELURUH tabel master (`users`, `projects`, `project_stages`, `project_notes`, `project_files`, `survey_requests`, `notifications`) sudah berjalan di Supabase Production/Development.
-   - Trigger otomatis sinkronisasi nama pengguna (`sync_user_name_changes`) untuk mencegah hilangnya proyek saat profil disunting.
-   - Skrip perbaikan dan pengisian `client_id` otomatis (`fix_project_client_ids.sql`).
-
-3. **Storage Bucket & Management File**:
-   - Bucket privat `projects` untuk pengunggahan laporan NDT, sertifikat, dan foto progres harian.
-   - Generator Signed URL berjangka waktu di `storageService.ts` untuk pengunduhan file yang aman.
-
-4. **Dual Backend Fallback (Express REST API + SQLite)**:
-   - REST API server berbasis Node.js/Express di folder `backend/server.js`.
-   - Router mandiri: `authRoutes.js`, `projectRoutes.js`, `bookingRoutes.js`, `fileRoutes.js`, `notificationRoutes.js`.
-   - Pengamanan CORS (`allowedOrigins`), rate limiting (`authLimiter`), JWT token middleware, dan Multer file upload handler.
-   - Local SQLite database (`gsi_one.db`) dengan script pengisi data awal (`seed_data.js`).
-
-5. **Sinkronisasi Data Real-time (Supabase WebSockets)**:
-   - Hook `useProjectRealtime.ts` untuk mendengarkan perubahan instan (*INSERT*, *UPDATE*, *DELETE*) pada tabel proyek, tahapan, dan catatan.
-
-#### B. Yang Belum Selesai / Rencana Pengembangan (Pending & Roadmap)
-
-1. **Push Notification Service (FCM / OneSignal Integration)**:
-   - *Status*: Belum Selesai (Dalam Perancangan).
-   - *Keterangan*: Notifikasi saat ini tersimpan di tabel database `notifications` dan dapat dibaca di in-app notification center. Namun, pengiriman push notification langsung ke perangkat mobile pengguna saat layar mati (*background service*) via Firebase Cloud Messaging (FCM) atau OneSignal belum dipasang.
-
-2. **Automated Cron Jobs / Supabase Edge Functions**:
-   - *Status*: Belum Selesai (Rencana Pengembangan).
-   - *Keterangan*: Direktori `supabase/functions/` telah disiapkan. Skrip otomatisasi tingkat server untuk mendeteksi proyek jatuh tempo (*overdue project reminder*) dan pembersihan file temporary belum di-deploy sebagai Edge Functions.
-
-3. **Database Audit Logs & Activity Trail**:
-   - *Status*: Belum Selesai.
-   - *Keterangan*: Belum ada tabel khusus `audit_logs` untuk mencatat riwayat perubahan data sensitif (misal: siapa yang menghapus file proyek atau mengubah status tahapan proyek secara mendalam).
-
-4. **Offline Synchronization Engine (Offline First)**:
-   - *Status*: Belum Selesai.
-   - *Keterangan*: Aplikasi memerlukan koneksi internet aktif untuk mutasi data Supabase. Antrean mutasi offline (*offline mutation queue*) belum diintegrasikan dengan database lokal ponsel.
-
-5. **Otomatisasi Pipeline Migrasi Database (Supabase CLI Integration)**:
-   - *Status*: Belum Selesai (Eksekusi Manual).
-   - *Keterangan*: Skrip SQL saat ini dieksekusi secara manual via Supabase SQL Editor Dashboard. Perlu penyatuan pipeline CI/CD migrasi terstruktur menggunakan Supabase CLI (`supabase db push`).
-
----
 
 ## 6. Standar Penulisan Kode & Konvensi (Coding Standards)
 
@@ -280,7 +215,7 @@ cd android
 
 1. **Data Proyek Tidak Muncul Setelah Edit Profil**:
    - *Penyebab*: `client_name` pada tabel `projects` tidak cocok dengan nama user baru.
-   - *Solusi*: Pastikan trigger `sync_user_name_changes` di PostgreSQL aktif. Jika ada proyek lama tanpa `client_id`, jalankan script `backend/fix_project_client_ids.sql`.
+   - *Solusi*: Pastikan relasi `client_id` proyek benar. Perubahan nama tidak menentukan akses RLS.
 
 2. **Metro Bundler Cache Stale / Error Import Assets**:
    - Jalankan perintah bundler dengan reset cache:

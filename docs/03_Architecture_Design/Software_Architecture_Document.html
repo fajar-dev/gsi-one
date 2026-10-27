@@ -117,7 +117,7 @@
 <h2>Standar: ISO/IEC/IEEE 42010</h2>
 <hr />
 <h2>1. Ikhtisar Arsitektur</h2>
-<p>GSI One menggunakan arsitektur <strong>Clean Architecture &amp; Layered Domain Design</strong> pada sisi klien (frontend) dengan komunikasi dua arah ke backend melalui HTTPS REST API dan Supabase Cloud (PostgreSQL + Realtime WebSocket + Storage + Auth RLS).</p>
+<p>GSI One menggunakan arsitektur <strong>Clean Architecture &amp; Layered Domain Design</strong> pada sisi klien (frontend) dengan komunikasi langsung ke Supabase Cloud melalui SDK (PostgreSQL + Realtime WebSocket + Storage + Auth RLS).</p>
 <hr />
 <h2>2. Komponen Arsitektur</h2>
 <h3>2.1 Lapisan Presentasi (Presentation Layer)</h3>
@@ -147,7 +147,7 @@
   <li><strong>Project modularization</strong>: <code>SupabaseProjectRepository</code> adalah façade dengan <code>ProjectQueryRepository</code>, <code>ProjectStageRepository</code>, <code>ProjectFileRepository</code>, dan <code>ProjectCommandRepository</code>; <code>projectMapper.ts</code> menjadi batas DTO database.</li>
   <li><strong>Cross-cutting services</strong>: <code>notificationService.ts</code> menjalankan pagination dan mutasi sadar-RLS; <code>storageService.ts</code> menerbitkan signed URL untuk bucket privat; <code>logger.ts</code> membentuk log terstruktur di development.</li>
 </ul>
-<h3>2.5 Backend &amp; Database Layer</h3>
+<h3>2.5 Layanan Supabase &amp; Database</h3>
 <ul>
   <li><strong>Database Production</strong>: Supabase PostgreSQL (dengan Row Level Security / RLS terintegrasi per role)</li>
   <li><strong>Storage</strong>: Bucket Supabase Storage (<code>projects/</code>) untuk dokumen &amp; foto inspeksi proyek</li>
@@ -223,7 +223,7 @@
     <tr>
       <td>ADR-08</td>
       <td>Trusted notification creation &amp; private storage</td>
-      <td>Insert notifikasi dilakukan trigger/backend; bucket proyek privat diakses dengan signed URL agar RLS dan akses file konsisten.</td>
+      <td>Insert notifikasi dilakukan trigger database atau Edge Function; bucket proyek privat diakses dengan signed URL agar RLS dan akses file konsisten.</td>
     </tr>
     <tr>
       <td>ADR-09</td>

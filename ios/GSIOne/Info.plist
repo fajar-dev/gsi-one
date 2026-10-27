@@ -24,6 +24,12 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>CFBundleURLTypes</key>
+	<array><dict><key>CFBundleURLSchemes</key><array><string>gsione</string></array></dict></array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array><string>https</string><string>http</string><string>tel</string><string>whatsapp</string></array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Pilih foto dokumentasi untuk diunggah ke proyek Anda.</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>

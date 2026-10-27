@@ -86,8 +86,7 @@ describe('notificationService & notificationStore - Automated Tests', () => {
       const mockOr = jest.fn().mockReturnValue({ order: mockOrder });
       (supabase.from as jest.Mock).mockReturnValue({ select: jest.fn().mockReturnValue({ or: mockOr }) });
 
-      const result = await notificationService.getNotifications('client-A', 'client');
-      expect(result).toEqual([]);
+      await expect(notificationService.getNotifications('client-A', 'client')).rejects.toThrow('Database error');
     });
 
     it('should mark a single notification as read', async () => {

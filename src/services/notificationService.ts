@@ -31,11 +31,11 @@ export interface CreateNotificationInput {
 
 export const notificationService = {
   // SENGAJA no-op. INSERT notifikasi dari klien memang diblokir RLS; notifikasi
-  // dibuat oleh trigger database (SECURITY DEFINER), mis. trg_notify_on_new_booking.
+  // dibuat oleh trigger database (SECURITY DEFINER), trg_notify_on_new_booking dan trigger notify_project_activity.
   // Jangan "memperbaiki" fungsi ini tanpa lebih dulu menambah policy INSERT.
   createNotification: async (_input: CreateNotificationInput): Promise<void> => {
     if (__DEV__) {
-      console.warn('[notificationService] createNotification dipanggil dari client -- diabaikan (RLS memblokir INSERT langsung). Gunakan backend/trigger.');
+      console.warn('[notificationService] createNotification dipanggil dari client -- diabaikan (RLS memblokir INSERT langsung). Gunakan trigger database.');
     }
   },
 
@@ -60,19 +60,10 @@ export const notificationService = {
         .order('created_at', { ascending: false })
         .range(offset, offset + limit - 1);
 
-      if (error) {
-        if (__DEV__) {
-          console.warn('Gagal memuat notifikasi:', error.message);
-        }
-        return [];
-      }
-
-      return (data as unknown as AppNotification[]) || [];
+      if (error) throw new Error(error.message || 'Gagal memuat notifikasi.');
+      return ((data || []) as AppNotification[]).map(item => ({ ...item, id: String(item.id) }));
     } catch (err) {
-      if (__DEV__) {
-        console.warn('Exception saat getNotifications:', err);
-      }
-      return [];
+      throw err;
     }
   },
 

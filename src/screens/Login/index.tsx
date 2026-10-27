@@ -15,21 +15,22 @@ import Icon from 'react-native-vector-icons/Feather';
 import MCIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { setRememberSession } from '../../config/authPersistence';
 
 function Login(): React.ReactElement {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const insets = useSafeAreaInsets();
-    const { login, isLoading, user } = useAuthStore();
+    const { login, isLoading, user, isPasswordRecovery } = useAuthStore();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(true);
 
     useEffect(() => {
-        if (user) {
+        if (user && !isPasswordRecovery) {
             navigation.reset({ index: 0, routes: [{ name: 'AuthenticatedTabs' }] });
         }
-    }, [user, navigation]);
+    }, [user, navigation, isPasswordRecovery]);
 
     const validateEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
@@ -45,6 +46,7 @@ function Login(): React.ReactElement {
         }
 
         try {
+            await setRememberSession(rememberMe);
             await login(email, password);
             navigation.reset({ index: 0, routes: [{ name: 'AuthenticatedTabs' }] });
         } catch (error: unknown) {

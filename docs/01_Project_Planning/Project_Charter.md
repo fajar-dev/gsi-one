@@ -57,7 +57,7 @@ Mengembangkan aplikasi mobile **GSI One** sebagai platform digital PT Graha Surv
 
 1. Source code aplikasi mobile (Android APK & iOS IPA).
 2. Dokumentasi teknis lengkap (SRS, SDD, API Spec, Test Plan).
-3. Backend API yang terhubung dengan database Supabase.
+3. Layanan data Supabase dan Edge Function untuk operasi admin.
 4. Panduan pengguna dan administrator.
 
 ---

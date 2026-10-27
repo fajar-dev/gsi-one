@@ -27,7 +27,7 @@ export interface Project {
 
 export interface StageUpdate {
   id: string;
-  stage_id: string;
+  stage_id: string | null;
   description: string;
   progress: number;
   created_by: string;
@@ -60,6 +60,8 @@ export interface ProjectStage {
 
 export interface ProjectDetail extends Project {
   stages: ProjectStage[];
+  files?: ProjectFile[];
+  updates?: StageUpdate[];
 }
 
 const projectRepository: IProjectRepository = new SupabaseProjectRepository();

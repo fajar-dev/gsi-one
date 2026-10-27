@@ -1,7 +1,7 @@
 
 
 
--- Memindahkan aturan dari backend/helpers/projectHelpers.js ke database, supaya
+-- Menghitung status proyek di database, supaya
 -- projects.status tidak lagi nyangkut di 'pending' saat semua tahapan sudah 'done'.
 --
 -- SENGAJA: status 'on_hold' tidak pernah ditimpa otomatis -- itu keputusan manual

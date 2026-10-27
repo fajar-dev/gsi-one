@@ -51,6 +51,4 @@ Sebelum rilis ke production, semua kriteria berikut wajib terpenuhi:
 - [ ] Aplikasi berhasil build di Android dan iOS tanpa error.
 - [ ] UAT (User Acceptance Test) telah ditandatangani oleh representative klien.
 - [ ] Tidak ditemukan nilai API key, secret, atau password hardcoded di source code (scan dengan grep atau tool serupa).
-- [ ] File `.env` dan `backend/.env` terdaftar di `.gitignore` dan tidak ter-commit ke repositori Git.
-- [ ] Variabel `JWT_SECRET` di `backend/.env` menggunakan nilai acak yang panjang dan aman (bukan nilai default atau placeholder).
-
+- [ ] File `.env` terdaftar di `.gitignore` dan tidak ter-commit ke repositori Git.

@@ -128,11 +128,11 @@ graph TB
     end
 
     subgraph TrustedServer["Server-side Trusted Path"]
-        Express["Express: router modular + JWT"]
+        AdminFunction["Edge Function admin-create-user"]
         Triggers["Supabase trigger / SECURITY DEFINER"]
     end
 
-    subgraph External["5. External Backend & Database"]
+    subgraph External["5. Layanan Supabase & Database"]
         Supabase["Supabase Cloud (PostgreSQL DB, Realtime WS, Storage, Auth SDK)"]
         TypeSchema["Database Type Schema (types/database.types.ts)"]
     end
@@ -146,14 +146,13 @@ graph TB
     RepoContract <--> RepoImpl
     RepoImpl --> TypeSchema
     RepoImpl <--> Supabase
-    UI --> Express
-    Express --> Supabase
+    Facade --> AdminFunction
+    AdminFunction --> Supabase
     Triggers --> Supabase
 ```
 
 ### Pembaruan implementasi 30 Juli 2026
 
-- `backend/server.js` kini hanya menginisialisasi middleware dan mendaftarkan router; auth, proyek, booking, file, dan notifikasi dipisahkan ke `backend/routes/`.
 - `SupabaseProjectRepository` menjadi façade terhadap empat sub-repository dan mapper DTO eksplisit.
 - RLS proyek memakai relasi UUID; RLS notifikasi membatasi penerima dan menutup INSERT dari klien.
 - Realtime `stage_updates` dipersempit dengan `project_id`, yang diisi trigger database.

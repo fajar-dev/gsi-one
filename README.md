@@ -37,7 +37,7 @@ Codebase GSI One telah melalui audit maintainability komprehensif dan mencapai *
 - **State Management**: Zustand Stores (`authStore.ts`, `projectStore.ts`)
 - **Custom Hooks**: `useCreateProjectForm`, `useProjectDetail`, `useSurveyRequests`, `useEditProjectForm`, `useStructureDetail`, `useProfile`, `useProjectRealtime`
 - **Database & Realtime Sync**: Supabase PostgreSQL + Realtime WebSockets + Storage Buckets
-- **Backend API**: Express REST API Server + SQLite (`gsi_one.db`) untuk Local Dev
+- **Operasi admin**: Supabase Edge Function `admin-create-user`
 - **Testing & CI**: Jest (unit dan integration test) + GitHub Actions quality gate (`lint`, `typecheck`, `test:ci`)
 - **UI & Iconography**: Custom Design System (`assets/styles/Colors.tsx`), React Native Vector Icons (Feather), Linear Gradient, SVG
 
@@ -49,7 +49,7 @@ Codebase GSI One telah melalui audit maintainability komprehensif dan mencapai *
 d:\GSI One - Copy\
 ├── __tests__/               -- Automated Unit Test Suites (Domain, Utils, Service, UI)
 ├── assets/                  -- Aset gambar, ikon, dan Design Tokens (Colors.tsx)
-├── backend/                 -- Express API Server, SQLite DB, Multer, dan skema Supabase SQL
+├── supabase/                -- Migrasi PostgreSQL, Edge Functions, dan seed.sql
 ├── docs/                    -- Dokumentasi teknis lengkap (SRS, SDLC, Architecture, Deployment)
 └── src/
     ├── components/          -- Reusable UI components (ScreenHeader, BottomNav, ErrorBoundary, dll)
@@ -77,7 +77,7 @@ d:\GSI One - Copy\
 ## Panduan Pengoperasian & Verifikasi
 
 ### 1. Persiapan Environment (.env)
-Salin berkas `.env.example` menjadi `.env` pada folder root dan folder `backend/`:
+Salin berkas `.env.example` menjadi `.env` pada folder root:
 ```bash
 cp .env.example .env
 ```
@@ -125,17 +125,17 @@ cd android
 ./gradlew assembleRelease
 ```
 Berkas AAB tersimpan di `android/app/build/outputs/bundle/release/app-release.aab`.
-Panduan deployment lengkap dari SDLC hingga Play Console rilis dapat dibaca di **[docs/07_Deployment/Deployment_Guide.md](file:///d:/GSI%20One%20-%20Copy/docs/07_Deployment/Deployment_Guide.md)**.
+Panduan deployment lengkap dari SDLC hingga Play Console rilis dapat dibaca di **[docs/07_Deployment/Deployment_Guide.md](docs/07_Deployment/Deployment_Guide.md)**.
 
 ---
 
 ## Dokumentasi Arsitektur Lengkap
 
-- **[Panduan Arsitektur & Refactoring Pengembang](file:///d:/GSI%20One%20-%20Copy/docs/DEVELOPER_REFACTORING_GUIDE.md)**
-- **[Arsitektur Sistem & Alur Kerja SDLC](file:///d:/GSI%20One%20-%20Copy/docs/ARCHITECTURE_AND_SDLC.md)**
-- **[Panduan Deployment Produksi](file:///d:/GSI%20One%20-%20Copy/docs/07_Deployment/Deployment_Guide.md)**
-- **[Katalog Lengkap API & Database](file:///d:/GSI%20One%20-%20Copy/docs/api_catalog_documentation.md)**
-- **[Spesifikasi API REST](file:///d:/GSI%20One%20-%20Copy/docs/API_SPECIFICATION.md)**
-- **[Peta Codebase Proyek](file:///d:/GSI%20One%20-%20Copy/CODEBASE_MAP.md)**
-- **[ADR 0001: Skalabilitas & Keamanan](docs/adr/0001-scalability-and-security-architecture.md)**
-- **[SLO Baseline](docs/slo/SLO_BASELINE.md)**
+- **[Panduan Arsitektur & Refactoring Pengembang](docs/04_Development/Developer_Refactoring_Guide.md)**
+- **[Arsitektur Sistem & Alur Kerja SDLC](docs/03_Architecture_Design/Architecture_And_SDLC.md)**
+- **[Panduan Deployment Produksi](docs/07_Deployment/Deployment_Guide.md)**
+- **[Katalog Lengkap API & Database](docs/03_Architecture_Design/API_Catalog_Documentation.md)**
+- **[Spesifikasi API REST](docs/03_Architecture_Design/API_SPECIFICATION_Full.md)**
+- **[Peta Codebase Proyek](CODEBASE_MAP.md)**
+- **[ADR 0001: Skalabilitas & Keamanan](docs/03_Architecture_Design/ADR/0001-scalability-and-security-architecture.md)**
+- **[SLO Baseline](docs/05_Quality_Assurance/SLO/SLO_BASELINE.md)**

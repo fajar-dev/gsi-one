@@ -59,6 +59,7 @@ export const UploadFileModal: React.FC<UploadFileModalProps> = ({
                 includeBase64: true,
             });
 
+            if (result.errorCode) throw new Error(result.errorMessage || 'Galeri tidak dapat dibuka.');
             if (result.didCancel || !result.assets || result.assets.length === 0) {
                 return;
             }
@@ -132,6 +133,7 @@ export const UploadFileModal: React.FC<UploadFileModalProps> = ({
             Alert.alert('Pilih Berkas', 'Silakan pilih foto dari galeri atau dokumen dari HP Anda terlebih dahulu.');
             return;
         }
+        if (localFile.size === 0) { Alert.alert('Berkas Kosong', 'Pilih berkas yang berisi data.'); return; }
         setIsSaving(true);
         try {
             await onSave(localFile.name, fileType, localFile.uri);

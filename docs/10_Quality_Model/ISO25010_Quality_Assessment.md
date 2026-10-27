@@ -1,5 +1,5 @@
 # Evaluasi Kualitas Perangkat Lunak ISO/IEC 25010
-## Proyek: GSI One Mobile Application & Backend Infrastructure
+## Proyek: GSI One Mobile Application & Supabase
 
 ---
 
@@ -19,7 +19,7 @@ ISO/IEC 25010 mendefinisikan delapan karakteristik kualitas utama perangkat luna
 | 2 | **Performance Efficiency** | Time Behaviour | B+ | TTI < 2 detik, API login p50 < 200ms |
 | 2 | | Resource Utilization | B | JSON body limit 10MB, static cache 7 hari (`maxAge: 7d`, `immutable`) |
 | 2 | | Capacity | B | Pagination `limit`/`offset` pada listing proyek & notifikasi |
-| 3 | **Compatibility** | Co-existence | A | Dual-DB (SQLite dev, PostgreSQL prod) tanpa konflik |
+| 3 | **Compatibility** | Co-existence | A | Satu sumber data PostgreSQL Supabase |
 | 3 | | Interoperability | A | REST API JSON standar, Supabase SDK, React Native cross-platform |
 | 4 | **Usability** | Appropriateness Recognizability | A | Design tokens terpusat (`Colors.tsx`), role-based theme (`useRoleTheme`) |
 | 4 | | Learnability | A | Onboarding < 5 menit, formulir intuitif |
@@ -31,10 +31,10 @@ ISO/IEC 25010 mendefinisikan delapan karakteristik kualitas utama perangkat luna
 | 5 | | Fault Tolerance | B | Retry manual saat API timeout (Known Issue KI-002) |
 | 5 | | Recoverability | B | Database trigger `sync_user_name_changes`, Rollback Plan tersedia |
 | 6 | **Security** | Confidentiality | A | RLS aktif 7 tabel, Signed URL Supabase Storage privat |
-| 6 | | Integrity | A | CORS whitelist 3 origin, Helmet headers aktif |
+| 6 | | Integrity | A | Policy RLS dan pemeriksaan role pada Edge Function |
 | 6 | | Non-repudiation | B+ | JWT token autentikasi, `created_by` / `uploaded_by` audit trail |
-| 6 | | Accountability | A | RBAC 4 peran (Admin, Marketing, Engineer, Client), rate limiting login |
-| 6 | | Authenticity | A | `JWT_SECRET` wajib, Admin-Only Registration, `bcryptjs` password hashing |
+| 6 | | Accountability | A | RBAC 4 peran (Admin, Marketing, Engineer, Client), pemantauan kegagalan Supabase Auth |
+| 6 | | Authenticity | A | Sesi Supabase Auth dan pendaftaran akun melalui Edge Function admin |
 | 7 | **Maintainability** | Modularity | A | Clean Architecture 5-layer, Repository Pattern, sub-repository facade |
 | 7 | | Reusability | A | Shared components, design tokens, helper utilities terpusat |
 | 7 | | Analysability | A | Structured logger (`logger.ts`), correlation ID |
@@ -55,6 +55,6 @@ ISO/IEC 25010 mendefinisikan delapan karakteristik kualitas utama perangkat luna
 | Compatibility | **A** | Dual-DB & REST API JSON interoperable |
 | Usability | **B+** | UI intuitif, aksesibilitas screen reader belum ada |
 | Reliability | **B+** | Stabil, retry otomatis belum tersedia |
-| Security | **A** | CORS, Helmet, RLS, JWT, RBAC, Admin-Only Register |
+| Security | **A** | RLS, Supabase Auth, RBAC, pendaftaran akun oleh admin |
 | Maintainability | **A** | Clean Architecture, skor Grade A |
 | Portability | **A** | Cross-platform Android, iOS, Web |

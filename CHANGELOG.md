@@ -2,24 +2,26 @@
 
 Semua perubahan dan pembaruan pada proyek GSI One Mobile dicatat di berkas ini.
 
+## 26 Oktober 2026
+
+- Menghapus layanan server aplikasi terpisah dan seluruh konfigurasi endpoint yang tidak digunakan.
+- Aplikasi memakai Supabase langsung; operasi admin menggunakan Edge Function.
+- Data demo mandiri tersedia pada `supabase/seed.sql`.
+- Memperbarui panduan setup, deployment, dan diagram arsitektur.
+
 ## [1.4.0] - 2026-07-30
 
 ### Keamanan, Skalabilitas, dan Kualitas Rilis
 - **RLS dan akses data**: Menutup pembuatan notifikasi langsung dari klien, menerapkan policy penerima/pemilik untuk baca, ubah, dan hapus notifikasi, serta mengganti ketergantungan policy proyek pada `client_name` menjadi UUID relasional (`client_id`/`created_by`).
 - **Database dan realtime**: Menambahkan indeks untuk query proyek, tahapan, pembaruan, berkas, dan notifikasi; `stage_updates.project_id` kini dibackfill dan disinkronkan oleh trigger agar channel realtime dapat difilter per proyek. Urutan stage juga dilindungi constraint unik `(project_id, sequence)`.
 - **Pagination dan storage privat**: List proyek/notifikasi memakai pagination offset-limit; bucket `projects` menjadi privat dengan policy baca/unggah berbasis akses proyek dan layanan `storageService.getSignedUrl()` untuk URL sementara.
-- **Refactor modul**: `backend/server.js` menjadi entry point yang mendaftarkan route modular. Repository proyek kini façade atas sub-repository query, stage, file, dan command, memakai mapper DTO eksplisit. Selector Zustand ditambahkan untuk state proyek dan notifikasi.
 - **Operasi dan quality gate**: Menambahkan migrasi retention notifikasi, logger terstruktur, benchmark lokal, baseline SLO, ADR, test integration, serta workflow GitHub Actions untuk lint, typecheck, dan test.
 
 ## [1.3.4] - 2026-07-30
 
 ### Perbaikan Bug Akses Proyek Saat Nama User (Client, Marketing, Engineer) Diubah
-- **Otorisasi & Access Control berbasis UUID `client_id` (`backend/server.js`, `backend/update_rls_policies.sql`)**:
   - Memperbarui RLS SELECT policy pada Supabase PostgreSQL (`projects`, `project_stages`, `stage_updates`, `project_files`) agar menyertakan kueri `client_id = auth.uid()`.
-  - Memperbarui kueri backend Express (`GET /api/projects` dan `GET /api/projects/:id`) untuk memeriksa `client_id` (UUID) di samping pencocokan string nama.
-- **Trigger PostgreSQL Sinkronisasi Nama Pengguna (`update_rls_policies.sql`)**:
   - Menambahkan PostgreSQL Trigger `sync_user_name_changes` pada tabel `public.users` yang secara otomatis mensinkronkan `projects.client_name = NEW.name` setiap kali nama pengguna diperbarui.
-- **Skrip Migrasi Data Proyek (`fix_project_client_ids.sql`)**:
   - Mengisi `client_id` pada proyek-proyek lama yang bernilai `NULL` serta mensinkronkan `client_name` dengan nama user terbaru.
 - **Pembaruan Modal Profile & Repository (`EditProfileModal.tsx`, `SupabaseProjectRepository.ts`)**:
   - Memperbarui `EditProfileModal.tsx` untuk mensinkronkan `client_name` secara eksplisit saat Client mengubah nama profil.
@@ -33,11 +35,8 @@ Semua perubahan dan pembaruan pada proyek GSI One Mobile dicatat di berkas ini.
 - **Akses Proyek Marketing (`SupabaseProjectRepository.ts`)**:
   - Memperbarui kueri `getProjects` untuk role `marketing` sehingga menyaring proyek berdasarkan `marketing_id = userId OR created_by = userId`.
   - Proyek yang dibuat oleh Admin dan di-assign ke staf Marketing kini dapat muncul pada daftar proyek akun Marketing terkait.
-- **Penyelesaian Error Supabase Storage Bucket (`uploadFile` & `setup_storage_bucket.sql`)**:
   - Memperbarui pembentukan `storagePath` pada `uploadFile` dari `projects/${projectId}/${cleanFileName}` menjadi `${projectId}/${cleanFileName}` untuk menghindari duplikasi nama bucket pada public URL.
-  - Menyediakan skrip SQL `backend/setup_storage_bucket.sql` untuk menginisialisasi storage bucket `projects` dengan properti `public = true` dan aturan RLS terkonfigurasi secara aman.
 - **Keterangan Survei Dihubungi Marketing (`SurveyRequestsScreen.tsx` & `useSurveyRequests.ts`)**:
-  - Menambahkan kolom `claimed_by` (VARCHAR) dan `claimed_at` (TIMESTAMP WITH TIME ZONE) pada tabel `public.bookings` (via `backend/update_bookings_schema.sql` dan `backend/supabase_schema.sql`).
   - Memperbarui penanganan klaim survei di `useSurveyRequests.ts` untuk menyimpan nama staf Marketing (misal `Ahmad (Marketing)`).
   - Memperbarui tampilan kartu survei di `SurveyRequestsScreen.tsx` dengan badge `Sudah Dihubungi` dan keterangan khusus `Sudah dihubungi oleh: [Nama Staf Marketing] ([Tanggal/Waktu])` yang terlihat jelas baik oleh role Admin maupun Marketing.
 
@@ -61,9 +60,6 @@ Semua perubahan dan pembaruan pada proyek GSI One Mobile dicatat di berkas ini.
 ## [1.3.1] - 2026-07-28
 
 ### Security Hardening & Audit System (Prioritas P1, P2 & P3)
-- **Privilege Escalation Protection (SEC-CRIT-01)**:
-  - Memperbarui fungsi trigger PostgreSQL `handle_new_user()` pada `backend/supabase_schema.sql` dan `backend/update_rls_policies.sql` untuk selalu menetapkan role `'client'` pada pendaftaran mandiri Supabase Auth.
-  - Mencabut total fallback registrasi client-side pada `authService.ts` untuk memastikan pendaftaran akun staf (`admin`, `marketing`, `engineer`) wajib melalui server Admin Express ter-otorisasi.
 - **Pembersihan Secret Keys dari Mobile App (SEC-HIGH-01)**:
   - Menghapus `RESEND_API_KEY` dari berkas `.env` dan `.env.example` aplikasi mobile untuk mencegah ekstraksi API Key melalui dekompilasi APK/IPA.
 - **Sanitasi PostgREST Filter Injection (SEC-HIGH-02)**:
@@ -71,10 +67,6 @@ Semua perubahan dan pembaruan pada proyek GSI One Mobile dicatat di berkas ini.
 - **Keystore & Security Storage Hardening (SEC-MED-01 & SEC-MED-02)**:
   - Memindahkan password debug keystore dari `android/app/build.gradle` ke `android/gradle.properties` (terpengabai Git).
   - Menambahkan sanitasi `sanitizeAuthUser` pada `authStore.ts` dan isolasi try-catch pada I/O `AsyncStorage`.
-- **Penguatan Middleware Express Backend (SEC-MED-03)**:
-  - Menambahkan `app.disable('x-powered-by')` di `backend/server.js` untuk menyembunyikan identitas framework backend, serta mengaktifkan audit logging pada filter CORS.
-- **Git Tracking & SQLite Isolation (SEC-HIGH-03)**:
-  - Menambahkan aturan pengabaian berkas database SQLite `*.db` dan `backend/*.db` pada `.gitignore`.
 
 ---
 
@@ -97,11 +89,6 @@ Semua perubahan dan pembaruan pada proyek GSI One Mobile dicatat di berkas ini.
 ## [1.1.0] - 2026-07-22
 
 ### Pembaruan Dokumentasi Komprehensif & Codebase Sync
-- **Katalog API & Database (`docs/api_catalog_documentation.md`)**:
-  - Mengisi berkas dokumentasi katalog API & database yang sebelumnya kosong (0 byte) dengan skema Supabase PostgreSQL lengkap, RLS Security Policies, Auth SDK, Realtime WebSocket channel, Storage buckets, dan rincian REST API Express.
-- **Spesifikasi REST API (`docs/API_SPECIFICATION.md`)**:
-  - Menambahkan spesifikasi REST API endpoints Express backend yang belum terdaftar (`POST /api/admin/create-user`, `GET /api/users/role/:role`, `GET /api/dashboard/stats`, `POST /api/stages/:id/updates`).
-  - Menambahkan rincian spesifikasi rate limiting (`authLimiter`), filter unggahan file Multer (`ALLOWED_MIME_TYPES`), CORS allowed origins, dan penanganan error jaringan.
 - **Peta Codebase (`CODEBASE_MAP.md`)**:
   - Meng-update peta arsitektur proyek mencakup arsitektur Clean Architecture, Domain Entities OOP (`src/domain/`), Repository Pattern (`src/services/repositories/`), Custom Hooks (`src/hooks/`), Helper Utilities (`src/utils/`), Sub-Modals (`src/screens/Projects/components/`), dan Service Detail Template.
 - **README Utama (`README.md`)**:

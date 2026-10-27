@@ -1,63 +1,18 @@
 # UML: Deployment Diagram
-## Proyek: GSI One Mobile Application & Backend Infrastructure
-
-Menggambarkan penyebaran fisik komponen sistem pada infrastruktur produksi.
 
 ```mermaid
-graph TB
-    subgraph ClientDevices["Perangkat Pengguna (Client Devices)"]
-        AndroidDevice["Android Mobile Device\n(GSI One APK / AAB)"]
-        iOSDevice["iOS Mobile Device\n(GSI One IPA / TestFlight)"]
-        WebBrowser["Web Browser Client\n(React Native Web)"]
-    end
-
-    subgraph DistributionStore["Distribusi Aplikasi"]
-        PlayStore["Google Play Console Track"]
-        AppStore["Apple App Store Connect"]
-    end
-
-    subgraph VPSProduction["VPS Production Server (api.grahasurvei.com)"]
-        NginxProxy["Nginx Reverse Proxy / SSL TLS 1.3"]
-        
-        subgraph PM2Cluster["PM2 Process Manager"]
-            ExpressNode["Express.js Server (Node.js v20+)\n(server.js - Port 3000)"]
-            HelmetModule["Helmet Security Headers"]
-            CorsModule["CORS Origin Whitelist Filter"]
-            RateLimitModule["Auth Rate Limiter Middleware"]
-        end
-
-        LocalDB[("SQLite Database\n(gsi_one.db) - Dev/Fallback")]
-        LocalStorageDir["Local Disk Uploads\n(backend/uploads/)"]
-    end
-
-    subgraph SupabaseCloudProd["Supabase Cloud Platform (Managed Services)"]
-        SupaGateway["Supabase API Gateway / Kong"]
-        PostgreSQLDB[("PostgreSQL Database\n(7 Tabel & RLS Policies)")]
-        StorageBucket["Supabase Storage Bucket Privat\n('projects/')"]
-        RealtimeEngine["WebSocket Realtime Service"]
-        AuthEngine["GoTrue Auth Service"]
-    end
-
-    PlayStore -->|Install| AndroidDevice
-    AppStore -->|Install| iOSDevice
-
-    AndroidDevice -->|"HTTPS REST (Port 443)"| NginxProxy
-    iOSDevice -->|"HTTPS REST (Port 443)"| NginxProxy
-    WebBrowser -->|"HTTPS REST (Port 443)"| NginxProxy
-
-    NginxProxy --> ExpressNode
-    ExpressNode --> HelmetModule
-    ExpressNode --> CorsModule
-    ExpressNode --> RateLimitModule
-    ExpressNode --> LocalDB
-    ExpressNode --> LocalStorageDir
-
-    AndroidDevice -->|"HTTPS / WSS (Supabase SDK)"| SupaGateway
-    iOSDevice -->|"HTTPS / WSS (Supabase SDK)"| SupaGateway
-    WebBrowser -->|"HTTPS / WSS (Supabase SDK)"| SupaGateway
-
-    SupaGateway --> PostgreSQLDB
-    SupaGateway --> StorageBucket
-    SupaGateway --> RealtimeEngine
-    SupaGateway --> AuthEngine
+flowchart TB
+    Play[Google Play / APK] --> Android[Perangkat Android]
+    Store[App Store / TestFlight] --> IOS[Perangkat iOS]
+    Hosting[Hosting bundle web] --> Web[Browser]
+    Android --> Cloud[Supabase Cloud melalui HTTPS / WSS]
+    IOS --> Cloud
+    Web --> Cloud
+    Cloud --> Auth[Auth]
+    Cloud --> DB[PostgreSQL / RLS]
+    Cloud --> Storage[Storage]
+    Cloud --> Realtime[Realtime]
+    Cloud --> Functions[Edge Functions]
 ```
+
+Aplikasi tidak memerlukan proses server lokal tambahan. Prosedur deployment mencakup migrasi Supabase, Edge Function, konfigurasi environment client, serta distribusi bundle mobile/web.

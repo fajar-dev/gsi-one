@@ -1,5 +1,5 @@
 # User Stories Specification
-## Proyek: GSI One Mobile Application & Backend Infrastructure
+## Proyek: GSI One Mobile Application & Supabase
 
 ---
 
@@ -30,4 +30,3 @@
 ### 1.5 Peran: System Administrator (Admin)
 - **US-ADM-01**: Sebagai System Administrator, saya ingin mendaftarkan akun baru untuk Klien, Engineer, dan Marketing via modal Admin tanpa membuka pendaftaran mandiri publik.
 - **US-ADM-02**: Sebagai System Administrator, saya ingin membuat proyek teknis baru, mengonfigurasi `project_code`, menentukan Klien, Marketing, dan Engineer penanggung jawab.
-- **US-ADM-03**: Sebagai System Administrator, saya ingin memastikan keamanan backend dengan audit origin CORS, Helmet headers, dan RLS Supabase.

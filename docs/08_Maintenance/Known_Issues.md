@@ -1,5 +1,5 @@
 # Known Issues
-## Proyek: GSI One Mobile Application & Backend Infrastructure
+## Proyek: GSI One Mobile Application & Supabase
 
 ---
 
@@ -17,5 +17,3 @@ Daftar masalah yang sudah diketahui dan status penanganannya.
 | KI-004 | DevOps | CI/CD pipeline belum otomatis di server produksi | Low | Build dan deploy masih manual via SSH | Gunakan langkah di Deployment Guide | v4.0.0 | Open |
 | KI-005 | Data | Data katalog layanan bersifat statis (hardcoded di `structures.ts`) | Low | Pembaruan konten memerlukan deploy ulang | Edit langsung file `structures.ts` | v4.0.0 | Open |
 | KI-006 | Fitur | Tidak ada push notification setelah booking diterima | Low | Klien tidak mendapat notifikasi instan | Tim GSI menghubungi klien via telepon/email | v4.0.0 | Open |
-| KI-007 | Keamanan | Rate limiter login dilewati untuk `localhost` / `127.0.0.1` | Low | Potensi brute-force di environment dev | Hanya berlaku di localhost, tidak di production | Accepted | Accepted |
-| KI-008 | Database | Migrasi kolom SQLite menggunakan `try/catch(e){}` silent error | Low | Error migrasi kolom terlewat tanpa log | Periksa manual skema SQLite setelah inisialisasi | v3.1.0 | Open |

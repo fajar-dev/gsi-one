@@ -113,49 +113,28 @@
 <body>
   <div class="container">
     <h1>Code Review Checklist</h1>
-<h2>Proyek: GSI One Mobile Application &amp; Backend Express API</h2>
-<hr />
-<p>Checklist ini wajib diverifikasi oleh reviewer sebelum menyetujui Pull Request.</p>
-<hr />
-<h2>A. Keterbacaan &amp; Maintainability</h2>
+<h2>Implementasi</h2>
 <ul>
-  <li>[ ] Nama variabel, fungsi, dan komponen deskriptif dan mengikuti konvensi (lihat Coding Standard).</li>
-  <li>[ ] Tidak ada kode yang dikomentari tanpa penjelasan (<code>// TODO</code> tanpa tiket dilarang).</li>
-  <li>[ ] Fungsi memiliki single responsibility (tidak melakukan terlalu banyak hal sekaligus).</li>
-  <li>[ ] Tidak ada magic number (angka literal tanpa konstanta bernama).</li>
+  <li>[ ] Perubahan memenuhi kebutuhan pengguna dan mempertahankan kontrak aplikasi.</li>
+  <li>[ ] Logika UI, state, service, dan repository memiliki tanggung jawab jelas.</li>
+  <li>[ ] Error Supabase dan hasil mutasi yang tersaring RLS ditangani dengan benar.</li>
+  <li>[ ] State loading dan kegagalan tidak menampilkan data pengguna/proyek sebelumnya.</li>
 </ul>
-<h2>B. Keamanan &amp; Audit System (CORS, RLS, &amp; Headers)</h2>
+<h2>Supabase</h2>
 <ul>
-  <li>[ ] Tidak ada data sensitif (token, password) yang dicetak di <code>console.log</code>.</li>
-  <li>[ ] Backend Express memverifikasi origin CORS via whitelist resmi (<code>https://grahasurvei.com</code>, <code>http://localhost:3000</code>, <code>http://10.0.2.2:3000</code>).</li>
-  <li>[ ] Integrasi <code>helmet()</code> aktif untuk proteksi XSS, HSTS, dan Framing.</li>
-  <li>[ ] Wajib memeriksa keberadaan <code>JWT_SECRET</code> pada startup backend server.</li>
-  <li>[ ] Tabel database Supabase baru terlindungi oleh Row Level Security (RLS) policies.</li>
-  <li>[ ] Tidak ada API key, secret, URL Supabase, atau JWT secret yang ditulis langsung (hardcode) di source code.</li>
-  <li>[ ] File <code>.env</code> dan <code>backend/.env</code> tidak ikut ter-commit (<code>.gitignore</code>).</li>
+  <li>[ ] Policy RLS dan kontrol UI diperiksa sebagai dua lapisan berbeda.</li>
+  <li>[ ] Edge Function memverifikasi sesi dan role sebelum operasi privileged.</li>
+  <li>[ ] Origin web yang dibutuhkan tercakup pada Edge Function.</li>
+  <li>[ ] Service-role key dan password database tidak masuk bundle atau log.</li>
+  <li>[ ] Upload Storage dan metadata database tetap konsisten saat ada kegagalan.</li>
+  <li>[ ] Migrasi baru diuji pada skema dan data yang relevan.</li>
 </ul>
-<h2>C. Performa &amp; Resource Optimization</h2>
+<h2>Verifikasi</h2>
 <ul>
-  <li>[ ] Tidak ada re-render yang tidak perlu (gunakan <code>useCallback</code>, <code>useMemo</code> bila relevan).</li>
-  <li>[ ] Komponen daftar panjang menggunakan <code>FlatList</code> dengan pagination <code>limit</code>/<code>offset</code>.</li>
-  <li>[ ] File upload dibatasi maksimum 10MB dengan validasi tipe berkas Multer.</li>
-</ul>
-<h2>D. Penanganan Error &amp; Resiliensi</h2>
-<ul>
-  <li>[ ] Semua pemanggilan <code>async/await</code> memiliki blok <code>try/catch</code>.</li>
-  <li>[ ] State loading (<code>isLoading</code>) diatur dengan benar.</li>
-  <li>[ ] Pesan error yang ditampilkan ke pengguna bersifat ramah dan menggunakan helper <code>errorHelpers.ts</code>.</li>
-</ul>
-<h2>E. Pengujian &amp; Automated Testing</h2>
-<ul>
-  <li>[ ] Logika bisnis baru memiliki unit test Jest yang lulus (<code>npm test</code>).</li>
-  <li>[ ] Pengecekan tipe data TypeScript bebas error (<code>npm run typecheck</code>).</li>
-  <li>[ ] Reviewer sudah menguji perubahan secara manual di emulator/device atau Postman API.</li>
-</ul>
-<h2>F. Kesesuaian dengan Requirement</h2>
-<ul>
-  <li>[ ] Perubahan sesuai dengan acceptance criteria yang tercantum di User Story.</li>
-  <li>[ ] Aturan Zero Emoji dipatuhi secara ketat pada komentar dan respons UI.</li>
+  <li>[ ] <code>npm run lint</code>, <code>npm run typecheck</code>, dan <code>npm run test:ci</code> lulus.</li>
+  <li>[ ] Alur yang berubah diuji pada platform yang relevan.</li>
+  <li>[ ] Perubahan dokumentasi dirender ulang dengan <code>node docs/generate_docs.js</code>.</li>
+  <li>[ ] <code>.env</code> dan signing key tetap tidak dilacak Git.</li>
 </ul>
 
   </div>

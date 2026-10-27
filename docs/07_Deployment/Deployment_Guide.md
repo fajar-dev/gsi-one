@@ -1,72 +1,35 @@
-# Deployment Guide & SDLC Release Strategy
-## Proyek: GSI One Mobile Application & Express Backend Infrastructure
+# Deployment Guide
 
----
+## Quality gates
 
-## 1. Prasyarat & Quality Gates Deployment
+Jalankan `npm ci`, `npm run lint`, `npm run typecheck`, dan `npm run test:ci`. Verifikasi login serta operasi tiap peran di lingkungan pengujian; test dengan mock tidak menggantikan pemeriksaan RLS pada database.
 
-Sebelum rilis ke lingkungan produksi (*production environment*), seluruh kriteria *Quality Gates* berikut wajib terpenuhi:
+## Supabase
 
-- [x] **TypeScript Strict Check**: `npm run typecheck` menghasilkan **0 Errors**.
-- [x] **Automated Testing Suite**: `npm run test:ci` atau `npm test` menghasilkan **0 Failures** (15 Test Suites Passed).
-- [x] **Security Audit**: Backend Express terverifikasi mengaktifkan `helmet()`, CORS whitelist origin (`https://grahasurvei.com`), dan validasi startup `JWT_SECRET`.
-- [x] **Database RLS Policies**: Seluruh tabel Supabase (`projects`, `bookings`, `project_stages`, `stage_updates`, `project_files`, `notifications`, `users`) telah mengaktifkan Row Level Security (RLS).
-- [x] **Keystore & Signing Config**: Keystore rilis Android telah siap dan terkonfigurasi di `android/app/build.gradle`.
+1. Pilih project yang sesuai dan terapkan migrasi dari `supabase/migrations/` secara berurutan.
+2. Deploy `supabase/functions/admin-create-user/` dan verifikasi konfigurasi server serta daftar origin web.
+3. Pastikan Auth, policy database, bucket `projects`, dan publikasi realtime sesuai kebutuhan aplikasi.
+4. Isi `.env` aplikasi dengan `SUPABASE_URL` dan `SUPABASE_ANON_KEY` project tersebut.
+5. Data demo tersedia di `supabase/seed.sql`; jalankan hanya bila data demo dibutuhkan.
 
----
+## Build Android
 
-## 2. Deployment Backend Express REST API
-
-### 2.1 SSH & Direct Setup di Server VPS
-```bash
-# 1. SSH ke VPS Server
-ssh admin@api.grahasurvei.com
-
-# 2. Clone / Pull kode backend terbaru
-cd /var/www/gsi-one/backend
-git pull origin main
-
-# 3. Install dependensi backend
-npm ci --production
-
-# 4. Pastikan file backend/.env sudah diisi:
-# PORT=3000
-# JWT_SECRET=super_secret_jwt_key
-# SUPABASE_URL=https://<your-project>.supabase.co
-# SUPABASE_SECRET_KEY=service_role_key
-
-# 5. Jalankan server backend menggunakan PM2
-pm2 start server.js --name "gsi-one-backend"
-pm2 save
-```
-
----
-
-## 3. Build & Bundle Android Release (APK / AAB)
+Siapkan SDK/JDK dan signing key rilis sebelum menjalankan:
 
 ```bash
-# 1. Masuk ke folder android
 cd android
-
-# 2. Bersihkan sisa build terdahulu
-./gradlew clean
-
-# 3. Build Production AAB (Untuk Google Play Console Track Pengujian Tertutup / Closed Testing)
 ./gradlew bundleRelease
-
-# 4. Build Production APK (Untuk Instalasi Langsung / Internal HP Testing)
 ./gradlew assembleRelease
 ```
 
-**Lokasi Berkas Biner Hasil Build:**
-- **Android App Bundle (AAB)**: `android/app/build/outputs/bundle/release/app-release.aab`
-- **Android Package (APK)**: `android/app/build/outputs/apk/release/app-release.apk`
+AAB: `android/app/build/outputs/bundle/release/app-release.aab`.
+APK: `android/app/build/outputs/apk/release/app-release.apk`.
 
----
+## Verifikasi rilis
 
-## 4. Verifikasi Pasca-Deployment (Smoke Test Checklist)
+- Login admin, marketing, engineer, dan klien.
+- Pembuatan akun melalui Edge Function.
+- Booking, daftar proyek, mutasi tahapan, catatan, upload, dan pembukaan berkas.
+- Realtime pada detail proyek dan isolasi data antar-klien.
 
-- [ ] **Download & Install**: Aplikasi dapat diinstal dengan lancar dari Google Play / APK.
-- [ ] **CORS Verification**: Endpoint REST API menolak origin yang tidak terdaftar dan melayani request domain `https://grahasurvei.com`.
-- [ ] **Authentication**: Login dengan akun Client, Marketing, Engineer, dan Admin berhasil.
-- [ ] **Realtime Sync & Storage**: Pembaruan status proyek tersinkronisasi dan file tersimpan aman di Supabase Storage privat.
+Tidak ada proses server aplikasi terpisah untuk di-deploy. Distribusi iOS memakai Xcode/App Store Connect; web memakai bundle React Native Web.

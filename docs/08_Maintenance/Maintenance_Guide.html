@@ -190,7 +190,7 @@ npm install &lt;package-name&gt;@latest</code></pre>
   <li>Jika crash rate meningkat &gt; 1%, segera investigasi dan terapkan hotfix.</li>
 </ul>
 <hr />
-<h2>5. Checklist Pemeliharaan Keamanan Backend</h2>
+<h2>5. Checklist Pemeliharaan Keamanan Supabase</h2>
 <table>
   <thead>
     <tr>
@@ -202,30 +202,6 @@ npm install &lt;package-name&gt;@latest</code></pre>
   </thead>
   <tbody>
     <tr>
-      <td>Verifikasi CORS whitelist masih sesuai</td>
-      <td>Per rilis</td>
-      <td>Lead Developer</td>
-      <td>Cek <code>allowedOrigins</code> di <code>server.js</code></td>
-    </tr>
-    <tr>
-      <td>Verifikasi <code>helmet()</code> aktif</td>
-      <td>Per rilis</td>
-      <td>Lead Developer</td>
-      <td>Cek HTTP response headers</td>
-    </tr>
-    <tr>
-      <td>Rotasi <code>JWT_SECRET</code></td>
-      <td>Per semester</td>
-      <td>Admin Server</td>
-      <td>Generate key baru via <code>crypto.randomBytes(64)</code></td>
-    </tr>
-    <tr>
-      <td>Verifikasi RLS aktif di semua tabel Supabase</td>
-      <td>Per rilis</td>
-      <td>Lead Developer</td>
-      <td>Jalankan <code>backend/verify_rls.sql</code></td>
-    </tr>
-    <tr>
       <td>Audit hardcoded secrets di source code</td>
       <td>Per rilis</td>
       <td>QA Engineer</td>
@@ -236,12 +212,6 @@ npm install &lt;package-name&gt;@latest</code></pre>
       <td>Per PR</td>
       <td>Code Reviewer</td>
       <td>Cek <code>.gitignore</code> dan git status</td>
-    </tr>
-    <tr>
-      <td>Review log audit CORS ditolak</td>
-      <td>Mingguan</td>
-      <td>Admin Server</td>
-      <td>Cek server console untuk <code>[CORS SECURITY AUDIT]</code></td>
     </tr>
     <tr>
       <td>Verifikasi rate limiter login berfungsi</td>
@@ -272,32 +242,11 @@ npm install &lt;package-name&gt;@latest</code></pre>
       <td>Tinggi (breaking changes)</td>
     </tr>
     <tr>
-      <td><code>express</code></td>
-      <td>4.21.2</td>
-      <td>Backend Framework</td>
-      <td>Bulanan</td>
-      <td>Rendah (minor/patch)</td>
-    </tr>
-    <tr>
       <td><code>@supabase/supabase-js</code></td>
       <td>2.110.x</td>
       <td>Database SDK</td>
       <td>Bulanan</td>
       <td>Sedang</td>
-    </tr>
-    <tr>
-      <td><code>helmet</code></td>
-      <td>8.3.0</td>
-      <td>Security Middleware</td>
-      <td>Bulanan</td>
-      <td>Rendah</td>
-    </tr>
-    <tr>
-      <td><code>jsonwebtoken</code></td>
-      <td>9.0.2</td>
-      <td>Auth Token</td>
-      <td>Per semester</td>
-      <td>Rendah</td>
     </tr>
     <tr>
       <td><code>zustand</code></td>

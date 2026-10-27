@@ -45,12 +45,12 @@ Jika isu tidak terselesaikan dalam 24 jam di level tim, maka eskalasi ke Project
 | Aktivitas / Deliverable | Project Manager | Lead Developer | Mobile Dev | QA Engineer | UI/UX Designer |
 | --- | --- | --- | --- | --- | --- |
 | Perencanaan Proyek & Milestone | **A** | C | I | I | I |
-| Arsitektur Backend Express & CORS | C | **R/A** | I | C | - |
-| Desain Skema Database (SQLite & Supabase) | I | **R/A** | C | I | - |
+| Arsitektur Supabase & Edge Functions | C | **R/A** | I | C | - |
+| Desain Skema PostgreSQL Supabase | I | **R/A** | C | I | - |
 | Implementasi Frontend React Native | I | C | **R/A** | I | C |
 | Konfigurasi RLS Policies Supabase | I | **R/A** | C | C | - |
 | Pengujian Otomatis Jest | I | C | R | **R/A** | - |
-| Audit Keamanan CORS & Helmet | C | **R/A** | I | R | - |
+| Audit Keamanan RLS dan Edge Function | C | **R/A** | I | R | - |
 | Desain UI/UX & Design Tokens | I | C | C | - | **R/A** |
 | Deployment & Release Management | **A** | R | C | R | - |
 | Dokumentasi SDLC & Maintenance | **R/A** | C | I | I | - |
@@ -60,4 +60,3 @@ Keterangan:
 - **A** = Accountable (Penanggung Jawab Akhir)
 - **C** = Consulted (Dikonsultasi)
 - **I** = Informed (Diberi Informasi)
-

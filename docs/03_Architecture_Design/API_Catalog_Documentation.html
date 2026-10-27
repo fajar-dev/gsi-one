@@ -142,17 +142,17 @@
     <tr>
       <td>Storage</td>
       <td><code>storageService.ts</code></td>
-      <td>Signed URL bucket <code>projects</code> privat.</td>
+      <td>Utilitas signed URL; alur UI saat ini membuka URL tersimpan.</td>
+    </tr>
+    <tr>
+      <td>Akun admin</td>
+      <td><code>supabase/functions/admin-create-user/</code></td>
+      <td>Validasi sesi admin dan pembuatan akun Auth.</td>
     </tr>
     <tr>
       <td>Survei</td>
       <td><code>SupabaseSurveyRepository.ts</code></td>
       <td>Pembuatan dan pengelolaan booking survei.</td>
-    </tr>
-    <tr>
-      <td>Backend</td>
-      <td><code>backend/routes/*.js</code></td>
-      <td>Auth, proyek, booking, upload, dan notifikasi melalui router terpisah.</td>
     </tr>
   </tbody>
 </table>
@@ -189,7 +189,7 @@
     <tr>
       <td>Berkas</td>
       <td>Storage bucket <code>projects</code></td>
-      <td>Privat; policy membaca berdasarkan akses proyek, unggah untuk staff, akses konsumsi melalui signed URL.</td>
+      <td>Migrasi terbaru menetapkan bucket publik; unggah untuk staf, UI membuka URL tersimpan.</td>
     </tr>
     <tr>
       <td>Retention</td>
@@ -198,7 +198,7 @@
     </tr>
   </tbody>
 </table>
-<p>Lihat <a href="API_SPECIFICATION.md">API Specification</a> untuk endpoint dan kontrak rinci, serta <a href="adr/0001-scalability-and-security-architecture.md">ADR 0001</a> untuk alasan desain.</p>
+<p>Lihat <a href="API<em>SPECIFICATION</em>Full.md">API Specification</a> untuk endpoint dan kontrak rinci, serta <a href="ADR/0001-scalability-and-security-architecture.md">ADR 0001</a> untuk alasan desain.</p>
 
   </div>
 </body>

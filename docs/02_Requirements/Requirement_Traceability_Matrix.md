@@ -48,25 +48,13 @@
 
 ---
 
-## Matriks Keterlacakan Endpoint API ke Modul Kode Backend
+## Matriks Keterlacakan Layanan
 
-| Endpoint REST API | HTTP Method | File Route Backend | Auth Required | Rate Limited |
-| --- | --- | --- | --- | --- |
-| `/api/login` | POST | `authRoutes.js` | Tidak | Ya (10/15min) |
-| `/api/register` | POST | `authRoutes.js` | Tidak | Tidak (Disabled 403) |
-| `/api/auth/lookup-ticket` | POST | `authRoutes.js` | Tidak | Ya (10/15min) |
-| `/api/admin/create-user` | POST | `authRoutes.js` | Ya (Admin) | Tidak |
-| `/api/users/role/:role` | GET | `authRoutes.js` | Ya | Tidak |
-| `/api/dashboard/stats` | GET | `projectRoutes.js` | Ya | Tidak |
-| `/api/projects` | GET | `projectRoutes.js` | Ya | Tidak |
-| `/api/projects/:id` | GET | `projectRoutes.js` | Ya | Tidak |
-| `/api/projects/:id` | PUT | `projectRoutes.js` | Ya | Tidak |
-| `/api/projects/:id` | DELETE | `projectRoutes.js` | Ya (Admin) | Tidak |
-| `/api/stages/:id` | PUT | `projectRoutes.js` | Ya | Tidak |
-| `/api/stages/:id/details` | PUT | `projectRoutes.js` | Ya | Tidak |
-| `/api/stages/:id` | DELETE | `projectRoutes.js` | Ya | Tidak |
-| `/api/stages/:id/updates` | POST | `projectRoutes.js` | Ya | Tidak |
-| `/api/booking` | POST | `bookingRoutes.js` | Ya | Tidak |
-| `/api/projects/:id/files` | POST | `fileRoutes.js` | Ya | Tidak |
-| `/api/notifications` | POST | `notificationRoutes.js` | Ya | Tidak |
-
+| Operasi | Implementasi | Layanan |
+| --- | --- | --- |
+| Login dan tiket | `authService.ts` | Supabase Auth dan RPC |
+| Pembuatan akun | `admin-create-user/index.ts` | Edge Function dan Auth Admin API |
+| Proyek, tahapan, catatan, metadata file | `repositories/sub/` | PostgREST dan RLS |
+| Booking | `SupabaseSurveyRepository.ts` | PostgREST dan trigger |
+| Notifikasi | `notificationService.ts` | PostgREST dan RLS |
+| Upload | `ProjectFileRepository.ts` | Supabase Storage |

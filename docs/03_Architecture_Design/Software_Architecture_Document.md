@@ -6,7 +6,7 @@
 
 ## 1. Ikhtisar Arsitektur
 
-GSI One menggunakan arsitektur **Clean Architecture & Layered Domain Design** pada sisi klien (frontend) dengan komunikasi dua arah ke backend melalui HTTPS REST API dan Supabase Cloud (PostgreSQL + Realtime WebSocket + Storage + Auth RLS).
+GSI One menggunakan arsitektur **Clean Architecture & Layered Domain Design** pada sisi klien (frontend) dengan komunikasi langsung ke Supabase Cloud melalui SDK (PostgreSQL + Realtime WebSocket + Storage + Auth RLS).
 
 ---
 
@@ -35,7 +35,7 @@ GSI One menggunakan arsitektur **Clean Architecture & Layered Domain Design** pa
 - **Project modularization**: `SupabaseProjectRepository` adalah façade dengan `ProjectQueryRepository`, `ProjectStageRepository`, `ProjectFileRepository`, dan `ProjectCommandRepository`; `projectMapper.ts` menjadi batas DTO database.
 - **Cross-cutting services**: `notificationService.ts` menjalankan pagination dan mutasi sadar-RLS; `storageService.ts` menerbitkan signed URL untuk bucket privat; `logger.ts` membentuk log terstruktur di development.
 
-### 2.5 Backend & Database Layer
+### 2.5 Layanan Supabase & Database
 - **Database Production**: Supabase PostgreSQL (dengan Row Level Security / RLS terintegrasi per role)
 - **Storage**: Bucket Supabase Storage (`projects/`) untuk dokumen & foto inspeksi proyek
 - **Realtime**: Supabase WebSocket Subscription untuk perubahan progres live
@@ -74,5 +74,5 @@ GSI One menggunakan arsitektur **Clean Architecture & Layered Domain Design** pa
 | ADR-05 | Centralize Design Tokens & Role Theme System | `Colors.tsx` dan `useRoleTheme()` memastikan konsistensi visual otomatis lintas 4 role pengguna.        |
 | ADR-06 | Repository Pattern                           | Memisahkan kueri Supabase DB dari UI & Hook layer demi maintainability skor A.                          |
 | ADR-07 | Shared Error Helpers & Formatters            | Menggabungkan pengolahan error dan formatting ke `errorHelpers.ts`, `formatters.ts`, `statusMapper.ts`.   |
-| ADR-08 | Trusted notification creation & private storage | Insert notifikasi dilakukan trigger/backend; bucket proyek privat diakses dengan signed URL agar RLS dan akses file konsisten. |
+| ADR-08 | Trusted notification creation & private storage | Insert notifikasi dilakukan trigger database atau Edge Function; bucket proyek privat diakses dengan signed URL agar RLS dan akses file konsisten. |
 | ADR-09 | Pagination & project-scoped realtime | List besar dibatasi `limit`/`offset`; trigger mengisi `stage_updates.project_id` agar channel realtime hanya menerima event proyek terkait. |

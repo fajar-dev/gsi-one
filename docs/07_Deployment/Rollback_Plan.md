@@ -24,8 +24,9 @@ Rollback ke versi sebelumnya dilakukan jika setelah rilis production ditemukan:
 1. Hubungi Apple Support untuk meminta penghentian distribusi versi terbaru (App Store tidak mendukung rollback langsung).
 2. Upload IPA versi sebelumnya dari arsip Xcode dan submit sebagai rilis baru.
 
-### Backend API (grahasurvei.com)
-- Hubungi administrator server untuk melakukan rollback ke backup database terakhir jika diperlukan.
+### Supabase
+- Deploy ulang versi Edge Function yang telah diverifikasi.
+- Koreksi skema lewat migrasi lanjutan yang ditinjau; pemulihan backup database memerlukan evaluasi dampak terhadap data baru dan prosedur administrator project.
 
 ---
 

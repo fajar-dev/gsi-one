@@ -11,7 +11,8 @@
     "test": "jest",
     "test:coverage": "jest --coverage --runInBand",
     "test:ci": "jest --ci --runInBand",
-    "web": "webpack serve --mode development"
+    "web": "webpack serve --mode development",
+    "seed:storage": "node scripts/seed_storage.cjs"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^3.1.1",

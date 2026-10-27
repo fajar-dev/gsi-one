@@ -27,14 +27,12 @@ GSI One adalah aplikasi mobile berbasis lintas platform (cross-platform) Android
 - **RLS**: Row Level Security (Kebijakan Keamanan Tingkat Baris pada Supabase PostgreSQL).
 - **AsyncStorage**: Penyimpanan data key-value lokal pada React Native untuk persistensi token autentikasi dan profil pengguna.
 - **Zustand**: Library manajemen state global yang digunakan pada aplikasi (`authStore`, `projectStore`).
-- **CORS**: Cross-Origin Resource Sharing (Mekanisme keamanan HTTP untuk membatasi origin request terdaftar pada backend Express).
+- **CORS**: Cross-Origin Resource Sharing (Mekanisme keamanan HTTP untuk membatasi origin web yang diizinkan pada Edge Function).
 - **JWT**: JSON Web Token (Standar enkripsi token untuk autentikasi dan otorisasi sesi pengguna).
 - **RBAC**: Role-Based Access Control (Sistem pengontrolan hak akses terstruktur berdasarkan 4 peran: Admin, Marketing, Engineer, dan Client).
 - **DTO**: Data Transfer Object (Pola objek pemetaan data terisolasi antara skema database dan entitas domain aplikasi via `projectMapper.ts`).
 - **REST API**: Representational State Transfer Application Programming Interface (Antarmuka komunikasi HTTP terstruktur berbasis JSON).
 - **BaaS**: Backend as a Service (Platform cloud backend terintegrasi Supabase untuk Database PostgreSQL, Auth, Realtime, dan Storage).
-- **Helmet**: Middleware keamanan Express.js untuk mengonfigurasi HTTP security headers (`X-Content-Type-Options`, `X-Frame-Options`, HSTS).
-- **Multer**: Middleware Node.js/Express untuk menangani penanganan pengungahan berkas `multipart/form-data` (foto inspeksi & laporan PDF).
 - **Signed URL**: URL akses berdurasi terbatas yang diterbitkan oleh Supabase Storage untuk mengunduh dokumen dari bucket privat `projects`.
 - **Stage Updates**: Catatan harian aktivitas kemajuan pekerjaan proyek di lapangan yang diinput oleh Field Engineer.
 - **Project Stages**: 4 tahapan linimasa standar dalam proyek GSI One (Inisiasi, Survei Lapangan, Analisis & Laporan, Selesai).
@@ -50,7 +48,7 @@ GSI One adalah aplikasi mobile berbasis lintas platform (cross-platform) Android
 ## 2. Deskripsi Umum
 
 ### 2.1 Perspektif Produk
-GSI One Mobile beroperasi sebagai klien frontend React Native yang terhubung ke Supabase Cloud (PostgreSQL Database, Realtime WebSocket Subscription, Auth RLS, dan Cloud Storage) serta REST API backend Express.
+GSI One Mobile beroperasi sebagai klien frontend React Native yang terhubung ke Supabase Cloud (PostgreSQL Database, Realtime WebSocket Subscription, Auth RLS, dan Cloud Storage) serta Edge Functions untuk operasi admin.
 
 ```
 +-----------------------------------------------------------------------+
@@ -61,7 +59,7 @@ GSI One Mobile beroperasi sebagai klien frontend React Native yang terhubung ke 
     | HTTPS         | Realtime WS         | Storage SDK         | Local Storage
     v               v                     v                     v
 +-----------+  +-------------------+  +-----------------+  +---------------+
-| Express   |  | Supabase Realtime |  | Supabase Storage|  | AsyncStorage  |
+| Supabase  |  | Supabase Realtime |  | Supabase Storage|  | AsyncStorage  |
 | REST API  |  | WebSocket Engine  |  | (Bucket Projects)|  | (Auth Session)|
 +-----------+  +-------------------+  +-----------------+  +---------------+
     |                   |                     |
@@ -118,7 +116,7 @@ Aplikasi ini mendukung 4 peran pengguna utama:
 
 #### 3.1.1 Autentikasi & Pengelolaan Sesi (FR-AUTH)
 - **FR-AUTH-01: Login Pengguna via Nomor Tiket / Email**
-  Sistem harus memungkinkan pengguna masuk menggunakan Nomor Tiket atau Email beserta Kata Sandi. Kredensial divalidasi melalui layanan autentikasi Supabase dan/atau REST API Backend.
+  Sistem harus memungkinkan pengguna masuk menggunakan Nomor Tiket atau Email beserta Kata Sandi. Kredensial divalidasi melalui layanan autentikasi Supabase.
 - **FR-AUTH-02: Pendaftaran Akun Terpusat (Admin-Only)**
   Sistem hanya mengizinkan akun bertipe `admin` untuk membuat akun pengguna baru (Klien, Marketing, Engineer) melalui `AdminRegisterModal`. Registrasi mandiri oleh publik ditiadakan demi keamanan.
 - **FR-AUTH-03: Persistensi Sesi Lokal**

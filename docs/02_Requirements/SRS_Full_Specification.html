@@ -139,14 +139,12 @@
   <li><strong>RLS</strong>: Row Level Security (Kebijakan Keamanan Tingkat Baris pada Supabase PostgreSQL).</li>
   <li><strong>AsyncStorage</strong>: Penyimpanan data key-value lokal pada React Native untuk persistensi token autentikasi dan profil pengguna.</li>
   <li><strong>Zustand</strong>: Library manajemen state global yang digunakan pada aplikasi (<code>authStore</code>, <code>projectStore</code>).</li>
-  <li><strong>CORS</strong>: Cross-Origin Resource Sharing (Mekanisme keamanan HTTP untuk membatasi origin request terdaftar pada backend Express).</li>
+  <li><strong>CORS</strong>: Cross-Origin Resource Sharing (Mekanisme keamanan HTTP untuk membatasi origin web yang diizinkan pada Edge Function).</li>
   <li><strong>JWT</strong>: JSON Web Token (Standar enkripsi token untuk autentikasi dan otorisasi sesi pengguna).</li>
   <li><strong>RBAC</strong>: Role-Based Access Control (Sistem pengontrolan hak akses terstruktur berdasarkan 4 peran: Admin, Marketing, Engineer, dan Client).</li>
   <li><strong>DTO</strong>: Data Transfer Object (Pola objek pemetaan data terisolasi antara skema database dan entitas domain aplikasi via <code>projectMapper.ts</code>).</li>
   <li><strong>REST API</strong>: Representational State Transfer Application Programming Interface (Antarmuka komunikasi HTTP terstruktur berbasis JSON).</li>
   <li><strong>BaaS</strong>: Backend as a Service (Platform cloud backend terintegrasi Supabase untuk Database PostgreSQL, Auth, Realtime, dan Storage).</li>
-  <li><strong>Helmet</strong>: Middleware keamanan Express.js untuk mengonfigurasi HTTP security headers (<code>X-Content-Type-Options</code>, <code>X-Frame-Options</code>, HSTS).</li>
-  <li><strong>Multer</strong>: Middleware Node.js/Express untuk menangani penanganan pengungahan berkas <code>multipart/form-data</code> (foto inspeksi &amp; laporan PDF).</li>
   <li><strong>Signed URL</strong>: URL akses berdurasi terbatas yang diterbitkan oleh Supabase Storage untuk mengunduh dokumen dari bucket privat <code>projects</code>.</li>
   <li><strong>Stage Updates</strong>: Catatan harian aktivitas kemajuan pekerjaan proyek di lapangan yang diinput oleh Field Engineer.</li>
   <li><strong>Project Stages</strong>: 4 tahapan linimasa standar dalam proyek GSI One (Inisiasi, Survei Lapangan, Analisis &amp; Laporan, Selesai).</li>
@@ -161,7 +159,7 @@
 <hr />
 <h2>2. Deskripsi Umum</h2>
 <h3>2.1 Perspektif Produk</h3>
-<p>GSI One Mobile beroperasi sebagai klien frontend React Native yang terhubung ke Supabase Cloud (PostgreSQL Database, Realtime WebSocket Subscription, Auth RLS, dan Cloud Storage) serta REST API backend Express.</p>
+<p>GSI One Mobile beroperasi sebagai klien frontend React Native yang terhubung ke Supabase Cloud (PostgreSQL Database, Realtime WebSocket Subscription, Auth RLS, dan Cloud Storage) serta Edge Functions untuk operasi admin.</p>
 <pre><code class="language-">+-----------------------------------------------------------------------+
 |                         GSI One Mobile App                            |
 |                           (React Native)                              |
@@ -170,7 +168,7 @@
     | HTTPS         | Realtime WS         | Storage SDK         | Local Storage
     v               v                     v                     v
 +-----------+  +-------------------+  +-----------------+  +---------------+
-| Express   |  | Supabase Realtime |  | Supabase Storage|  | AsyncStorage  |
+| Supabase  |  | Supabase Realtime |  | Supabase Storage|  | AsyncStorage  |
 | REST API  |  | WebSocket Engine  |  | (Bucket Projects)|  | (Auth Session)|
 +-----------+  +-------------------+  +-----------------+  +---------------+
     |                   |                     |
@@ -244,7 +242,7 @@
 <ul>
   <li><strong>FR-AUTH-01: Login Pengguna via Nomor Tiket / Email</strong></li>
 </ul>
-<p>Sistem harus memungkinkan pengguna masuk menggunakan Nomor Tiket atau Email beserta Kata Sandi. Kredensial divalidasi melalui layanan autentikasi Supabase dan/atau REST API Backend.</p>
+<p>Sistem harus memungkinkan pengguna masuk menggunakan Nomor Tiket atau Email beserta Kata Sandi. Kredensial divalidasi melalui layanan autentikasi Supabase.</p>
 <ul>
   <li><strong>FR-AUTH-02: Pendaftaran Akun Terpusat (Admin-Only)</strong></li>
 </ul>

@@ -64,7 +64,7 @@ export function useEditProjectForm({
         if (visible && project) {
             setProjectCode(project.project_code || '');
             setProjectName(project.project_name || '');
-            setBudget(project.budget ? String(project.budget) : '');
+            setBudget(project.budget != null ? String(project.budget) : '');
             setStartDate(project.start_date ? new Date(project.start_date) : null);
             setEndDate(project.estimated_finish ? new Date(project.estimated_finish) : null);
             setStatus(project.status || 'pending');

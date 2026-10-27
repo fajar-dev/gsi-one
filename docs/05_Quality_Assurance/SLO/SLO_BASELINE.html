@@ -129,27 +129,27 @@
   </thead>
   <tbody>
     <tr>
-      <td>Auth (<code>/api/login</code>, <code>/api/auth/*</code>)</td>
+      <td>Supabase Auth dan RPC tiket</td>
       <td>&gt;= 99.5%</td>
       <td>Rolling 30 hari</td>
     </tr>
     <tr>
-      <td>Projects (<code>/api/projects</code>, <code>/api/stages/*</code>)</td>
+      <td>PostgREST proyek dan tahapan</td>
       <td>&gt;= 99.0%</td>
       <td>Rolling 30 hari</td>
     </tr>
     <tr>
-      <td>Bookings (<code>/api/bookings/*</code>)</td>
+      <td>PostgREST bookings</td>
       <td>&gt;= 99.0%</td>
       <td>Rolling 30 hari</td>
     </tr>
     <tr>
-      <td>Notifications (<code>/api/notifications</code>)</td>
+      <td>PostgREST notifications</td>
       <td>&gt;= 99.0%</td>
       <td>Rolling 30 hari</td>
     </tr>
     <tr>
-      <td>File Upload (<code>/api/files/upload</code>)</td>
+      <td>Supabase Storage upload</td>
       <td>&gt;= 98.0%</td>
       <td>Rolling 30 hari</td>
     </tr>
@@ -243,7 +243,7 @@
     </tr>
     <tr>
       <td><strong>Login Brute Force</strong></td>
-      <td>Rate limiter authLimiter aktif lebih dari 20x per IP dalam 15 menit</td>
+      <td>Lonjakan kegagalan login pada log Supabase Auth; threshold mengikuti konfigurasi Auth</td>
     </tr>
   </tbody>
 </table>

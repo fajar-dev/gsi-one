@@ -3,40 +3,29 @@ import { View, Text, StyleSheet, TouchableOpacity, Linking, Alert } from 'react-
 import Icon from 'react-native-vector-icons/Feather';
 import { colors, neutral } from '../../../assets/styles/Colors';
 import { scale, fontScale } from '../../utils/responsive';
+import { COMPANY_CONTACT } from '../../constants/contact';
 
 interface SupportCardProps {
   style?: object;
 }
 
 export function SupportCard({ style }: SupportCardProps): JSX.Element {
-  const handleCallSupport = () => {
-    const phoneNumber = 'tel:+622187654321';
-    Linking.canOpenURL(phoneNumber)
-      .then(supported => {
-        if (supported) {
-          Linking.openURL(phoneNumber);
-        } else {
-          Alert.alert('Kontak Layanan', 'Nomor telepon layanan pelanggan: +62 21 8765 4321');
-        }
-      })
-      .catch(() => {
-        Alert.alert('Kontak Layanan', 'Nomor telepon layanan pelanggan: +62 21 8765 4321');
-      });
+  const handleCallSupport = async () => {
+    const phoneNumber = `tel:${COMPANY_CONTACT.phone.replace(/[^+0-9]/g, '')}`;
+    try {
+      if (!await Linking.canOpenURL(phoneNumber)) throw new Error('Dialer unavailable');
+      await Linking.openURL(phoneNumber);
+    } catch {
+      Alert.alert('Kontak Layanan', `Nomor telepon layanan pelanggan: ${COMPANY_CONTACT.phone}`);
+    }
   };
 
-  const handleOpenWebsite = () => {
-    const url = 'https://grahasurvei.com';
-    Linking.canOpenURL(url)
-      .then(supported => {
-        if (supported) {
-          Linking.openURL(url);
-        } else {
-          Alert.alert('Situs Resmi', 'Kunjungi web kami di https://grahasurvei.com');
-        }
-      })
-      .catch(() => {
-        Alert.alert('Situs Resmi', 'Kunjungi web kami di https://grahasurvei.com');
-      });
+  const handleOpenWebsite = async () => {
+    try {
+      await Linking.openURL(COMPANY_CONTACT.website);
+    } catch {
+      Alert.alert('Situs Resmi', `Kunjungi web kami di ${COMPANY_CONTACT.website}`);
+    }
   };
 
   return (
@@ -52,7 +41,7 @@ export function SupportCard({ style }: SupportCardProps): JSX.Element {
           <Icon name="phone-call" size={scale(18)} color="#64748B" style={styles.infoIcon} />
           <Text style={styles.infoLabel}>Layanan Pelanggan</Text>
         </View>
-        <Text style={styles.infoValue}>+62 21 8765 4321</Text>
+        <Text style={styles.infoValue}>{COMPANY_CONTACT.phone}</Text>
       </TouchableOpacity>
 
       <View style={styles.divider} />

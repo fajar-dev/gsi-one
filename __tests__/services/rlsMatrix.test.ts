@@ -24,7 +24,7 @@ describe('RLS Authorization Matrix & Strict ID Filtering', () => {
 
     await repository.getProjects('usr-client-123', 'client');
 
-    expect(supabase.from).toHaveBeenCalledWith('projects');
+    expect(supabase.from).toHaveBeenCalledWith('projects_with_budget');
     expect(mockOr).toHaveBeenCalledWith('client_id.eq.usr-client-123,created_by.eq.usr-client-123');
   });
 
@@ -37,7 +37,7 @@ describe('RLS Authorization Matrix & Strict ID Filtering', () => {
 
     await repository.getProjects('usr-mkt-456', 'marketing');
 
-    expect(supabase.from).toHaveBeenCalledWith('projects');
+    expect(supabase.from).toHaveBeenCalledWith('projects_with_budget');
     expect(mockOr).toHaveBeenCalledWith('marketing_id.eq.usr-mkt-456,created_by.eq.usr-mkt-456');
   });
 
@@ -50,7 +50,7 @@ describe('RLS Authorization Matrix & Strict ID Filtering', () => {
 
     await repository.getProjects('usr-eng-789', 'engineer');
 
-    expect(supabase.from).toHaveBeenCalledWith('projects');
+    expect(supabase.from).toHaveBeenCalledWith('projects_with_budget');
     expect(mockOr).toHaveBeenCalledWith('engineer_id.eq.usr-eng-789,created_by.eq.usr-eng-789');
   });
 });

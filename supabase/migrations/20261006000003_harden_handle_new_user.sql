@@ -4,7 +4,7 @@
 -- handle_new_user() sebelumnya menyalin raw_user_meta_data->>'role' apa adanya.
 -- Karena pendaftaran mandiri terbuka (disable_signup=false), siapa pun bisa
 -- mendaftar dengan {"role":"admin"} dan mendapat is_admin()=true.
--- Versi ini memakai role 'client' tetap, sesuai backend/supabase_schema.sql.
+-- Versi ini memakai role 'client' tetap untuk setiap akun Auth baru.
 -- Alur admin-create-user tetap benar karena meng-upsert role setelah createUser.
 
 CREATE OR REPLACE FUNCTION public.handle_new_user()

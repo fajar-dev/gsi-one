@@ -9,7 +9,6 @@ import {
     KeyboardAvoidingView,
     Platform,
     Pressable,
-    Alert,
 } from 'react-native';
 import { colors } from '../../../../assets/styles/Colors';
 import { ProjectStage } from '../../../services/projectService';
@@ -29,22 +28,7 @@ export const EditStageModal: React.FC<EditStageModalProps> = ({
     onSave,
     onDelete,
 }) => {
-    const handleDelete = () => {
-        Alert.alert(
-            'Hapus Tahapan',
-            'Apakah Anda yakin ingin menghapus tahapan proyek ini? Semua catatan progres dan file terlampir untuk tahap ini akan dihapus.',
-            [
-                { text: 'Batal', style: 'cancel' },
-                {
-                    text: 'Hapus',
-                    style: 'destructive',
-                    onPress: () => {
-                        onDelete?.();
-                    }
-                }
-            ]
-        );
-    };
+    const handleDelete = () => onDelete?.();
     const [stageTitle, setStageTitle] = useState('');
     const [stageDesc, setStageDesc] = useState('');
 

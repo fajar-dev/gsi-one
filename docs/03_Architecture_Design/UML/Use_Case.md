@@ -1,5 +1,5 @@
 # UML: Use Case Diagram
-## Proyek: GSI One Mobile Application & Express REST API
+## Proyek: GSI One Mobile Application & Supabase
 
 Menggambarkan seluruh aktor dan use case yang tersedia dalam ekosistem GSI One.
 

@@ -113,12 +113,12 @@
 <body>
   <div class="container">
     <h1>Software Requirement Specification (SRS)</h1>
-<h2>Proyek: GSI One Mobile Application &amp; Backend REST API</h2>
+<h2>Proyek: GSI One Mobile Application &amp; Supabase</h2>
 <h2>Standar: ISO/IEC/IEEE 29148</h2>
 <hr />
 <h2>1. Pendahuluan</h2>
 <h3>1.1 Tujuan</h3>
-<p>Dokumen ini mendeskripsikan persyaratan fungsional dan non-fungsional untuk aplikasi <strong>GSI One</strong> (Mobile React Native &amp; Express Backend API) yang digunakan oleh PT Graha Survei Indonesia dalam memfasilitasi pemesanan survei, pelacakan proyek teknis, manajemen berkas inspeksi, dan notifikasi otomatis.</p>
+<p>Dokumen ini mendeskripsikan persyaratan fungsional dan non-fungsional untuk aplikasi <strong>GSI One</strong> (React Native &amp; Supabase) yang digunakan oleh PT Graha Survei Indonesia dalam memfasilitasi pemesanan survei, pelacakan proyek teknis, manajemen berkas inspeksi, dan notifikasi otomatis.</p>
 <h3>1.2 Lingkup Produk</h3>
 <p>GSI One menyediakan ekosistem terpadu berbasis 4 Peran Pengguna:</p>
 <ul>
@@ -137,14 +137,12 @@
   <li><strong>RLS</strong>: Row Level Security (Kebijakan Keamanan Tingkat Baris pada Supabase PostgreSQL).</li>
   <li><strong>AsyncStorage</strong>: Penyimpanan data key-value lokal pada React Native untuk persistensi token autentikasi dan profil pengguna.</li>
   <li><strong>Zustand</strong>: Library manajemen state global yang digunakan pada aplikasi (<code>authStore</code>, <code>projectStore</code>).</li>
-  <li><strong>CORS</strong>: Cross-Origin Resource Sharing (Mekanisme keamanan HTTP untuk membatasi origin request terdaftar pada backend Express).</li>
+  <li><strong>CORS</strong>: Cross-Origin Resource Sharing (Mekanisme keamanan HTTP untuk membatasi origin web yang diizinkan pada Edge Function).</li>
   <li><strong>JWT</strong>: JSON Web Token (Standar enkripsi token untuk autentikasi dan otorisasi sesi pengguna).</li>
   <li><strong>RBAC</strong>: Role-Based Access Control (Sistem pengontrolan hak akses terstruktur berdasarkan 4 peran: Admin, Marketing, Engineer, dan Client).</li>
   <li><strong>DTO</strong>: Data Transfer Object (Pola objek pemetaan data terisolasi antara skema database dan entitas domain aplikasi via <code>projectMapper.ts</code>).</li>
   <li><strong>REST API</strong>: Representational State Transfer Application Programming Interface (Antarmuka komunikasi HTTP terstruktur berbasis JSON).</li>
   <li><strong>BaaS</strong>: Backend as a Service (Platform cloud backend terintegrasi Supabase untuk Database PostgreSQL, Auth, Realtime, dan Storage).</li>
-  <li><strong>Helmet</strong>: Middleware keamanan Express.js untuk mengonfigurasi HTTP security headers (<code>X-Content-Type-Options</code>, <code>X-Frame-Options</code>, HSTS).</li>
-  <li><strong>Multer</strong>: Middleware Node.js/Express untuk menangani penanganan pengungahan berkas <code>multipart/form-data</code> (foto inspeksi &amp; laporan PDF).</li>
   <li><strong>Signed URL</strong>: URL akses berdurasi terbatas yang diterbitkan oleh Supabase Storage untuk mengunduh dokumen dari bucket privat <code>projects</code>.</li>
   <li><strong>Stage Updates</strong>: Catatan harian aktivitas kemajuan pekerjaan proyek di lapangan yang diinput oleh Field Engineer.</li>
   <li><strong>Project Stages</strong>: 4 tahapan linimasa standar dalam proyek GSI One (Inisiasi, Survei Lapangan, Analisis &amp; Laporan, Selesai).</li>
@@ -183,8 +181,7 @@
 <h2>3. Persyaratan Non-Fungsional (Non-Functional Requirements)</h2>
 <h3>3.1 Keamanan &amp; Networking (<code>NFR-SEC</code>)</h3>
 <ul>
-  <li><strong>NFR-SEC-01 (CORS)</strong>: Backend Express wajib membatasi origin HTTP request hanya ke domain resmi (<code>https://grahasurvei.com</code>, <code>http://localhost:3000</code>, <code>http://10.0.2.2:3000</code>).</li>
-  <li><strong>NFR-SEC-02 (Headers)</strong>: Menggunakan <code>helmet()</code> untuk proteksi XSS, HSTS, dan MIME sniffing.</li>
+  <li><strong>NFR-SEC-01 (CORS)</strong>: Edge Function membatasi origin web ke situs resmi dan localhost:8080 untuk development.</li>
   <li><strong>NFR-SEC-03 (RLS)</strong>: Row Level Security (RLS) PostgreSQL aktif untuk semua tabel Supabase.</li>
 </ul>
 <h3>3.2 Performa &amp; Skalabilitas (<code>NFR-PERF</code>)</h3>

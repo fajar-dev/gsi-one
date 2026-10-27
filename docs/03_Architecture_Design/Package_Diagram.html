@@ -112,57 +112,20 @@
 </head>
 <body>
   <div class="container">
-    <h1>UML: Package Diagram Specification</h1>
-<h2>Proyek: GSI One Mobile Application &amp; Express Backend API</h2>
-<p>Diagram Package memvisualisasikan pengorganisasian modul, direktori paket kode, dan ketergantungan antar-paket pada aplikasi frontend React Native dan backend Express.</p>
+    <h1>Package Diagram</h1>
 <pre class="mermaid">
-graph TB
-    subgraph FrontendPackages["Paket Frontend (src/)"]
-        direction TB
-        ScreensPkg["screens/\n(Login, Dashboard, Projects, BookSurvey)"]
-        ComponentsPkg["components/\n(BottomNav, ScreenHeader, StatusBadge, Modals)"]
-        HooksPkg["hooks/\n(useRoleTheme, useProjectDetail, useSurveyRequests)"]
-        StorePkg["store/\n(authStore.ts, projectStore.ts - Zustand)"]
-        DomainPkg["domain/\n(ProjectEntity.ts, SurveyRequestEntity.ts)"]
-        ServicesPkg["services/\n(authService, projectService, notificationService)"]
-        MappersPkg["services/mappers/\n(projectMapper.ts)"]
-        ReposPkg["services/repositories/\n(IProjectRepository, SupabaseProjectRepository)"]
-        SubReposPkg["services/repositories/sub/\n(ProjectQuery, ProjectStage, ProjectFile, ProjectCommand)"]
-        UtilsPkg["utils/\n(errorHelpers, formatters, statusMapper, responsive, logger)"]
-        ConfigPkg["config/\n(api.ts, supabase.ts)"]
-        ThemePkg["theme/\n(Colors.tsx, GlobalStyle.tsx, roleTheme.ts)"]
-        TypesPkg["types/\n(database.types.ts, index.ts)"]
-    end
-
-    subgraph BackendPackages["Paket Backend (backend/)"]
-        direction TB
-        ServerMain["server.js Entry Point"]
-        RoutesPkg["backend/routes/\n(authRoutes, projectRoutes, bookingRoutes, fileRoutes, notificationRoutes)"]
-        MiddlewaresPkg["backend/middlewares/\n(authMiddleware.js)"]
-        HelpersPkg["backend/helpers/\n(projectHelpers.js)"]
-        ConfigBackendPkg["backend/config/\n(supabase.js, multer.js)"]
-        DBPkg["backend/database.js\n(SQLite connection &amp; init)"]
-    end
-
-    ScreensPkg --&gt; ComponentsPkg
-    ScreensPkg --&gt; HooksPkg
-    ScreensPkg --&gt; ThemePkg
-    HooksPkg --&gt; StorePkg
-    StorePkg --&gt; ServicesPkg
-    ServicesPkg --&gt; ReposPkg
-    ReposPkg --&gt; SubReposPkg
-    SubReposPkg --&gt; MappersPkg
-    MappersPkg --&gt; DomainPkg
-    ServicesPkg --&gt; ConfigPkg
-    ServicesPkg --&gt; UtilsPkg
-    ConfigPkg --&gt; TypesPkg
-
-    ServerMain --&gt; RoutesPkg
-    RoutesPkg --&gt; MiddlewaresPkg
-    RoutesPkg --&gt; HelpersPkg
-    RoutesPkg --&gt; ConfigBackendPkg
-    RoutesPkg --&gt; DBPkg
+flowchart TD
+    Screens[src/screens dan components] --&gt; Hooks[src/hooks dan store]
+    Hooks --&gt; Domain[src/domain]
+    Hooks --&gt; Services[src/services]
+    Services --&gt; Repositories[repositories dan sub-repositories]
+    Repositories --&gt; Client[src/config/supabase.ts]
+    Client --&gt; Cloud[Supabase]
+    Functions[supabase/functions] --&gt; Cloud
+    Migrations[supabase/migrations] --&gt; Cloud
+    Seed[supabase/seed.sql] --&gt; Cloud
 </pre>
+<p>Service proyek memisahkan query, command, tahapan, dan berkas. Booking memiliki repository sendiri. Auth dan notifikasi memakai service yang terhubung ke Supabase.</p>
 
   </div>
 </body>

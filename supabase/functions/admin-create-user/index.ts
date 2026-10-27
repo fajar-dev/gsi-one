@@ -3,8 +3,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 
 const ALLOWED_ORIGINS = [
   'https://grahasurvei.com',
-  'http://localhost:3000',
-  'http://10.0.2.2:3000',
+  'http://localhost:8080',
+  'http://127.0.0.1:8080',
 ];
 
 function getCorsHeaders(req: Request): Record<string, string> {
@@ -12,6 +12,8 @@ function getCorsHeaders(req: Request): Record<string, string> {
   const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
   return {
     'Access-Control-Allow-Origin': allowedOrigin,
+    'Vary': 'Origin',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   };
 }
@@ -20,6 +22,8 @@ serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: getCorsHeaders(req) });
   }
+
+  if (req.method !== 'POST') return new Response('Method not allowed', { status: 405, headers: getCorsHeaders(req) });
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
@@ -83,16 +87,20 @@ serve(async (req: Request) => {
       );
     }
 
-    const validRoles = ['client', 'marketing', 'engineer'];
+    const validRoles = ['client', 'marketing', 'engineer', 'admin'];
     if (!validRoles.includes(role)) {
       return new Response(
-        JSON.stringify({ success: false, message: 'Role tidak valid. Pilih client, marketing, atau engineer.' }),
+        JSON.stringify({ success: false, message: 'Role tidak valid. Pilih client, marketing, engineer, atau admin.' }),
         { status: 400, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
       );
     }
 
     const cleanEmail = String(email).trim().toLowerCase();
     const cleanName = String(name).trim();
+    if (!cleanName || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      return new Response(JSON.stringify({ success: false, message: 'Nama dan email harus valid.' }),
+        { status: 400, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } });
+    }
 
     const { data: createdAuth, error: createAuthErr } = await supabaseAdmin.auth.admin.createUser({
       email: cleanEmail,
@@ -125,7 +133,9 @@ serve(async (req: Request) => {
       }, { onConflict: 'id' });
 
     if (upsertErr) {
-      console.error('[EDGE FUNCTION WARN] Gagal upsert public.users:', upsertErr.message);
+      await supabaseAdmin.auth.admin.deleteUser(newUserId);
+      return new Response(JSON.stringify({ success: false, message: `Profil gagal disimpan: ${upsertErr.message}` }),
+        { status: 400, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } });
     }
 
     return new Response(
@@ -137,6 +147,7 @@ serve(async (req: Request) => {
           email: cleanEmail,
           full_name: cleanName,
           role: role,
+          ...(ticket_number ? { ticket_number: String(ticket_number).trim() } : {}),
         },
       }),
       { status: 200, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }

@@ -113,7 +113,7 @@
 <body>
   <div class="container">
     <h1>UML: Activity Diagrams</h1>
-<h2>Proyek: GSI One Mobile Application &amp; Express Backend API</h2>
+<h2>Proyek: GSI One Mobile Application &amp; Supabase</h2>
 <hr />
 <h2>1. Activity Diagram: Alur Pemesanan Survei &amp; Pipeline Marketing</h2>
 <pre class="mermaid">
@@ -123,8 +123,8 @@ flowchart TD
     B --&gt; C{Validasi Form Client-Side}
     C --&gt;|Input Tidak Valid| Err1[Tampilkan Alert Field Error]
     Err1 --&gt; B
-    C --&gt;|Valid| D[Kirim Request POST /api/bookings]
-    D --&gt; E{Respons Server Express}
+    C --&gt;|Valid| D[Kirim Request surveyService.createBooking]
+    D --&gt; E{Respons Supabase}
     E --&gt;|Error/Timeout| Err2[Tampilkan Alert Network Error]
     Err2 --&gt; B
     E --&gt;|Success 201| F[Tampilkan SuccessScreen &amp; Reset Form]
@@ -148,16 +148,16 @@ flowchart TD
 flowchart TD
     Start([Mulai]) --&gt; A[Pengguna Buka Aplikasi]
     A --&gt; B{Apakah Session Token Ada di AsyncStorage?}
-    B --&gt;|Ya| C[Validasi Token ke /api/me atau Supabase Auth]
+    B --&gt;|Ya| C[Pulihkan sesi Supabase Auth]
     C --&gt;|Valid| D[Buka Dynamic Dashboard per Role]
     D --&gt; End1([Selesai - Sesi Aktif])
     C --&gt;|Expired/Invalid| E[Hapus Token &amp; Navigasi ke LoginScreen]
     B --&gt;|Tidak| E
     
     E --&gt; F[Pengguna Input Email/Nomor Tiket &amp; Password]
-    F --&gt; G[POST /api/login dengan Rate Limiter Audit]
+    F --&gt; G[supabase.auth.signInWithPassword]
     G --&gt; H{Respons Login Server}
-    H --&gt;|Gagal / Rate Limited| Err1[Tampilkan Alert Error / Rate Limit 15 Menit]
+    H --&gt;|Gagal| Err1[Tampilkan Alert Error]
     Err1 --&gt; F
     H --&gt;|Sukses 200| I[Simpan Token JWT &amp; Profil ke AsyncStorage]
     I --&gt; D
@@ -166,7 +166,7 @@ flowchart TD
         AdminStart([Admin Login]) --&gt; J[Buka Admin Dashboard]
         J --&gt; K[Tekan Tombol Buat Akun Baru]
         K --&gt; L[Input Nama, Email, Password, &amp; Role Pengguna]
-        L --&gt; M[POST /api/admin/create-user]
+        L --&gt; M[Edge Function admin-create-user]
         M --&gt; N{Validasi Role Admin}
         N --&gt;|Bukan Admin| Err2[Status 403 Forbidden]
         N --&gt;|Admin Valid| O[Akun Dibuat di Auth &amp; Profile Created]
@@ -184,17 +184,17 @@ flowchart TD
     
     D --&gt;|Update Status Stage| E[Ubah Status Stage: in_progress / done]
     E --&gt; F[Update Persentase Kemajuan Total Proyek]
-    F --&gt; G[PUT /api/stages/:stageId]
+    F --&gt; G[projectService.updateStageStatus]
     G --&gt; H[Linimasa Progres Terperbarui]
     
     D --&gt;|Tambah Log Harian| I[Buka AddLogModal]
     I --&gt; J[Input Tanggal, Ringkasan Aktivitas Lapangan &amp; Catatan Kendala]
-    J --&gt; K[POST /api/stages/:stageId/updates]
+    J --&gt; K[projectService.addStageUpdate]
     K --&gt; L[Entri Catatan Tersimpan di stage_updates]
     
     D --&gt;|Upload Berkas Lapangan| M[Buka UploadFileModal]
     M --&gt; N[Pilih Foto Inspeksi atau File Laporan PDF &lt; 10MB]
-    N --&gt; O[POST /api/projects/:id/files via Multer]
+    N --&gt; O[Upload Supabase Storage dan INSERT project_files]
     O --&gt; P[File Tersimpan di Storage Privat &amp; Metadata di DB]
     
     H &amp; L &amp; P --&gt; End([Selesai - Update Lapangan Tersimpan])

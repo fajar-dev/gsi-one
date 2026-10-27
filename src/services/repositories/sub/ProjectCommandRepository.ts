@@ -1,11 +1,11 @@
 import { supabase } from '../../../config/supabase';
 import { Project, ProjectUserRole } from '../../projectService';
 import { UserOptionDto } from '../IProjectRepository';
-import { notificationService } from '../../notificationService';
+import { storageService } from '../../storageService';
 
 export class ProjectCommandRepository {
     public async createProject(project: Omit<Project, 'id' | 'created_at' | 'status'>, userId: string): Promise<void> {
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('projects')
             .insert([
                 {
@@ -21,36 +21,6 @@ export class ProjectCommandRepository {
             throw new Error(error.message || 'Gagal membuat proyek baru');
         }
 
-        const projId = data?.id;
-        const projName = project.project_name;
-
-        if (project.client_id) {
-            notificationService.createNotification({
-                userId: project.client_id,
-                title: 'Proyek Baru Ditambahkan',
-                message: `Anda dimasukkan ke dalam proyek baru: "${projName}".`,
-                type: 'project_created',
-                referenceId: projId,
-            });
-        }
-
-        if (project.engineer_id) {
-            notificationService.createNotification({
-                userId: project.engineer_id,
-                title: 'Penugasan Proyek Baru',
-                message: `Anda telah ditugaskan sebagai Engineer untuk proyek: "${projName}".`,
-                type: 'engineer_assigned',
-                referenceId: projId,
-            });
-        }
-
-        notificationService.createNotification({
-            targetRole: 'marketing',
-            title: 'Proyek Baru Dibuat',
-            message: `Proyek "${projName}" baru saja dibuat.`,
-            type: 'project_created',
-            referenceId: projId,
-        });
     }
 
     public async updateProject(projectId: string, updates: Partial<Project>): Promise<void> {
@@ -80,49 +50,20 @@ export class ProjectCommandRepository {
         if (!updated || updated.length === 0) {
             throw new Error('Proyek tidak tersimpan: akses ditolak atau proyek tidak ditemukan.');
         }
-
-        try {
-            const { data: projData } = await supabase
-                .from('projects')
-                .select('project_name, client_id, engineer_id')
-                .eq('id', projectId)
-                .maybeSingle();
-
-            const projName = projData?.project_name || updates.project_name || 'Proyek';
-
-            if (projData?.client_id) {
-                notificationService.createNotification({
-                    userId: projData.client_id,
-                    title: 'Pembaruan Proyek',
-                    message: `Informasi proyek "${projName}" telah diperbarui.`,
-                    type: 'project_updated',
-                    referenceId: projectId,
-                });
-            }
-
-            if (updates.engineer_id) {
-                notificationService.createNotification({
-                    userId: updates.engineer_id,
-                    title: 'Penugasan Proyek',
-                    message: `Anda ditugaskan ke dalam proyek: "${projName}".`,
-                    type: 'engineer_assigned',
-                    referenceId: projectId,
-                });
-            }
-
-            notificationService.createNotification({
-                targetRole: 'marketing',
-                title: 'Perubahan Dalam Proyek',
-                message: `Data proyek "${projName}" mengalami perubahan.`,
-                type: 'project_updated',
-                referenceId: projectId,
-            });
-        } catch (notifErr) {
-            if (__DEV__) { console.warn('[NOTIFICATION ERROR] updateProject:', notifErr instanceof Error ? notifErr.message : notifErr); }
-        }
     }
 
     public async deleteProject(projectId: string): Promise<void> {
+        const { data: role, error: roleError } = await supabase.rpc('get_my_role');
+        if (roleError || !['admin', 'engineer'].includes(role)) {
+            throw new Error('Hanya admin atau engineer yang dapat menghapus proyek.');
+        }
+        const { data: project, error: projectError } = await supabase.from('projects')
+            .select('id, project_code').eq('id', projectId).single();
+        if (projectError || !project) throw new Error('Proyek tidak ditemukan atau akses ditolak.');
+        await storageService.removeProjectFiles(String(project.id));
+        if (project.project_code && project.project_code !== String(project.id)) {
+            await storageService.removeProjectFiles(project.project_code);
+        }
         const { data: deleted, error } = await supabase
             .from('projects')
             .delete()

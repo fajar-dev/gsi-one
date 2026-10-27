@@ -24,7 +24,7 @@ describe('Phase 1 - Server-side Pagination & Realtime Filters', () => {
 
     await repository.getProjects('usr-1', 'admin', { limit: 20, offset: 0 });
 
-    expect(supabase.from).toHaveBeenCalledWith('projects');
+    expect(supabase.from).toHaveBeenCalledWith('projects_with_budget');
     expect(mockOrder).toHaveBeenCalledWith('created_at', { ascending: false });
     expect(mockRange).toHaveBeenCalledWith(0, 19);
   });

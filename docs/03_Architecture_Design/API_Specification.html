@@ -112,76 +112,75 @@
 </head>
 <body>
   <div class="container">
-    <h1>API &amp; Repository Specification</h1>
-<h2>Proyek: GSI One Mobile Application &amp; Express REST Backend API</h2>
-<hr />
-<h2>1. Konfigurasi Server &amp; Keamanan Endpoint API</h2>
-<h3>1.1 Base URL &amp; Environment</h3>
-<ul>
-  <li><strong>Development (Android Emulator)</strong>: <code>http://10.0.2.2:3000/api</code></li>
-  <li><strong>Development (iOS/Web Simulator)</strong>: <code>http://localhost:3000/api</code></li>
-  <li><strong>Production</strong>: <code>https://grahasurvei.com/api</code></li>
-</ul>
-<h3>1.2 Keamanan HTTP Headers &amp; CORS Audit</h3>
-<ul>
-  <li><strong>CORS Whitelist</strong>: <code>https://grahasurvei.com</code>, <code>http://localhost:3000</code>, <code>http://10.0.2.2:3000</code>. Access Control Allow Credentials diset ke <code>true</code>.</li>
-  <li><strong>Security Headers</strong>: <code>helmet()</code> mengaktifkan <code>X-Content-Type-Options: nosniff</code>, <code>X-Frame-Options: SAMEORIGIN</code>, dan HSTS.</li>
-  <li><strong>X-Powered-By</strong>: Dinonaktifkan (<code>app.disable('x-powered-by')</code>).</li>
-  <li><strong>Autentikasi Header</strong>: <code>Authorization: Bearer &lt;JWT_TOKEN&gt;</code>.</li>
-</ul>
-<hr />
-<h2>2. Daftar Endpoint REST API Backend (<code>/api</code>)</h2>
-<h3>2.1 Auth Routes (<code>backend/routes/authRoutes.js</code>)</h3>
-<ul>
-  <li><code>POST /api/login</code>: Authenticate user, return JWT token and user profile. Rate-limited (10 attempts / 15 mins).</li>
-  <li><code>POST /api/register</code>: Admin-only registration endpoint to create new user accounts (<code>admin</code>, <code>marketing</code>, <code>engineer</code>, <code>client</code>).</li>
-  <li><code>GET /api/me</code>: Retrieve current logged-in user profile from JWT token.</li>
-</ul>
-<h3>2.2 Project Routes (<code>backend/routes/projectRoutes.js</code>)</h3>
-<ul>
-  <li><code>GET /api/projects</code>: Fetch list of projects accessible by the authenticated user (supports role-based filtering).</li>
-  <li><code>GET /api/projects/:id</code>: Fetch detailed project information, stages, updates, and files.</li>
-  <li><code>POST /api/projects</code>: Create a new project (Admin only) with auto-generated stages.</li>
-  <li><code>PUT /api/projects/:id</code>: Update project metadata (code, name, status, dates, assigned engineer).</li>
-  <li><code>DELETE /api/projects/:id</code>: Delete a project and associated records (Admin only).</li>
-  <li><code>PUT /api/projects/stages/:stageId</code>: Update project stage status (<code>pending</code>, <code>in_progress</code>, <code>done</code>).</li>
-  <li><code>POST /api/projects/stages/:stageId/updates</code>: Add a daily log / progress update (<code>stage_updates</code>).</li>
-</ul>
-<h3>2.3 Booking Routes (<code>backend/routes/bookingRoutes.js</code>)</h3>
-<ul>
-  <li><code>POST /api/bookings</code>: Public endpoint for submitting new survey requests.</li>
-  <li><code>GET /api/bookings</code>: Retrieve booking requests (Admin &amp; Marketing only).</li>
-  <li><code>PUT /api/bookings/:id/claim</code>: Claim a survey request (<code>pending</code> -&gt; <code>claimed</code>).</li>
-  <li><code>PUT /api/bookings/:id/status</code>: Update booking status (<code>approved</code> / <code>rejected</code>).</li>
-</ul>
-<h3>2.4 File Routes (<code>backend/routes/fileRoutes.js</code>)</h3>
-<ul>
-  <li><code>POST /api/files/upload</code>: Upload inspection photo or PDF document (uses Multer, max 10MB).</li>
-  <li><code>GET /api/files/project/:projectId</code>: List files attached to a specific project.</li>
-  <li><code>GET /uploads/:filename</code>: Static file streaming with caching header (<code>maxAge: 7d</code>, <code>immutable</code>).</li>
-</ul>
-<h3>2.5 Notification Routes (<code>backend/routes/notificationRoutes.js</code>)</h3>
-<ul>
-  <li><code>GET /api/notifications</code>: Get user notifications by <code>user<em>id</code> or <code>target</em>role</code>.</li>
-  <li><code>PUT /api/notifications/:id/read</code>: Mark a notification as read.</li>
-  <li><code>POST /api/notifications</code>: Internal/System endpoint to dispatch notifications.</li>
-</ul>
-<hr />
-<h2>3. Kontrak Repository Frontend (TypeScript)</h2>
-<h3>3.1 <code>SupabaseProjectRepository</code> (Facade Pattern)</h3>
-<ul>
-  <li><code>ProjectQueryRepository</code>: Memuat kueri proyek dan rincian detail.</li>
-  <li><code>ProjectStageRepository</code>: Mengelola pembaruan status stage dan log harian.</li>
-  <li><code>ProjectFileRepository</code>: Mengelola unggahan dokumen &amp; penanganan MIME type.</li>
-  <li><code>ProjectCommandRepository</code>: Menangani pemrosesan mutasi (create/update/delete).</li>
-</ul>
-<h3>3.2 <code>SupabaseSurveyRepository</code></h3>
-<ul>
-  <li><code>submitSurveyRequest()</code>: Mengirim formulir booking survei.</li>
-  <li><code>getSurveyRequests()</code>: Memuat daftar booking dengan filter status.</li>
-  <li><code>claimSurveyRequest()</code>: Mengubah klaim permohonan survei.</li>
-  <li><code>updateSurveyStatus()</code>: Memperbarui status persetujuan survei.</li>
-</ul>
+    <h1>API Specification</h1>
+<h2>Jalur komunikasi</h2>
+<p>Aplikasi mengakses Supabase melalui SDK pada <code>src/config/supabase.ts</code>. Konfigurasi hanya memerlukan <code>SUPABASE<em>URL</code> dan <code>SUPABASE</em>ANON_KEY</code>.</p>
+<table>
+  <thead>
+    <tr>
+      <th>Operasi</th>
+      <th>SDK / layanan</th>
+      <th>Lokasi implementasi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Login email/password</td>
+      <td><code>supabase.auth.signInWithPassword</code></td>
+      <td><code>src/services/authService.ts</code></td>
+    </tr>
+    <tr>
+      <td>Resolusi tiket klien</td>
+      <td>RPC <code>get<em>email</em>by<em>ticket</em>number</code></td>
+      <td><code>src/services/authService.ts</code></td>
+    </tr>
+    <tr>
+      <td>Pembuatan pengguna</td>
+      <td><code>supabase.functions.invoke('admin-create-user')</code></td>
+      <td><code>supabase/functions/admin-create-user/index.ts</code></td>
+    </tr>
+    <tr>
+      <td>Daftar/detail proyek</td>
+      <td>PostgREST tabel proyek dan relasinya</td>
+      <td><code>src/services/repositories/sub/ProjectQueryRepository.ts</code></td>
+    </tr>
+    <tr>
+      <td>Mutasi proyek</td>
+      <td>PostgREST <code>projects</code></td>
+      <td><code>ProjectCommandRepository.ts</code></td>
+    </tr>
+    <tr>
+      <td>Tahapan dan catatan</td>
+      <td>PostgREST <code>project<em>stages</code>, <code>stage</em>updates</code></td>
+      <td><code>ProjectStageRepository.ts</code></td>
+    </tr>
+    <tr>
+      <td>Upload</td>
+      <td>Storage bucket <code>projects</code> + metadata <code>project_files</code></td>
+      <td><code>ProjectFileRepository.ts</code></td>
+    </tr>
+    <tr>
+      <td>Booking</td>
+      <td>PostgREST <code>bookings</code></td>
+      <td><code>SupabaseSurveyRepository.ts</code></td>
+    </tr>
+    <tr>
+      <td>Notifikasi</td>
+      <td>PostgREST <code>notifications</code></td>
+      <td><code>src/services/notificationService.ts</code></td>
+    </tr>
+    <tr>
+      <td>Realtime</td>
+      <td>Channel perubahan PostgreSQL per proyek</td>
+      <td><code>src/hooks/useProjectRealtime.ts</code></td>
+    </tr>
+  </tbody>
+</table>
+<h2>Otorisasi</h2>
+<p>SDK memakai sesi Supabase Auth; RLS PostgreSQL membatasi akses baris. Pemeriksaan role di UI tidak menggantikan RLS. Edge Function memvalidasi token dan mengambil role admin dari <code>public.users</code>.</p>
+<h2>Error dan berkas</h2>
+<p>Service/repository memeriksa <code>error</code>; mutasi yang bisa tersaring RLS juga memeriksa baris hasil <code>.select('id')</code>. Berkas diunggah langsung ke Storage, lalu URL dan metadata dicatat di database. Konfigurasi bucket mengikuti migrasi, bukan asumsi pada UI.</p>
+<p>Lihat <a href="API<em>SPECIFICATION</em>Full.md">kontrak layanan lengkap</a> dan <a href="API<em>Catalog</em>Documentation.md">katalog</a>.</p>
 
   </div>
 </body>

@@ -75,16 +75,16 @@ export function useProfile() {
             Alert.alert('Validasi', 'Email wajib diisi');
             return;
         }
-        if (!newUserPassword.trim() || newUserPassword.length < 6) {
-            Alert.alert('Validasi', 'Password wajib diisi minimal 6 karakter');
+        if (!newUserPassword.trim() || newUserPassword.length < 8) {
+            Alert.alert('Validasi', 'Password wajib diisi minimal 8 karakter');
             return;
         }
 
         setIsSavingUser(true);
         try {
-            await adminCreateUser(newUserName.trim(), newUserEmail.trim(), newUserPassword, newUserRole);
+            const created = await adminCreateUser(newUserName.trim(), newUserEmail.trim(), newUserPassword, newUserRole);
             setShowRegisterModal(false);
-            Alert.alert('Berhasil', `Akun ${newUserName} [${ROLE_LABELS[newUserRole]}] berhasil dibuat.`);
+            Alert.alert('Berhasil', `Akun ${newUserName} [${ROLE_LABELS[newUserRole]}] berhasil dibuat.${created?.ticket_number ? `\nNomor tiket: ${created.ticket_number}` : ''}`);
         } catch (err: unknown) {
             const message = err instanceof Error ? err.message : 'Terjadi kesalahan saat mendaftarkan pengguna baru';
             Alert.alert('Gagal Membuat Pengguna', message);

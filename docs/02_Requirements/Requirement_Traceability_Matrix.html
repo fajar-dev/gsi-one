@@ -395,136 +395,45 @@
   </tbody>
 </table>
 <hr />
-<h2>Matriks Keterlacakan Endpoint API ke Modul Kode Backend</h2>
+<h2>Matriks Keterlacakan Layanan</h2>
 <table>
   <thead>
     <tr>
-      <th>Endpoint REST API</th>
-      <th>HTTP Method</th>
-      <th>File Route Backend</th>
-      <th>Auth Required</th>
-      <th>Rate Limited</th>
+      <th>Operasi</th>
+      <th>Implementasi</th>
+      <th>Layanan</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td><code>/api/login</code></td>
-      <td>POST</td>
-      <td><code>authRoutes.js</code></td>
-      <td>Tidak</td>
-      <td>Ya (10/15min)</td>
+      <td>Login dan tiket</td>
+      <td><code>authService.ts</code></td>
+      <td>Supabase Auth dan RPC</td>
     </tr>
     <tr>
-      <td><code>/api/register</code></td>
-      <td>POST</td>
-      <td><code>authRoutes.js</code></td>
-      <td>Tidak</td>
-      <td>Tidak (Disabled 403)</td>
+      <td>Pembuatan akun</td>
+      <td><code>admin-create-user/index.ts</code></td>
+      <td>Edge Function dan Auth Admin API</td>
     </tr>
     <tr>
-      <td><code>/api/auth/lookup-ticket</code></td>
-      <td>POST</td>
-      <td><code>authRoutes.js</code></td>
-      <td>Tidak</td>
-      <td>Ya (10/15min)</td>
+      <td>Proyek, tahapan, catatan, metadata file</td>
+      <td><code>repositories/sub/</code></td>
+      <td>PostgREST dan RLS</td>
     </tr>
     <tr>
-      <td><code>/api/admin/create-user</code></td>
-      <td>POST</td>
-      <td><code>authRoutes.js</code></td>
-      <td>Ya (Admin)</td>
-      <td>Tidak</td>
+      <td>Booking</td>
+      <td><code>SupabaseSurveyRepository.ts</code></td>
+      <td>PostgREST dan trigger</td>
     </tr>
     <tr>
-      <td><code>/api/users/role/:role</code></td>
-      <td>GET</td>
-      <td><code>authRoutes.js</code></td>
-      <td>Ya</td>
-      <td>Tidak</td>
+      <td>Notifikasi</td>
+      <td><code>notificationService.ts</code></td>
+      <td>PostgREST dan RLS</td>
     </tr>
     <tr>
-      <td><code>/api/dashboard/stats</code></td>
-      <td>GET</td>
-      <td><code>projectRoutes.js</code></td>
-      <td>Ya</td>
-      <td>Tidak</td>
-    </tr>
-    <tr>
-      <td><code>/api/projects</code></td>
-      <td>GET</td>
-      <td><code>projectRoutes.js</code></td>
-      <td>Ya</td>
-      <td>Tidak</td>
-    </tr>
-    <tr>
-      <td><code>/api/projects/:id</code></td>
-      <td>GET</td>
-      <td><code>projectRoutes.js</code></td>
-      <td>Ya</td>
-      <td>Tidak</td>
-    </tr>
-    <tr>
-      <td><code>/api/projects/:id</code></td>
-      <td>PUT</td>
-      <td><code>projectRoutes.js</code></td>
-      <td>Ya</td>
-      <td>Tidak</td>
-    </tr>
-    <tr>
-      <td><code>/api/projects/:id</code></td>
-      <td>DELETE</td>
-      <td><code>projectRoutes.js</code></td>
-      <td>Ya (Admin)</td>
-      <td>Tidak</td>
-    </tr>
-    <tr>
-      <td><code>/api/stages/:id</code></td>
-      <td>PUT</td>
-      <td><code>projectRoutes.js</code></td>
-      <td>Ya</td>
-      <td>Tidak</td>
-    </tr>
-    <tr>
-      <td><code>/api/stages/:id/details</code></td>
-      <td>PUT</td>
-      <td><code>projectRoutes.js</code></td>
-      <td>Ya</td>
-      <td>Tidak</td>
-    </tr>
-    <tr>
-      <td><code>/api/stages/:id</code></td>
-      <td>DELETE</td>
-      <td><code>projectRoutes.js</code></td>
-      <td>Ya</td>
-      <td>Tidak</td>
-    </tr>
-    <tr>
-      <td><code>/api/stages/:id/updates</code></td>
-      <td>POST</td>
-      <td><code>projectRoutes.js</code></td>
-      <td>Ya</td>
-      <td>Tidak</td>
-    </tr>
-    <tr>
-      <td><code>/api/booking</code></td>
-      <td>POST</td>
-      <td><code>bookingRoutes.js</code></td>
-      <td>Ya</td>
-      <td>Tidak</td>
-    </tr>
-    <tr>
-      <td><code>/api/projects/:id/files</code></td>
-      <td>POST</td>
-      <td><code>fileRoutes.js</code></td>
-      <td>Ya</td>
-      <td>Tidak</td>
-    </tr>
-    <tr>
-      <td><code>/api/notifications</code></td>
-      <td>POST</td>
-      <td><code>notificationRoutes.js</code></td>
-      <td>Ya</td>
-      <td>Tidak</td>
+      <td>Upload</td>
+      <td><code>ProjectFileRepository.ts</code></td>
+      <td>Supabase Storage</td>
     </tr>
   </tbody>
 </table>

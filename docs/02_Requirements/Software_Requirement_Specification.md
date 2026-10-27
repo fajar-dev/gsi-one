@@ -1,5 +1,5 @@
 # Software Requirement Specification (SRS)
-## Proyek: GSI One Mobile Application & Backend REST API
+## Proyek: GSI One Mobile Application & Supabase
 ## Standar: ISO/IEC/IEEE 29148
 
 ---
@@ -7,7 +7,7 @@
 ## 1. Pendahuluan
 
 ### 1.1 Tujuan
-Dokumen ini mendeskripsikan persyaratan fungsional dan non-fungsional untuk aplikasi **GSI One** (Mobile React Native & Express Backend API) yang digunakan oleh PT Graha Survei Indonesia dalam memfasilitasi pemesanan survei, pelacakan proyek teknis, manajemen berkas inspeksi, dan notifikasi otomatis.
+Dokumen ini mendeskripsikan persyaratan fungsional dan non-fungsional untuk aplikasi **GSI One** (React Native & Supabase) yang digunakan oleh PT Graha Survei Indonesia dalam memfasilitasi pemesanan survei, pelacakan proyek teknis, manajemen berkas inspeksi, dan notifikasi otomatis.
 
 ### 1.2 Lingkup Produk
 GSI One menyediakan ekosistem terpadu berbasis 4 Peran Pengguna:
@@ -25,14 +25,12 @@ GSI One menyediakan ekosistem terpadu berbasis 4 Peran Pengguna:
 - **RLS**: Row Level Security (Kebijakan Keamanan Tingkat Baris pada Supabase PostgreSQL).
 - **AsyncStorage**: Penyimpanan data key-value lokal pada React Native untuk persistensi token autentikasi dan profil pengguna.
 - **Zustand**: Library manajemen state global yang digunakan pada aplikasi (`authStore`, `projectStore`).
-- **CORS**: Cross-Origin Resource Sharing (Mekanisme keamanan HTTP untuk membatasi origin request terdaftar pada backend Express).
+- **CORS**: Cross-Origin Resource Sharing (Mekanisme keamanan HTTP untuk membatasi origin web yang diizinkan pada Edge Function).
 - **JWT**: JSON Web Token (Standar enkripsi token untuk autentikasi dan otorisasi sesi pengguna).
 - **RBAC**: Role-Based Access Control (Sistem pengontrolan hak akses terstruktur berdasarkan 4 peran: Admin, Marketing, Engineer, dan Client).
 - **DTO**: Data Transfer Object (Pola objek pemetaan data terisolasi antara skema database dan entitas domain aplikasi via `projectMapper.ts`).
 - **REST API**: Representational State Transfer Application Programming Interface (Antarmuka komunikasi HTTP terstruktur berbasis JSON).
 - **BaaS**: Backend as a Service (Platform cloud backend terintegrasi Supabase untuk Database PostgreSQL, Auth, Realtime, dan Storage).
-- **Helmet**: Middleware keamanan Express.js untuk mengonfigurasi HTTP security headers (`X-Content-Type-Options`, `X-Frame-Options`, HSTS).
-- **Multer**: Middleware Node.js/Express untuk menangani penanganan pengungahan berkas `multipart/form-data` (foto inspeksi & laporan PDF).
 - **Signed URL**: URL akses berdurasi terbatas yang diterbitkan oleh Supabase Storage untuk mengunduh dokumen dari bucket privat `projects`.
 - **Stage Updates**: Catatan harian aktivitas kemajuan pekerjaan proyek di lapangan yang diinput oleh Field Engineer.
 - **Project Stages**: 4 tahapan linimasa standar dalam proyek GSI One (Inisiasi, Survei Lapangan, Analisis & Laporan, Selesai).
@@ -69,8 +67,7 @@ GSI One menyediakan ekosistem terpadu berbasis 4 Peran Pengguna:
 ## 3. Persyaratan Non-Fungsional (Non-Functional Requirements)
 
 ### 3.1 Keamanan & Networking (`NFR-SEC`)
-- **NFR-SEC-01 (CORS)**: Backend Express wajib membatasi origin HTTP request hanya ke domain resmi (`https://grahasurvei.com`, `http://localhost:3000`, `http://10.0.2.2:3000`).
-- **NFR-SEC-02 (Headers)**: Menggunakan `helmet()` untuk proteksi XSS, HSTS, dan MIME sniffing.
+- **NFR-SEC-01 (CORS)**: Edge Function membatasi origin web ke situs resmi dan localhost:8080 untuk development.
 - **NFR-SEC-03 (RLS)**: Row Level Security (RLS) PostgreSQL aktif untuk semua tabel Supabase.
 
 ### 3.2 Performa & Skalabilitas (`NFR-PERF`)
@@ -110,4 +107,3 @@ stateDiagram-v2
         Pending -> In_Progress -> Done
     end note
 ```
-

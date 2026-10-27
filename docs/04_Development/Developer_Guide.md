@@ -1,83 +1,52 @@
 # Developer Guide
-## Proyek: GSI One Mobile Application & Express Backend Server
 
----
+## Lingkungan
 
-## 1. Persiapan Lingkungan Pengembangan (Development Setup)
+- Node.js 20 atau lebih baru dan npm.
+- JDK 17, Android SDK Platform 36, Build Tools 36.0.0, dan NDK 27.1.12297006 untuk Android.
+- Xcode dan CocoaPods untuk iOS.
+- Project Supabase yang telah dikonfigurasi dengan migrasi dan Edge Function.
 
-### 1.1 Persyaratan Sistem
-- Node.js v20+ & npm / yarn
-- Android Studio & Android SDK (API Level 21+)
-- Xcode (khusus macOS untuk pengembangan iOS)
-- React Native CLI (v0.83+)
-- SQLite3 (untuk database lokal backend)
-
-### 1.2 Langkah Instalasi & Menjalankan Frontend
-1. Clone repositori proyek GSI One.
-2. Install dependensi frontend:
-   ```bash
-   npm ci
-   ```
-3. Buat file `.env` di root proyek:
-   ```env
-   SUPABASE_URL=https://your-supabase-url.supabase.co
-   SUPABASE_ANON_KEY=your-anon-key
-   APP_ENV=development
-   API_BASE_URL_EMULATOR=http://10.0.2.2:3000
-   API_BASE_URL_SIMULATOR=http://localhost:3000
-   API_BASE_URL_PRODUCTION=https://grahasurvei.com
-   ```
-4. Jalankan aplikasi pada Emulator / Simulator:
-   ```bash
-   # Android
-   npm run android
-
-   # iOS
-   npm run ios
-
-   # Web
-   npm run web
-   ```
-
-### 1.3 Langkah Instalasi & Menjalankan Backend Server
-1. Masuk ke direktori `backend/`:
-   ```bash
-   cd backend
-   npm ci
-   ```
-2. Buat file `backend/.env`:
-   ```env
-   PORT=3000
-   JWT_SECRET=rahasia_jwt_secret_gsi_one_2026_super_secure
-   SUPABASE_URL=https://your-supabase-url.supabase.co
-   SUPABASE_SECRET_KEY=your-service-role-key
-   ```
-3. Menjalankan server backend Express (otomatis menginisialisasi SQLite `gsi_one.db`):
-   ```bash
-   npm start
-   ```
-
-### 1.4 Pengujian & Validasi Kualitas Kode
 ```bash
-# Jalankan unit test Jest
-npm test
-
-# Jalankan coverage test
-npm run test:coverage
-
-# Pengecekan tipe data TypeScript
-npm run typecheck
-
-# Pengujian kualitas linting
-npm run lint
+npm ci
+cp .env.example .env
 ```
 
----
+Isi `SUPABASE_URL` dan `SUPABASE_ANON_KEY` pada `.env`.
 
-## 2. Aturan Pengkodingan (Coding Guidelines)
+## Menjalankan aplikasi
 
-- **Clean Architecture**: Selalu pisahkan UI dari logika data menggunakan Custom Hooks dan Repository Pattern.
-- **Strict TypeScript**: Selalu tentukan tipe data pada fungsi dan variabel. Dilarang menggunakan `any`.
-- **Zero Emoji Rule**: Seluruh dokumen, respon sistem, dan komentar kode wajib bersih dari penggunaan emoji.
-- **Error Handling**: Gunakan `getErrorMessage` dari `src/utils/errorHelpers.ts` untuk menangkap kesalahan secara konsisten.
-- **Security Awareness**: Selalu gunakan `helmet()`, validasi CORS origin, dan RLS Supabase saat menambah endpoint atau tabel baru.
+```bash
+npm start
+```
+
+Pada terminal lain:
+
+```bash
+npm run android
+```
+
+Untuk perangkat Android lewat USB, pastikan USB debugging aktif dan pasang koneksi Metro:
+
+```bash
+adb devices
+adb reverse tcp:8081 tcp:8081
+```
+
+iOS menggunakan `npm run ios`; web menggunakan `npm run web` pada port 8080. Komunikasi data langsung menuju Supabase.
+
+## Database dan akun demo
+
+`supabase/migrations/` berisi perubahan skema, trigger, dan RLS. `supabase/seed.sql` mengisi 4 akun, 3 proyek, 10 tahapan, 2 catatan, dan 1 metadata foto. Jalankan di SQL Editor setelah migrasi pada project yang dituju. Password akun baru adalah `password123`; akun lama tidak direset oleh seed.
+
+Pendaftaran akun aplikasi memakai Edge Function `admin-create-user` yang memverifikasi sesi dan role admin sebelum memakai Auth Admin API.
+
+## Pemeriksaan
+
+```bash
+npm run lint
+npm run typecheck
+npm run test:ci
+```
+
+Pisahkan UI, hook/store, service, dan repository. Gunakan helper error bersama serta periksa hasil mutasi agar penolakan RLS tidak dilaporkan sebagai keberhasilan.

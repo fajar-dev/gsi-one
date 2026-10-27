@@ -113,7 +113,7 @@
 <body>
   <div class="container">
     <h1>Evaluasi Kualitas Perangkat Lunak ISO/IEC 25010</h1>
-<h2>Proyek: GSI One Mobile Application &amp; Backend Infrastructure</h2>
+<h2>Proyek: GSI One Mobile Application &amp; Supabase</h2>
 <hr />
 <h2>1. Ikhtisar Standar ISO/IEC 25010</h2>
 <p>ISO/IEC 25010 mendefinisikan delapan karakteristik kualitas utama perangkat lunak. Berikut adalah hasil evaluasi komprehensif pada GSI One:</p>
@@ -177,7 +177,7 @@
       <td><strong>Compatibility</strong></td>
       <td>Co-existence</td>
       <td>A</td>
-      <td>Dual-DB (SQLite dev, PostgreSQL prod) tanpa konflik</td>
+      <td>Satu sumber data PostgreSQL Supabase</td>
     </tr>
     <tr>
       <td>3</td>
@@ -261,7 +261,7 @@
       <td></td>
       <td>Integrity</td>
       <td>A</td>
-      <td>CORS whitelist 3 origin, Helmet headers aktif</td>
+      <td>Policy RLS dan pemeriksaan role pada Edge Function</td>
     </tr>
     <tr>
       <td>6</td>
@@ -275,14 +275,14 @@
       <td></td>
       <td>Accountability</td>
       <td>A</td>
-      <td>RBAC 4 peran (Admin, Marketing, Engineer, Client), rate limiting login</td>
+      <td>RBAC 4 peran (Admin, Marketing, Engineer, Client), pemantauan kegagalan Supabase Auth</td>
     </tr>
     <tr>
       <td>6</td>
       <td></td>
       <td>Authenticity</td>
       <td>A</td>
-      <td><code>JWT_SECRET</code> wajib, Admin-Only Registration, <code>bcryptjs</code> password hashing</td>
+      <td>Sesi Supabase Auth dan pendaftaran akun melalui Edge Function admin</td>
     </tr>
     <tr>
       <td>7</td>
@@ -381,7 +381,7 @@
     <tr>
       <td>Security</td>
       <td><strong>A</strong></td>
-      <td>CORS, Helmet, RLS, JWT, RBAC, Admin-Only Register</td>
+      <td>RLS, Supabase Auth, RBAC, pendaftaran akun oleh admin</td>
     </tr>
     <tr>
       <td>Maintainability</td>

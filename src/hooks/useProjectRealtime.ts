@@ -41,6 +41,11 @@ function useProjectRealtime({
             .channel(channelName)
             .on(
                 'postgres_changes',
+                { event: '*', schema: 'public', table: 'project_files', filter: `project_id=eq.${projectId}` },
+                (payload: RealtimePayload) => { onStageUpdateRef.current?.(payload); }
+            )
+            .on(
+                'postgres_changes',
                 {
                     event: '*', 
                     schema: 'public',

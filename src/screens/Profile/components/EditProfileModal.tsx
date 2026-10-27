@@ -8,6 +8,7 @@ import { colors } from '../../../../assets/styles/Colors';
 import { scale, fontScale } from '../../../utils/responsive';
 import { useAuthStore } from '../../../store/authStore';
 import { supabase } from '../../../config/supabase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface EditProfileModalProps {
   visible: boolean;
@@ -44,21 +45,12 @@ export function EditProfileModal({ visible, onClose }: EditProfileModalProps) {
           throw new Error(error.message);
         }
 
-        try {
-          if (user.role === 'client') {
-            await supabase
-              .from('projects')
-              .update({ client_name: newName })
-              .eq('client_id', user.id);
-          }
-        } catch (syncErr) {
-          if (__DEV__) { console.warn('[EditProfileModal] Gagal mengupdate nama terikat:', syncErr); }
-        }
-
         const store = useAuthStore.getState();
         if (store.user) {
+          const updatedUser = { ...store.user, full_name: newName };
+          await AsyncStorage.setItem('auth_user', JSON.stringify(updatedUser));
           useAuthStore.setState({
-            user: { ...store.user, full_name: newName },
+            user: updatedUser,
           });
         }
       }

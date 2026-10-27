@@ -113,128 +113,50 @@
 <body>
   <div class="container">
     <h1>UML: Sequence Diagrams</h1>
-<h2>Proyek: GSI One Mobile Application &amp; Express Backend API</h2>
-<hr />
-<h2>1. Sequence Diagram: Alur Autentikasi Login JWT &amp; Rate Limiting</h2>
+<h2>Login</h2>
 <pre class="mermaid">
 sequenceDiagram
-    actor User as Pengguna (User)
-    participant Screen as LoginScreen.tsx
-    participant Store as authStore (Zustand)
-    participant Storage as AsyncStorage
-    participant Express as Backend Express Server
-    participant Limiter as authLimiter (Rate Limit)
-    participant DB as SQLite / Supabase DB
-
-    User-&gt;&gt;Screen: Input Email/Nomor Tiket &amp; Password
-    Screen-&gt;&gt;Store: login(ticketOrEmail, password)
-    Store-&gt;&gt;Express: POST /api/login { email, password }
-    Express-&gt;&gt;Limiter: Check Request Rate (&lt; 10 / 15 mins)
-    
-    alt Rate Limit Terlampaui (&gt; 10 attempts)
-        Limiter--&gt;&gt;Express: Block Request
-        Express--&gt;&gt;Store: 429 Too Many Requests
-        Store--&gt;&gt;Screen: Tampilkan Pesan Terlalu Banyak Percobaan
-    else Rate Limit Valid
-        Limiter--&gt;&gt;Express: Pass Request
-        Express-&gt;&gt;DB: Query User &amp; Verify Password Hashing (bcryptjs)
-        alt Kredensial Valid
-            DB--&gt;&gt;Express: Return User Record
-            Express-&gt;&gt;Express: Sign JWT Token (JWT_SECRET)
-            Express--&gt;&gt;Store: 200 OK { token, user }
-            Store-&gt;&gt;Storage: setItem('auth_token', token) &amp; ('auth_user', user)
-            Store--&gt;&gt;Screen: Redirect ke Dynamic Dashboard per Role
-        else Kredensial Salah
-            DB--&gt;&gt;Express: User Not Found / Invalid Password
-            Express--&gt;&gt;Store: 401 Unauthorized
-            Store--&gt;&gt;Screen: Tampilkan Pesan Kredensial Salah
-        end
+    actor User as Pengguna
+    participant UI as Login
+    participant Store as authStore
+    participant Auth as Supabase Auth
+    participant DB as PostgreSQL / RLS
+    User-&gt;&gt;UI: Email atau tiket dan password
+    UI-&gt;&gt;Store: login
+    opt Identifier adalah tiket
+      Store-&gt;&gt;DB: RPC get_email_by_ticket_number
+      DB--&gt;&gt;Store: Email
+    end
+    Store-&gt;&gt;Auth: signInWithPassword
+    Auth--&gt;&gt;Store: Sesi
+    Store-&gt;&gt;DB: Profil public.users
+    DB--&gt;&gt;Store: Nama, role, tiket
+    Store--&gt;&gt;UI: Dashboard sesuai role
+</pre>
+<h2>Booking dan proyek</h2>
+<pre class="mermaid">
+sequenceDiagram
+    actor User as Pengguna
+    participant UI as Screen
+    participant Service as Service / Repository
+    participant DB as Supabase PostgreSQL
+    User-&gt;&gt;UI: Kirim booking
+    UI-&gt;&gt;Service: createBooking
+    Service-&gt;&gt;DB: INSERT bookings
+    DB-&gt;&gt;DB: Trigger notifikasi booking
+    DB--&gt;&gt;UI: Berhasil
+    User-&gt;&gt;UI: Klaim booking
+    UI-&gt;&gt;Service: claimBooking
+    Service-&gt;&gt;DB: UPDATE status dan claimed_by
+    User-&gt;&gt;UI: Buat proyek sebagai admin
+    UI-&gt;&gt;Service: createProject
+    Service-&gt;&gt;DB: INSERT projects beserta penugasan
+    opt Konversi dari booking
+      Service-&gt;&gt;DB: DELETE booking setelah proyek dibuat
     end
 </pre>
-<hr />
-<h2>2. Sequence Diagram: Alur Booking Survei &amp; Konversi ke Proyek</h2>
-<pre class="mermaid">
-sequenceDiagram
-    actor Public as Pengunjung Publik
-    actor Marketing as Staf Marketing
-    participant BookScreen as BookSurveyScreen.tsx
-    participant ReqScreen as SurveyRequestsScreen.tsx
-    participant Express as Backend Express API
-    participant DB as Database (bookings &amp; projects)
-
-    Public-&gt;&gt;BookScreen: Isi Form Booking Survei &amp; Kirim
-    BookScreen-&gt;&gt;Express: POST /api/bookings { full_name, email, phone, location, preferred_date }
-    Express-&gt;&gt;DB: INSERT INTO bookings (status='pending')
-    DB--&gt;&gt;Express: Record ID Created
-    Express--&gt;&gt;BookScreen: 201 Created -&gt; Navigate ke SuccessScreen
-
-    Marketing-&gt;&gt;ReqScreen: Buka Antrean Permohonan Survei
-    ReqScreen-&gt;&gt;Express: GET /api/bookings
-    Express-&gt;&gt;DB: SELECT * FROM bookings WHERE status='pending'
-    DB--&gt;&gt;Express: Return List Bookings
-    Express--&gt;&gt;ReqScreen: Render List Bookings
-
-    Marketing-&gt;&gt;ReqScreen: Tekan Klaim Permohonan
-    ReqScreen-&gt;&gt;Express: PUT /api/bookings/:id/claim
-    Express-&gt;&gt;DB: UPDATE bookings SET status='claimed', claimed_by=marketing_name
-    DB--&gt;&gt;Express: Success
-    Express--&gt;&gt;ReqScreen: Status Updated
-
-    Marketing-&gt;&gt;ReqScreen: Setujui &amp; Konversi ke Proyek Baru
-    ReqScreen-&gt;&gt;Express: PUT /api/bookings/:id/status { status: 'approved' }
-    Express-&gt;&gt;DB: UPDATE bookings SET status='approved'
-    ReqScreen-&gt;&gt;Express: POST /api/projects { project_code, name, client_id, start_date }
-    Express-&gt;&gt;DB: INSERT INTO projects &amp; Generate 4 Default project_stages
-    DB--&gt;&gt;Express: Project Created
-    Express--&gt;&gt;ReqScreen: Proyek Baru Berhasil Dibuat
-</pre>
-<hr />
-<h2>3. Sequence Diagram: Pembaruan Stage &amp; Input Log Harian (Field Engineer)</h2>
-<pre class="mermaid">
-sequenceDiagram
-    actor Eng as Field Engineer
-    participant Screen as ProjectDetailScreen.tsx
-    participant Modal as AddLogModal.tsx
-    participant Express as Backend Express API
-    participant DB as Database (stage_updates &amp; project_stages)
-
-    Eng-&gt;&gt;Screen: Buka Proyek &amp; Pilih Stage
-    Eng-&gt;&gt;Screen: Update Progress Stage ke 50%
-    Screen-&gt;&gt;Express: PUT /api/stages/:stageId { status: 'in_progress', progress: 50 }
-    Express-&gt;&gt;DB: UPDATE project_stages SET progress=50, status='in_progress'
-    DB--&gt;&gt;Express: Success
-    Express--&gt;&gt;Screen: Progress Updated
-
-    Eng-&gt;&gt;Modal: Input Catatan Pekerjaan Lapangan &amp; Submit
-    Modal-&gt;&gt;Express: POST /api/stages/:stageId/updates { description, progress }
-    Express-&gt;&gt;DB: INSERT INTO stage_updates (project_id, stage_id, description, progress)
-    DB--&gt;&gt;Express: Log Record Created
-    Express--&gt;&gt;Screen: Refresh Timeline &amp; Daily Logs
-</pre>
-<hr />
-<h2>4. Sequence Diagram: Upload Berkas Inspeksi &amp; Signed URL Privat</h2>
-<pre class="mermaid">
-sequenceDiagram
-    actor Eng as Field Engineer
-    actor Client as Klien Terdaftar
-    participant Modal as UploadFileModal.tsx
-    participant Express as Backend Express API
-    participant Multer as Multer Middleware
-    participant Storage as Supabase Storage Privat
-
-    Eng-&gt;&gt;Modal: Pilih Berkas Laporan PDF (&lt; 10MB) &amp; Upload
-    Modal-&gt;&gt;Express: POST /api/projects/:id/files (multipart/form-data)
-    Express-&gt;&gt;Multer: Validasi Ukuran (&lt; 10MB) &amp; Mime Type
-    Multer-&gt;&gt;Storage: Upload File ke Bucket Privat 'projects/'
-    Storage--&gt;&gt;Express: File Path / Key
-    Express-&gt;&gt;Express: INSERT Metadata ke tabel project_files
-    Express--&gt;&gt;Modal: 201 Created -&gt; File Berhasil Diunggah
-
-    Client-&gt;&gt;Express: GET /api/files/project/:projectId
-    Express-&gt;&gt;Storage: Request Signed URL (Expires in 3600s)
-    Storage--&gt;&gt;Express: Return Signed URL
-    Express--&gt;&gt;Client: Return File List dengan Signed Download URL
-</pre>
+<h2>Berkas dan realtime</h2>
+<p>Upload mengirim konten ke Storage dan kemudian mencatat metadata di <code>project_files</code>. Perubahan proyek, tahapan, serta catatan diterima oleh subscription pada detail proyek dan memicu pemuatan ulang. Kedua operasi upload/metadata belum berada dalam satu transaksi.</p>
 
   </div>
 </body>

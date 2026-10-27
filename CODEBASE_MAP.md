@@ -13,11 +13,12 @@ Aplikasi GSI One menganut pola **Clean Architecture & Layered Domain Design (OOP
    - **Repository Pattern (`src/services/repositories/`)**: `SupabaseProjectRepository.ts` adalah façade atas sub-repository query, stage, file, dan command; `projectMapper.ts` memetakan DTO database secara eksplisit. `storageService.ts` menangani signed URL bucket privat dan `notificationService.ts` menangani notifikasi berhalaman.
    - **Custom Hooks (`src/hooks/`)**: State isolation hooks (`useSurveyRequests`, `useProjectDetail`, `useEditProjectForm`, `useStructureDetail`, `useProfile`, `useProjectRealtime`, `useAuth`).
    - **State Management**: Zustand Stores (`authStore.ts`, `projectStore.ts`).
-   - **UI Component Layer (`src/screens/` & `src/components/`)**: Visual rendering presentation layer yang sepenuhnya *decoupled* dari logika bisnis backend.
+   - **UI Component Layer (`src/screens/` & `src/components/`)**: Visual rendering presentation layer yang sepenuhnya *decoupled* dari logika akses data.
 
-2. **Backend (Node.js/Express & Supabase)**:
-   - Berada di dalam direktori `backend/`, dengan `server.js` sebagai entry point yang mendaftarkan router `authRoutes`, `projectRoutes`, `bookingRoutes`, `fileRoutes`, dan `notificationRoutes`. Konfigurasi, middleware auth, dan helper status proyek berada di modul terpisah.
-   - Dilengkapi fitur keamanan CORS (`allowedOrigins`), rate limiting (`authLimiter`), penanganan upload Multer, dan pemrosesan kredensial terenkripsi (bcryptjs & JWT).
+2. **Layanan Supabase**:
+   - `supabase/migrations/` menyimpan skema, policy RLS, indeks, dan trigger.
+   - `supabase/functions/admin-create-user/` menangani pembuatan akun oleh admin.
+   - `supabase/seed.sql` menyediakan data demo mandiri.
 
 ---
 
@@ -140,9 +141,6 @@ Aplikasi GSI One menganut pola **Clean Architecture & Layered Domain Design (OOP
 ## Panduan Perintah Pengembangan & Verifikasi
 
 ```bash
-# Menjalankan Backend Express API Server
-cd backend && npm run dev
-
 # Menjalankan Mobile App (Android)
 npm run android
 

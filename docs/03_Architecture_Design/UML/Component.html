@@ -113,57 +113,20 @@
 <body>
   <div class="container">
     <h1>UML: Component Diagram</h1>
-<h2>Proyek: GSI One Mobile Application &amp; Express Backend API</h2>
-<p>Menggambarkan komponen-komponen perangkat lunak frontend, backend routers, middleware, dan external services.</p>
 <pre class="mermaid">
-graph TB
-    subgraph ClientDevice["Perangkat Mobile &amp; Browser (Android / iOS / Web)"]
-        subgraph FrontendApp["Frontend App (React Native + TypeScript)"]
-            Presentation["Presentation Layer\n(screens/ &amp; components/)"]
-            StateHooks["State &amp; Hooks Layer\n(Zustand stores &amp; Custom Hooks)"]
-            DomainLayer["Domain Layer\n(OOP Entities &amp; Rules)"]
-            ServiceRepo["Service &amp; Repo Layer\n(IProjectRepository &amp; Facades)"]
-            LocalStore["AsyncStorage\n(Auth Token &amp; Session)"]
-        end
-    end
-
-    subgraph ServerNode["Backend Express Server (Node.js)"]
-        ServerCore["server.js Entry Point\n(CORS, Helmet, Rate Limiter)"]
-        
-        subgraph Routers["Modul Routers (backend/routes/)"]
-            AuthRoute["authRoutes.js\n(/api/login, /api/admin/create-user)"]
-            ProjRoute["projectRoutes.js\n(/api/projects, /api/stages)"]
-            BookRoute["bookingRoutes.js\n(/api/bookings)"]
-            FileRoute["fileRoutes.js\n(/api/files/upload)"]
-            NotifRoute["notificationRoutes.js\n(/api/notifications)"]
-        end
-
-        DBAdapter["backend/database.js\n(SQLite3 Local Dev DB)"]
-        MulterMiddleware["backend/config/multer.js\n(File Upload Handler)"]
-    end
-
-    subgraph CloudBaaS["Supabase Cloud Platform (Production)"]
-        SupaPostgres["PostgreSQL Database\n(7 Tabel &amp; RLS Policies)"]
-        SupaAuth["Supabase Auth Engine"]
-        SupaStorage["Supabase Storage\n(Bucket Privat 'projects/')"]
-        SupaRealtime["Supabase Realtime Engine\n(WebSocket Subscription)"]
-    end
-
-    Presentation --&gt; StateHooks
-    StateHooks --&gt; DomainLayer
-    StateHooks --&gt; ServiceRepo
-    ServiceRepo --&gt; LocalStore
-    Presentation --&gt; ServerCore
-    ServiceRepo --&gt; CloudBaaS
-
-    ServerCore --&gt; Routers
-    AuthRoute --&gt; DBAdapter
-    ProjRoute --&gt; DBAdapter
-    BookRoute --&gt; DBAdapter
-    FileRoute --&gt; MulterMiddleware
-    MulterMiddleware --&gt; SupaStorage
-    Routers --&gt; SupaPostgres
+flowchart LR
+    UI[Screen dan komponen] --&gt; State[Hook / Zustand Store]
+    State --&gt; Service[Service]
+    Service --&gt; Repo[Repository]
+    Repo --&gt; DB[Supabase PostgreSQL / RLS]
+    Service --&gt; Auth[Supabase Auth]
+    Service --&gt; Function[admin-create-user]
+    Repo --&gt; Storage[Supabase Storage]
+    State --&gt; Realtime[Supabase Realtime]
+    Function --&gt; Auth
+    Function --&gt; DB
 </pre>
+<p>Definisi database berada di <code>supabase/migrations/</code>, data demo di <code>supabase/seed.sql</code>, dan fungsi privileged di <code>supabase/functions/</code>.</p>
 
   </div>
 </body>

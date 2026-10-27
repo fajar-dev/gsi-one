@@ -113,89 +113,57 @@
 <body>
   <div class="container">
     <h1>Test Cases Specification</h1>
-<h2>Proyek: GSI One Mobile Application &amp; Express REST API</h2>
-<h2>Engine Pengujian: Jest, React Native Testing Library, &amp; Supertest / Postman</h2>
-<hr />
-<h2>1. Ikhtisar Suite Pengujian Automated (Jest)</h2>
-<p>Pengujian otomatis GSI One Mobile mencakup <strong>15 Test Suites</strong> dengan status <strong>PASSED</strong>, termasuk pagination, RLS security matrix, storage signed URL, backend API endpoints, dan alur integrasi:</p>
+<h2>Pengujian otomatis yang tersedia</h2>
+<p>Suite berada di <code>_<em>tests</em>_/</code>: domain ProjectEntity, SurveyRequestEntity, UserRole; helper format, error, tiket, user, dan proyek; service notifikasi, signed URL, mapper, pagination, filter query per role; alur repository/notifikasi dengan mock; serta render App.</p>
+<p>Jalankan <code>npm run test:ci</code>. Test Supabase memakai mock; hasilnya tidak membuktikan RLS atau layanan cloud bekerja.</p>
+<h2>Skenario manual</h2>
 <table>
   <thead>
     <tr>
-      <th>Test Suite File</th>
-      <th>Komponen / Modul yang Diuji</th>
-      <th>Status</th>
+      <th>Area</th>
+      <th>Pemeriksaan</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td><code>authRepository.test.ts</code></td>
-      <td>Autentikasi Supabase, Login Tiket/Email, Admin User Creation</td>
-      <td>PASSED</td>
+      <td>Auth</td>
+      <td>Login email/tiket, password salah, logout, pemulihan sesi</td>
     </tr>
     <tr>
-      <td><code>projectEntity.test.ts</code></td>
-      <td>Entitas OOP ProjectEntity, Invarian Aturan Bisnis Proyek</td>
-      <td>PASSED</td>
+      <td>Admin</td>
+      <td>Pembuatan akun client/marketing/engineer melalui <code>admin-create-user</code>; non-admin ditolak</td>
     </tr>
     <tr>
-      <td><code>surveyRequest.test.ts</code></td>
-      <td>Permohonan Survei, Validasi Form, Status Pipeline</td>
-      <td>PASSED</td>
+      <td>Booking</td>
+      <td>Validasi form publik, penyimpanan pending, klaim dan nama pengambil, penghapusan oleh admin</td>
     </tr>
     <tr>
-      <td><code>errorHelpers.test.ts</code></td>
-      <td>Helper Penanganan Error Terpusat &amp; Parsing Pesan Error</td>
-      <td>PASSED</td>
+      <td>Proyek</td>
+      <td>Pembuatan dengan klien dan staf terdaftar, edit, hapus, filter daftar</td>
     </tr>
     <tr>
-      <td><code>formatters.test.ts</code></td>
-      <td>Formatting Tanggal, Mata Uang, Kode Proyek, Nomor Tiket</td>
-      <td>PASSED</td>
+      <td>Tahapan</td>
+      <td>Tambah/edit/hapus, ubah status, catatan progres, perhitungan status proyek</td>
     </tr>
     <tr>
-      <td><code>statusMapper.test.ts</code></td>
-      <td>Pemetaan Warna Badge Status Proyek &amp; Tahapan</td>
-      <td>PASSED</td>
+      <td>Berkas</td>
+      <td>Pilih foto/dokumen, upload Storage, pencatatan metadata, buka URL</td>
     </tr>
     <tr>
-      <td><code>useProjectDetail.test.ts</code></td>
-      <td>Custom Hook Manage State Proyek, Log Harian, Berkas</td>
-      <td>PASSED</td>
+      <td>Realtime</td>
+      <td>Dua perangkat pada proyek yang sama menerima perubahan tahapan/catatan</td>
     </tr>
     <tr>
-      <td><code>useSurveyRequests.test.ts</code></td>
-      <td>Custom Hook Manage Antrean Survei, Klaim, &amp; Approval</td>
-      <td>PASSED</td>
+      <td>Notifikasi</td>
+      <td>Trigger booking, baca, tandai dibaca, hapus, rollback saat mutasi gagal</td>
     </tr>
     <tr>
-      <td><code>notificationService.test.ts</code></td>
-      <td>Pengiriman &amp; Pengubahan Status Dibaca Notifikasi</td>
-      <td>PASSED</td>
+      <td>RLS</td>
+      <td>Isolasi antar-klien dan evaluasi akses staf langsung melalui Supabase</td>
     </tr>
   </tbody>
 </table>
-<hr />
-<h2>2. Skenario Test Cases Kunci</h2>
-<h3>2.1 Modul Autentikasi &amp; Keamanan Backend (TC-AUTH &amp; TC-SEC)</h3>
-<ul>
-  <li><strong>TC-AUTH-001</strong>: Login berhasil menggunakan Email dan Kata Sandi valid. (EXPECT: Return JWT Token &amp; User Profile).</li>
-  <li><strong>TC-AUTH-002</strong>: Pengguna non-admin mencoba membuat akun baru via <code>/api/register</code>. (EXPECT: Status 403 Forbidden).</li>
-  <li><strong>TC-SEC-001 (CORS Audit)</strong>: HTTP Request dari origin tidak dikenal (misal <code>http://malicious-site.com</code>). (EXPECT: Connection Error / CORS Origin Blocked &amp; Console Warning <code>[CORS SECURITY AUDIT]</code>).</li>
-  <li><strong>TC-SEC-002 (Security Headers)</strong>: Verifikasi HTTP Response Headers. (EXPECT: Header <code>X-Content-Type-Options: nosniff</code> dan <code>X-Frame-Options: SAMEORIGIN</code> terpasang via <code>helmet()</code>).</li>
-  <li><strong>TC-SEC-003 (Fatal Env Validation)</strong>: Menjalankan <code>server.js</code> tanpa <code>JWT_SECRET</code>. (EXPECT: Server exit dengan status code 1).</li>
-</ul>
-<h3>2.2 Modul Book Survey &amp; Pipeline (TC-SURVEY)</h3>
-<ul>
-  <li><strong>TC-SURVEY-001</strong>: Pengajuan survei lokasi dengan data valid. (EXPECT: Record tersimpan di <code>bookings</code> status <code>pending</code>).</li>
-  <li><strong>TC-SURVEY-002</strong>: Staf Marketing mengklaim permohonan survei. (EXPECT: Status berubah ke <code>claimed</code> dan <code>claimed_by</code> terisi).</li>
-  <li><strong>TC-SURVEY-003</strong>: Staf menyetujui permohonan survei. (EXPECT: Status berubah ke <code>approved</code> dan dapat dikonversi ke proyek).</li>
-</ul>
-<h3>2.3 Modul Project Tracking &amp; Files (TC-PROJ &amp; TC-FILE)</h3>
-<ul>
-  <li><strong>TC-PROJ-001</strong>: Pembuatan proyek baru beserta 4 tahapan linimasa default. (EXPECT: Stages default otomatis dibuat).</li>
-  <li><strong>TC-PROJ-002</strong>: Field Engineer memperbarui progres tahapan ke 50%. (EXPECT: Total progress bar proyek terhitung proporsional).</li>
-  <li><strong>TC-FILE-001</strong>: Upload foto inspeksi atau laporan PDF &lt; 10MB via <code>/api/files/upload</code>. (EXPECT: File tersimpan di <code>uploads/</code> atau Supabase Storage privat dan metadata terdaftar di DB).</li>
-</ul>
+<p>Pembuatan proyek tidak menambahkan tahapan otomatis; tahapan dibuat pada detail proyek. Kemajuan keseluruhan dihitung dari proporsi tahapan selesai.</p>
 
   </div>
 </body>

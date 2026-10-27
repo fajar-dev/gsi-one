@@ -39,7 +39,7 @@ graph TD
 | **Pusat Notifikasi In-App** | ❌ | ✅ | ✅ | ✅ | ✅ |
 
 > [!IMPORTANT]
-> **Model Pendaftaran Akun Terpusat**: Pendaftaran akun publik telah dinonaktifkan demi privasi dan keamanan proyek teknis. Seluruh akun (termasuk Klien) didaftarkan secara terpusat oleh Admin melalui modal [AdminRegisterModal](file:///d:/fajar/GSI%20One%20-%20Copy/src/screens/Dashboard/components/AdminRegisterModal.tsx) atau Supabase Edge Function [admin-create-user](file:///d:/fajar/GSI%20One%20-%20Copy/supabase/functions/admin-create-user/index.ts).
+> **Model Pendaftaran Akun Terpusat**: Pendaftaran akun publik telah dinonaktifkan demi privasi dan keamanan proyek teknis. Seluruh akun (termasuk Klien) didaftarkan secara terpusat oleh Admin melalui modal [AdminRegisterModal](src/screens/Dashboard/components/AdminRegisterModal.tsx) atau Supabase Edge Function [admin-create-user](supabase/functions/admin-create-user/index.ts).
 
 ---
 
@@ -88,8 +88,8 @@ classDiagram
     class DataSources {
         <<Infrastructure>>
         Supabase PostgreSQL (RLS)
-        Supabase Storage (Signed URLs)
-        Express REST API (Fallback)
+        Supabase Storage
+        Supabase Edge Functions
     }
 
     UIComponents ..> CustomHooks : consume
@@ -103,23 +103,23 @@ classDiagram
 ### Penjelasan Lapisan Arsitektur:
 1. **Presentation Layer (`src/screens/`, `src/components/`)**:
    - Komponen UI murni deklaratif yang terisolasi dari kueri langsung ke database.
-   - Menggunakan token desain terpusat dari [Colors.tsx](file:///d:/fajar/GSI%20One%20-%20Copy/assets/styles/Colors.tsx) dan utilitas tata letak [GlobalStyle.tsx](file:///d:/fajar/GSI%20One%20-%20Copy/assets/styles/GlobalStyle.tsx).
+   - Menggunakan token desain terpusat dari [Colors.tsx](assets/styles/Colors.tsx) dan utilitas tata letak [GlobalStyle.tsx](assets/styles/GlobalStyle.tsx).
 2. **Logic & Hook Isolation Layer (`src/hooks/`)**:
    - Memisahkan *side-effects*, penanganan formulir, dan langganan WebSocket dari render tree UI.
-   - Contoh: [useProjectDetail.ts](file:///d:/fajar/GSI%20One%20-%20Copy/src/hooks/useProjectDetail.ts), [useSurveyRequests.ts](file:///d:/fajar/GSI%20One%20-%20Copy/src/hooks/useSurveyRequests.ts), [useProjectRealtime.ts](file:///d:/fajar/GSI%20One%20-%20Copy/src/hooks/useProjectRealtime.ts).
+   - Contoh: [useProjectDetail.ts](src/hooks/useProjectDetail.ts), [useSurveyRequests.ts](src/hooks/useSurveyRequests.ts), [useProjectRealtime.ts](src/hooks/useProjectRealtime.ts).
 3. **State Management (`src/store/`)**:
-   - Dikelola oleh Zustand v5: [authStore.ts](file:///d:/fajar/GSI%20One%20-%20Copy/src/store/authStore.ts), [projectStore.ts](file:///d:/fajar/GSI%20One%20-%20Copy/src/store/projectStore.ts), dan [notificationStore.ts](file:///d:/fajar/GSI%20One%20-%20Copy/src/store/notificationStore.ts).
+   - Dikelola oleh Zustand v5: [authStore.ts](src/store/authStore.ts), [projectStore.ts](src/store/projectStore.ts), dan [notificationStore.ts](src/store/notificationStore.ts).
    - Mendukung pembaruan optimistik (*optimistic update*) dengan *rollback* otomatis jika mutasi ditolak oleh server/RLS.
 4. **Repository Layer (`src/services/repositories/`)**:
-   - [SupabaseProjectRepository.ts](file:///d:/fajar/GSI%20One%20-%20Copy/src/services/repositories/SupabaseProjectRepository.ts) bertindak sebagai façade yang mendelegasikan tanggung jawab kepada sub-repository:
-     - [ProjectQueryRepository.ts](file:///d:/fajar/GSI%20One%20-%20Copy/src/services/repositories/sub/ProjectQueryRepository.ts): Kueri daftar proyek, detail, filtering, dan pagination.
-     - [ProjectStageRepository.ts](file:///d:/fajar/GSI%20One%20-%20Copy/src/services/repositories/sub/ProjectStageRepository.ts): Penambahan/perubahan tahapan dan catatan harian.
-     - [ProjectFileRepository.ts](file:///d:/fajar/GSI%20One%20-%20Copy/src/services/repositories/sub/ProjectFileRepository.ts): Pengunggahan berkas teknis dan pembuatan signed URL.
-     - [ProjectCommandRepository.ts](file:///d:/fajar/GSI%20One%20-%20Copy/src/services/repositories/sub/ProjectCommandRepository.ts): Pembuatan dan pembaruan data master proyek.
-   - [projectMapper.ts](file:///d:/fajar/GSI%20One%20-%20Copy/src/services/mappers/projectMapper.ts) memetakan raw row PostgreSQL ke instance model entitas.
+   - [SupabaseProjectRepository.ts](src/services/repositories/SupabaseProjectRepository.ts) bertindak sebagai façade yang mendelegasikan tanggung jawab kepada sub-repository:
+     - [ProjectQueryRepository.ts](src/services/repositories/sub/ProjectQueryRepository.ts): Kueri daftar proyek, detail, filtering, dan pagination.
+     - [ProjectStageRepository.ts](src/services/repositories/sub/ProjectStageRepository.ts): Penambahan/perubahan tahapan dan catatan harian.
+     - [ProjectFileRepository.ts](src/services/repositories/sub/ProjectFileRepository.ts): Pengunggahan berkas teknis dan pembuatan signed URL.
+     - [ProjectCommandRepository.ts](src/services/repositories/sub/ProjectCommandRepository.ts): Pembuatan dan pembaruan data master proyek.
+   - [projectMapper.ts](src/services/mappers/projectMapper.ts) memetakan raw row PostgreSQL ke instance model entitas.
 5. **Domain Entities (`src/domain/`)**:
-   - [ProjectEntity.ts](file:///d:/fajar/GSI%20One%20-%20Copy/src/domain/entities/ProjectEntity.ts): Menyediakan kalkulasi bisnis mandiri seperti `getProgressPercentage()`, `isOverdue()`, dan `getFormattedBudget()`.
-   - [SurveyRequestEntity.ts](file:///d:/fajar/GSI%20One%20-%20Copy/src/domain/entities/SurveyRequestEntity.ts): Menyediakan method klaim dan generator URL pesan WhatsApp otomatis.
+   - [ProjectEntity.ts](src/domain/entities/ProjectEntity.ts): Menyediakan kalkulasi bisnis mandiri seperti `getProgressPercentage()`, `isOverdue()`, dan `getFormattedBudget()`.
+   - [SurveyRequestEntity.ts](src/domain/entities/SurveyRequestEntity.ts): Menyediakan method klaim dan generator URL pesan WhatsApp otomatis.
 
 ---
 
@@ -191,9 +191,9 @@ erDiagram
    - Ketika nama Klien diubah di tabel `users`, trigger PostgreSQL secara otomatis mensinkronkan nilai `projects.client_name` agar riwayat akses data tidak terputus.
 3. **Storage Bucket Privat `projects`**:
    - Bucket tidak dibuka ke publik (`public = false`).
-   - Setiap foto progres dan dokumen NDT diakses menggunakan signed URL sementara berdurasi terukur via [storageService.ts](file:///d:/fajar/GSI%20One%20-%20Copy/src/services/storageService.ts).
+   - Setiap foto progres dan dokumen NDT diakses menggunakan signed URL sementara berdurasi terukur via [storageService.ts](src/services/storageService.ts).
 4. **Proteksi Mutasi Notifikasi**:
-   - Pengguna dilarang melakukan `INSERT` notifikasi langsung dari client. Notifikasi hanya dibuat melalui trigger database atau backend server terpercaya.
+   - Pengguna dilarang melakukan `INSERT` notifikasi langsung dari client. Notifikasi hanya dibuat melalui trigger database atau Edge Function tepercaya.
 
 ---
 
@@ -207,11 +207,6 @@ d:/fajar/GSI One - Copy/
 │   └── styles/
 │       ├── Colors.tsx              # Definisi token warna (roleColors, neutral, surface, overlay)
 │       └── GlobalStyle.tsx         # Objek utilitas StyleSheet (Gs.h1, Gs.flexRow, Gs.cornerMD)
-├── backend/
-│   ├── server.js                   # Node.js/Express REST API entry point
-│   ├── database.js                 # SQLite connection & schema initialization
-│   ├── routes/                     # Router modular (auth, project, booking, file, notification)
-│   └── supabase_schema.sql         # Skema DDL master PostgreSQL Supabase
 ├── docs/                           # Dokumentasi SDLC, SRS, Architecture, & index.html portal
 ├── supabase/
 │   ├── functions/admin-create-user # Edge function pendaftaran user via Service Role Key
@@ -223,8 +218,7 @@ d:/fajar/GSI One - Copy/
 │   │   ├── common/SupportCard.tsx  # Kartu kontak bantuan (telepon & situs GSI)
 │   │   └── ErrorBoundary/          # Komponen penangkap crash render tree
 │   ├── config/
-│   │   ├── supabase.ts             # Inisialisasi Supabase Client SDK
-│   │   └── api.ts                  # Resolver Base URL API dinamis (Emulator/Sim/Prod)
+│   │   └── supabase.ts             # Client SDK dan konfigurasi Supabase
 │   ├── domain/
 │   │   ├── entities/               # ProjectEntity.ts & SurveyRequestEntity.ts
 │   │   └── enums/                  # UserRole.ts & ProjectStatus.ts
@@ -266,15 +260,15 @@ d:/fajar/GSI One - Copy/
 Untuk mempertahankan integritas kode dan kualitas lulusan CI/CD:
 
 1. **Strict TypeScript (Zero `any`)**:
-   - Hindari casting tipe `as any`. Semua tipe data respons database wajib menggunakan definisi di [src/types/database.types.ts](file:///d:/fajar/GSI%20One%20-%20Copy/src/types/database.types.ts) atau kelas domain entity.
+   - Hindari casting tipe `as any`. Semua tipe data respons database wajib menggunakan definisi di [src/types/database.types.ts](src/types/database.types.ts) atau kelas domain entity.
 2. **Gunakan Helper Terpusat**:
-   - Format Tanggal & Mata Uang: Gunakan fungsi `formatDateDisplay()`, `formatDateDb()`, atau `formatCurrency()` dari [src/utils/formatters.ts](file:///d:/fajar/GSI%20One%20-%20Copy/src/utils/formatters.ts).
-   - Penanganan Error: Bungkus pesan error catch block dengan `getErrorMessage(error, 'Pesan default')` dari [src/utils/errorHelpers.ts](file:///d:/fajar/GSI%20One%20-%20Copy/src/utils/errorHelpers.ts).
-   - Dimensi Responsif: Gunakan `scale()`, `fontScale()`, `wp()`, dan `hp()` dari [src/utils/responsive.ts](file:///d:/fajar/GSI%20One%20-%20Copy/src/utils/responsive.ts).
+   - Format Tanggal & Mata Uang: Gunakan fungsi `formatDateDisplay()`, `formatDateDb()`, atau `formatCurrency()` dari [src/utils/formatters.ts](src/utils/formatters.ts).
+   - Penanganan Error: Bungkus pesan error catch block dengan `getErrorMessage(error, 'Pesan default')` dari [src/utils/errorHelpers.ts](src/utils/errorHelpers.ts).
+   - Dimensi Responsif: Gunakan `scale()`, `fontScale()`, `wp()`, dan `hp()` dari [src/utils/responsive.ts](src/utils/responsive.ts).
 3. **Konsistensi Tema Role**:
-   - Selalu ambil warna tema menggunakan hook `useRoleTheme()` dari [src/theme/roleTheme.ts](file:///d:/fajar/GSI%20One%20-%20Copy/src/theme/roleTheme.ts) agar elemen UI otomatis mengikuti role pengguna aktif.
+   - Selalu ambil warna tema menggunakan hook `useRoleTheme()` dari [src/theme/roleTheme.ts](src/theme/roleTheme.ts) agar elemen UI otomatis mengikuti role pengguna aktif.
 4. **Isolasi Repository**:
-   - Dilarang keras menuliskan query PostgREST `supabase.from(...)` di file UI screen/komponen. Logika data wajib ditempatkan di [src/services/repositories/](file:///d:/fajar/GSI%20One%20-%20Copy/src/services/repositories).
+   - Dilarang keras menuliskan query PostgREST `supabase.from(...)` di file UI screen/komponen. Logika data wajib ditempatkan di [src/services/repositories/](src/services/repositories).
 
 ---
 
@@ -327,20 +321,18 @@ Seluruh test suite Jest telah diuji dan terverifikasi **100% lulus (74 tests pas
 ### 8.1 Prasyarat Perangkat Lunak
 - **Node.js**: Versi `20.x` LTS atau lebih baru
 - **JDK**: OpenJDK 17
-- **Android Studio**: Android SDK Platform 34 (API 34/35), Android SDK Build-Tools, NDK
+- **Android Studio**: Android SDK Platform 36, Build-Tools 36.0.0, NDK 27.1.12297006 (sesuai `android/build.gradle`)
 - **Package Manager**: npm v10+
 
 ### 8.2 Konfigurasi Lingkungan (`.env`)
 Salin template berkas konfigurasi:
 ```powershell
 cp .env.example .env
-cp .env.example backend/.env
 ```
 Pastikan kunci berikut telah terkonfigurasi:
 ```env
-EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-EXPO_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-EXPO_PUBLIC_API_URL=http://localhost:5000/api
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
 ```
 
 ### 8.3 Perintah Operasional Harian
@@ -354,9 +346,6 @@ npm run android
 # 3. Menjalankan Versi Web (debugging cepat di browser Chrome/Edge)
 npm run web
 
-# 4. Menjalankan Server Backend Express (opsional / local SQLite)
-cd backend
-node server.js
 ```
 
 ### 8.4 Quality Gate Check (Wajib sebelum Commit)

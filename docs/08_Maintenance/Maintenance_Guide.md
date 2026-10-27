@@ -54,17 +54,12 @@ Data studi kasus dan detail struktur tersimpan di `src/data/structures.ts`. Untu
 
 ---
 
-## 5. Checklist Pemeliharaan Keamanan Backend
+## 5. Checklist Pemeliharaan Keamanan Supabase
 
 | Item Audit | Frekuensi | Penanggung Jawab | Cara Verifikasi |
 | --- | --- | --- | --- |
-| Verifikasi CORS whitelist masih sesuai | Per rilis | Lead Developer | Cek `allowedOrigins` di `server.js` |
-| Verifikasi `helmet()` aktif | Per rilis | Lead Developer | Cek HTTP response headers |
-| Rotasi `JWT_SECRET` | Per semester | Admin Server | Generate key baru via `crypto.randomBytes(64)` |
-| Verifikasi RLS aktif di semua tabel Supabase | Per rilis | Lead Developer | Jalankan `backend/verify_rls.sql` |
 | Audit hardcoded secrets di source code | Per rilis | QA Engineer | Grep untuk pattern API key / secret |
 | Verifikasi `.env` tidak ter-commit | Per PR | Code Reviewer | Cek `.gitignore` dan git status |
-| Review log audit CORS ditolak | Mingguan | Admin Server | Cek server console untuk `[CORS SECURITY AUDIT]` |
 | Verifikasi rate limiter login berfungsi | Per rilis | QA Engineer | Test dengan > 10 login gagal berturut |
 
 ---
@@ -74,11 +69,7 @@ Data studi kasus dan detail struktur tersimpan di `src/data/structures.ts`. Untu
 | Package | Versi Saat Ini | Tipe | Jadwal Review | Risiko Update |
 | --- | --- | --- | --- | --- |
 | `react-native` | 0.83.1 | Frontend Framework | Per quarter | Tinggi (breaking changes) |
-| `express` | 4.21.2 | Backend Framework | Bulanan | Rendah (minor/patch) |
 | `@supabase/supabase-js` | 2.110.x | Database SDK | Bulanan | Sedang |
-| `helmet` | 8.3.0 | Security Middleware | Bulanan | Rendah |
-| `jsonwebtoken` | 9.0.2 | Auth Token | Per semester | Rendah |
 | `zustand` | 5.0.14 | State Management | Per quarter | Sedang |
 | `typescript` | 5.8.3 | Type Checking | Per quarter | Rendah |
 | `jest` | 29.6.3 | Testing Framework | Per quarter | Rendah |
-

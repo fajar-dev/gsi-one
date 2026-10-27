@@ -1,7 +1,7 @@
 import { supabase } from '../../../config/supabase';
 import { Project, ProjectDetail, ProjectStage } from '../../projectService';
 import { PaginationOptions } from '../IProjectRepository';
-import { ProjectRow } from '../../../types/database.types';
+import { ProjectRow, ProjectStageRow, StageUpdateRow, ProjectFileRow } from '../../../types/database.types';
 import { projectMapper } from '../../mappers/projectMapper';
 
 export class ProjectQueryRepository {
@@ -11,7 +11,7 @@ export class ProjectQueryRepository {
             selectFields = 'id, project_code, project_name, client_name, start_date, estimated_finish, status, created_by, created_at';
         }
 
-        let query = supabase.from('projects').select(selectFields);
+        let query = supabase.from('projects_with_budget').select(selectFields);
 
         if (role === 'client') {
             if (userId) {
@@ -52,7 +52,7 @@ export class ProjectQueryRepository {
         }
 
         const { data: projectData, error: projectError } = await supabase
-            .from('projects')
+            .from('projects_with_budget')
             .select(selectFields)
             .eq('id', projectId)
             .single();
@@ -71,49 +71,26 @@ export class ProjectQueryRepository {
             throw new Error(stagesError.message || 'Gagal memuat tahapan proyek');
         }
 
-        const stages: ProjectStage[] = [];
-        const stageIds = (stagesData || []).map(s => s.id);
-
-        let allUpdates: Record<string, unknown>[] = [];
-        let allFiles: Record<string, unknown>[] = [];
-
-        if (stageIds.length > 0) {
-            const [updatesRes, filesRes] = await Promise.all([
-                supabase
-                    .from('stage_updates')
-                    .select('*')
-                    .in('stage_id', stageIds)
-                    .order('created_at', { ascending: false }),
-                supabase
-                    .from('project_files')
-                    .select('*')
-                    .in('stage_id', stageIds)
-                    .order('created_at', { ascending: false }),
-            ]);
-            // Tanpa ini, query yang gagal tampil sebagai "belum ada catatan/berkas".
-            if (updatesRes.error) {
-                throw new Error(updatesRes.error.message || 'Gagal memuat catatan progres tahapan');
-            }
-            if (filesRes.error) {
-                throw new Error(filesRes.error.message || 'Gagal memuat berkas tahapan');
-            }
-
-            allUpdates = (updatesRes.data || []) as Record<string, unknown>[];
-            allFiles = (filesRes.data || []) as Record<string, unknown>[];
-        }
-
-        for (const stage of (stagesData || [])) {
-            stages.push({
-                ...stage,
-                updates: allUpdates.filter((u: Record<string, unknown>) => u.stage_id === stage.id) || [],
-                files: allFiles.filter((f: Record<string, unknown>) => f.stage_id === stage.id) || [],
-            });
-        }
-
+        const [updatesRes, filesRes] = await Promise.all([
+            supabase.from('stage_updates').select('*').eq('project_id', projectId)
+                .order('created_at', { ascending: false }),
+            supabase.from('project_files').select('*').eq('project_id', projectId)
+                .order('created_at', { ascending: false }),
+        ]);
+        if (updatesRes.error) throw new Error(updatesRes.error.message);
+        if (filesRes.error) throw new Error(filesRes.error.message);
+        const updates = ((updatesRes.data || []) as StageUpdateRow[]).map(projectMapper.mapStageUpdateRowToEntity);
+        const files = ((filesRes.data || []) as ProjectFileRow[]).map(projectMapper.mapProjectFileRowToEntity);
+        const stages: ProjectStage[] = ((stagesData || []) as ProjectStageRow[]).map(row => {
+            const stage = projectMapper.mapStageRowToEntity(row);
+            return { ...stage, updates: updates.filter(u => u.stage_id === stage.id), files: files.filter(f => f.stage_id === stage.id) };
+        });
         return {
-            ...((projectData as unknown as ProjectRow) as unknown as Project),
+            ...projectMapper.mapProjectRowToEntity(projectData as Partial<ProjectRow>),
             stages,
-        } as ProjectDetail;
+            files: files.filter(f => !f.stage_id),
+            updates: updates.filter(u => !u.stage_id),
+        };
     }
 }
 

@@ -19,6 +19,7 @@ interface ProjectState {
   stats: DashboardStats | null;
   isLoading: boolean;
   isLoadingDetail: boolean;
+  detailRequestId: number;
   error: string | null;
 
   fetchProjects: () => Promise<void>;
@@ -43,13 +44,16 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   stats: null,
   isLoading: false,
   isLoadingDetail: false,
+  detailRequestId: 0,
   error: null,
 
   fetchProjects: async () => {
+    const fetchingUserId = useAuthStore.getState().user?.id;
     set({ isLoading: true, error: null });
     try {
       const { user } = useAuthStore.getState();
       const projects = await projectService.getProjects(user?.id, user?.role);
+      if (useAuthStore.getState().user?.id !== fetchingUserId) return;
       set({ projects, isLoading: false });
       get().computeStats();
     } catch (err: unknown) {
@@ -58,13 +62,19 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   },
 
   fetchProjectDetail: async (projectId: string) => {
-    set({ isLoadingDetail: true, error: null });
+    const requestId = get().detailRequestId + 1;
+    const userId = useAuthStore.getState().user?.id;
+    set({ isLoadingDetail: true, selectedProject: null, error: null, detailRequestId: requestId });
     try {
       const { user } = useAuthStore.getState();
       const detail = await projectService.getProjectDetail(projectId, user?.role);
-      set({ selectedProject: detail, isLoadingDetail: false });
+      if (get().detailRequestId === requestId && useAuthStore.getState().user?.id === userId) {
+        set({ selectedProject: detail, isLoadingDetail: false });
+      }
     } catch (err: unknown) {
-      set({ error: getErrorMessage(err), isLoadingDetail: false });
+      if (get().detailRequestId === requestId) {
+        set({ selectedProject: null, error: getErrorMessage(err), isLoadingDetail: false });
+      }
     }
   },
 
@@ -217,7 +227,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     set({ stats });
   },
 
-  clearSelectedProject: () => set({ selectedProject: null }),
+  clearSelectedProject: () => set({ selectedProject: null, isLoadingDetail: false, detailRequestId: get().detailRequestId + 1 }),
   clearError: () => set({ error: null }),
 }));
 

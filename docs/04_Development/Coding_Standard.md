@@ -11,7 +11,7 @@
 | Komponen React       | PascalCase      | `BookSurvey`, `BottomNav`     |
 | File komponen        | PascalCase.tsx  | `HomeSkeleton.tsx`            |
 | Fungsi / variabel    | camelCase       | `handleSubmit`, `isLoading`   |
-| Konstanta global     | SCREAMING_SNAKE | `API_BASE_URL`, `USER_KEY`    |
+| Konstanta global     | SCREAMING_SNAKE | `SUPABASE_URL`, `USER_KEY`    |
 | Interface TypeScript | PascalCase (+ I opsional) | `AuthUser`, `LoginResult` |
 | Tipe TypeScript      | PascalCase      | `RootStackParamList`          |
 | File store/service   | camelCase.ts    | `authStore.ts`, `authService.ts` |
@@ -160,30 +160,10 @@ Untuk konteks di luar React (navigasi, helper), gunakan `getRoleTheme(role)` dar
 | `src/services/mappers/` | DTO mapper (projectMapper) | TypeScript |
 | `src/types/` | Definisi tipe data global & database types | TypeScript |
 | `src/utils/` | Utility functions (errorHelpers, formatters, statusMapper, responsive, logger) | TypeScript |
-| `src/config/` | Konfigurasi (api.ts, supabase.ts) | TypeScript |
+| `src/config/` | Konfigurasi Supabase dan adapter platform | TypeScript |
 | `src/domain/` | Domain entities (ProjectEntity) | TypeScript |
 | `src/theme/` | Design tokens & role theme | TypeScript |
-| `backend/server.js` | Entry point Express server | JavaScript |
-| `backend/database.js` | Inisialisasi SQLite database & helper (run, get, all) | JavaScript |
-| `backend/routes/` | Route handlers (auth, projects, bookings, files, notifications) | JavaScript |
-| `backend/middlewares/` | Middleware (authenticateToken JWT) | JavaScript |
-| `backend/helpers/` | Backend helpers (projectHelpers) | JavaScript |
-| `backend/config/` | Backend config (supabase.js, multer.js) | JavaScript |
 | `__tests__/` | Test suites Jest | TypeScript |
 | `docs/` | Dokumentasi SDLC (12 folder + HTML Viewer) | Markdown |
 
 ---
-
-## 8. Tabel Konvensi Penamaan Backend (Node.js / Express)
-
-| Elemen | Konvensi | Contoh |
-| --- | --- | --- |
-| File route | camelCase.js | `authRoutes.js`, `projectRoutes.js` |
-| File middleware | camelCase.js | `authMiddleware.js` |
-| File helper | camelCase.js | `projectHelpers.js` |
-| Variabel / fungsi | camelCase | `authenticateToken`, `recalculateProjectStatus` |
-| Konstanta environment | SCREAMING_SNAKE | `JWT_SECRET`, `SUPABASE_URL` |
-| Route path | kebab-case / RESTful | `/api/projects/:id`, `/api/admin/create-user` |
-| Tabel database | snake_case | `project_stages`, `stage_updates`, `project_files` |
-| Kolom database | snake_case | `client_id`, `created_at`, `project_code` |
-
