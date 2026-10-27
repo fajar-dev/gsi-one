@@ -112,6 +112,8 @@ Suite Jest mencakup unit test serta integration test untuk pemetaan proyek, pagi
 
 ## Panduan Deployment Singkat
 
+Signing release dapat dibaca dari `android/signing.properties` yang diabaikan Git, atau properti Gradle `MYAPP_UPLOAD_STORE_FILE`, `MYAPP_UPLOAD_STORE_PASSWORD`, `MYAPP_UPLOAD_KEY_ALIAS`, dan `MYAPP_UPLOAD_KEY_PASSWORD`. Simpan keystore dan kredensial sebagai cadangan privat; gunakan kunci yang sama untuk pembaruan berikutnya.
+
 ```bash
 # 1. Masuk ke folder android
 cd android

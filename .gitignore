@@ -54,6 +54,7 @@ screencap*.png
 .kotlin/
 .cxx/
 local.properties
+/android/signing.properties
 *.iml
 *.hprof
 *.jks

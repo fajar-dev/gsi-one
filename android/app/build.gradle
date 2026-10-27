@@ -10,6 +10,15 @@ def enableProguardInReleaseBuilds = true
 
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
+def localSigningProperties = new Properties()
+def localSigningFile = rootProject.file('signing.properties')
+if (localSigningFile.exists()) {
+    localSigningFile.withInputStream { localSigningProperties.load(it) }
+}
+def releaseSigningValue = { name ->
+    project.findProperty(name) ?: localSigningProperties.getProperty(name)
+}
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -33,11 +42,11 @@ android {
             keyPassword project.hasProperty('DEBUG_KEY_PASSWORD') ? DEBUG_KEY_PASSWORD : 'android'
         }
         release {
-            if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
-                storeFile file(MYAPP_UPLOAD_STORE_FILE)
-                storePassword MYAPP_UPLOAD_STORE_PASSWORD
-                keyAlias MYAPP_UPLOAD_KEY_ALIAS
-                keyPassword MYAPP_UPLOAD_KEY_PASSWORD
+            if (releaseSigningValue('MYAPP_UPLOAD_STORE_FILE')) {
+                storeFile file(releaseSigningValue('MYAPP_UPLOAD_STORE_FILE'))
+                storePassword releaseSigningValue('MYAPP_UPLOAD_STORE_PASSWORD')
+                keyAlias releaseSigningValue('MYAPP_UPLOAD_KEY_ALIAS')
+                keyPassword releaseSigningValue('MYAPP_UPLOAD_KEY_PASSWORD')
             }
         }
     }
