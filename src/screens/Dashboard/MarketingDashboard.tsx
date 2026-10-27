@@ -1,8 +1,15 @@
-import React, { JSX, useCallback } from 'react';
-import { View, ScrollView, Text, RefreshControl, StyleSheet } from 'react-native';
+import { palette, spacing, typography } from '../../theme/tokens';
+import { JSX, useCallback } from 'react';
+import {
+  View,
+  ScrollView,
+  Text,
+  RefreshControl,
+  StyleSheet,
+} from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { AuthenticatedNavigationProp } from '../../types/navigation';
-import { roleColors, neutral, surface } from '../../../assets/styles/Colors';
+import { roleColors, neutral, surface } from '../../theme/colors';
 import { scale, fontScale } from '../../utils/responsive';
 import { useAuthStore } from '../../store/authStore';
 import { useProjectStore } from '../../store/projectStore';
@@ -21,7 +28,7 @@ function MarketingDashboard(): JSX.Element {
   useFocusEffect(
     useCallback(() => {
       fetchProjects();
-    }, [fetchProjects])
+    }, [fetchProjects]),
   );
 
   const initials = getUserInitials(user?.full_name);
@@ -30,7 +37,7 @@ function MarketingDashboard(): JSX.Element {
     {
       label: 'Daftar Survey',
       icon: 'calendar',
-      iconColor: '#0F9F67',
+      iconColor: palette.brand,
       bgStyle: { backgroundColor: '#E8F5E9' },
       onPress: () => navigation.navigate('SurveyRequests'),
     },
@@ -55,16 +62,23 @@ function MarketingDashboard(): JSX.Element {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={isLoading} onRefresh={fetchProjects} colors={['#0F9F67']} />
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={fetchProjects}
+            colors={[palette.brand]}
+          />
         }
       >
         <DashboardHeader
-          gradientColors={[roleColors.marketing.gradientStart, roleColors.marketing.gradientEnd]}
+          gradientColors={[
+            roleColors.marketing.gradientStart,
+            roleColors.marketing.gradientEnd,
+          ]}
           userName={user?.full_name || 'Tim Marketing'}
           initials={initials}
           roleLabel="Marketing & Business Dev"
           roleIcon="briefcase"
-          rolePillStyle={{ backgroundColor: 'rgba(15, 159, 103, 0.4)' }}
+          rolePillStyle={styles.staticStyle1}
           subtitle="Pantau reservasi survey, hubungan klien, dan portofolio proyek GSI One."
         />
 
@@ -86,18 +100,20 @@ function MarketingDashboard(): JSX.Element {
 }
 
 const styles = StyleSheet.create({
+  staticStyle1: { backgroundColor: 'rgba(15, 159, 103, 0.4)' },
+
   container: { flex: 1, backgroundColor: surface.screen },
-  scrollContent: { paddingBottom: scale(24) },
+  scrollContent: { paddingBottom: scale(spacing.xxl) },
   body: {
-    paddingHorizontal: scale(16),
-    paddingTop: scale(8),
+    paddingHorizontal: scale(spacing.xl),
+    paddingTop: scale(spacing.sm),
   },
   sectionTitle: {
-    fontSize: fontScale(16),
+    fontSize: fontScale(typography.bodyLarge),
     fontWeight: '800',
     color: neutral[900],
-    marginTop: scale(20),
-    marginBottom: scale(12),
+    marginTop: scale(spacing.xl),
+    marginBottom: scale(spacing.md),
   },
 });
 

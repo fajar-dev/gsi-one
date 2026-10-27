@@ -1,14 +1,30 @@
+import { ActionButton } from '../../components/ui/ActionButton';
+import {
+  buttonMetrics,
+  palette,
+  touchTarget,
+  spacing,
+  typography,
+  radius,
+} from '../../theme/tokens';
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  ActivityIndicator,
+  StyleSheet,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { supabase } from '../../config/supabase';
+
+import { authService } from '../../services/authService';
 import { RootStackParamList } from '../../types/navigation';
 import { useAuthStore } from '../../store/authStore';
 
 export default function ResetPasswordScreen(): React.ReactElement {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [password, setPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
   const [ready, setReady] = useState(false);
@@ -17,50 +33,140 @@ export default function ResetPasswordScreen(): React.ReactElement {
   const [done, setDone] = useState(false);
   useEffect(() => {
     let mounted = true;
-    supabase.auth.getUser().then(({ data, error: sessionError }) => {
+    authService.hasValidSession().then(valid => {
       if (!mounted) return;
-      if (sessionError || !data.user) setError('Sesi reset tidak valid. Silakan minta tautan baru.');
+      if (!valid)
+        setError('Sesi reset tidak valid. Silakan minta tautan baru.');
       else setReady(true);
     });
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
   const save = async () => {
-    if (password.length < 8) { setError('Kata sandi minimal 8 karakter.'); return; }
-    if (password !== confirmation) { setError('Konfirmasi kata sandi tidak sama.'); return; }
+    if (password.length < 8) {
+      setError('Kata sandi minimal 8 karakter.');
+      return;
+    }
+    if (password !== confirmation) {
+      setError('Konfirmasi kata sandi tidak sama.');
+      return;
+    }
     setSaving(true);
     setError('');
     try {
-      const { error: updateError } = await supabase.auth.updateUser({ password });
-      if (updateError) throw updateError;
-      await AsyncStorage.removeItem('auth_password_recovery');
-      useAuthStore.setState({ isPasswordRecovery: false });
-      await useAuthStore.getState().logout();
+      await useAuthStore.getState().completePasswordRecovery(password);
       setDone(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kata sandi belum berhasil diubah.');
-    } finally { setSaving(false); }
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Kata sandi belum berhasil diubah.',
+      );
+    } finally {
+      setSaving(false);
+    }
   };
-  return <View style={styles.container}>
-    <Text style={styles.title}>{done ? 'Kata Sandi Diperbarui' : 'Buat Kata Sandi Baru'}</Text>
-    <Text>{done ? 'Silakan masuk memakai kata sandi baru Anda.' : 'Masukkan kata sandi minimal 8 karakter.'}</Text>
-    {!!error && <Text accessibilityRole="alert" style={styles.error}>{error}</Text>}
-    {ready && !done && <>
-      <TextInput style={styles.input} placeholder="Kata sandi baru" secureTextEntry autoCapitalize="none" value={password} onChangeText={setPassword} />
-      <TextInput style={styles.input} placeholder="Ulangi kata sandi baru" secureTextEntry autoCapitalize="none" value={confirmation} onChangeText={setConfirmation} />
-      <TouchableOpacity style={styles.button} disabled={saving} onPress={save}>
-        {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Simpan Kata Sandi</Text>}
-      </TouchableOpacity>
-    </>}
-    {(done || !ready) && <TouchableOpacity style={styles.button} onPress={() => navigation.reset({ index: 0, routes: [{ name: done ? 'Login' : 'ForgotPassword' }] })}>
-      <Text style={styles.buttonText}>{done ? 'Masuk' : 'Minta Tautan Baru'}</Text>
-    </TouchableOpacity>}
-  </View>;
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>
+        {done ? 'Kata Sandi Diperbarui' : 'Buat Kata Sandi Baru'}
+      </Text>
+      <Text>
+        {done
+          ? 'Silakan masuk memakai kata sandi baru Anda.'
+          : 'Masukkan kata sandi minimal 8 karakter.'}
+      </Text>
+      {!!error && (
+        <Text accessibilityRole="alert" style={styles.error}>
+          {error}
+        </Text>
+      )}
+      {ready && !done && (
+        <>
+          <TextInput
+            style={styles.input}
+            placeholder="Kata sandi baru"
+            secureTextEntry
+            autoCapitalize="none"
+            value={password}
+            onChangeText={setPassword}
+            accessibilityLabel="Kata sandi baru"
+            autoCorrect={false}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Ulangi kata sandi baru"
+            secureTextEntry
+            autoCapitalize="none"
+            value={confirmation}
+            onChangeText={setConfirmation}
+            accessibilityLabel="Ulangi kata sandi baru"
+            autoCorrect={false}
+          />
+          <ActionButton
+            style={styles.button}
+            disabled={saving}
+            onPress={save}
+            accessibilityRole="button"
+          >
+            {saving ? (
+              <ActivityIndicator color={palette.white} />
+            ) : (
+              <Text style={styles.buttonText}>Simpan Kata Sandi</Text>
+            )}
+          </ActionButton>
+        </>
+      )}
+      {(done || !ready) && (
+        <ActionButton
+          style={styles.button}
+          onPress={() =>
+            navigation.reset({
+              index: 0,
+              routes: [{ name: done ? 'Login' : 'ForgotPassword' }],
+            })
+          }
+          accessibilityRole="button"
+        >
+          <Text style={styles.buttonText}>
+            {done ? 'Masuk' : 'Minta Tautan Baru'}
+          </Text>
+        </ActionButton>
+      )}
+    </View>
+  );
 }
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 24, backgroundColor: '#fff' },
-  title: { fontSize: 24, fontWeight: '700', color: '#024734', marginBottom: 16 },
-  input: { borderWidth: 1, borderColor: '#aaa', borderRadius: 8, padding: 14, marginTop: 16 },
-  error: { color: '#b00020', marginTop: 16 },
-  button: { backgroundColor: '#024734', padding: 16, borderRadius: 8, alignItems: 'center', marginTop: 20 },
-  buttonText: { color: '#fff', fontWeight: '700' },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: spacing.xxl,
+    backgroundColor: palette.white,
+  },
+  title: {
+    fontSize: typography.heading,
+    fontWeight: '700',
+    color: '#024734',
+    marginBottom: spacing.lg,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#aaa',
+    borderRadius: radius.sm,
+    padding: 14,
+    marginTop: spacing.lg,
+  },
+  error: { color: '#b00020', marginTop: spacing.lg },
+  button: {
+    minHeight: touchTarget.minSize,
+    minWidth: touchTarget.minSize,
+    backgroundColor: '#024734',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: buttonMetrics.paddingVertical,
+    borderRadius: radius.sm,
+    alignItems: 'center',
+    marginTop: spacing.xl,
+  },
+  buttonText: { color: palette.white, fontWeight: '700' },
 });

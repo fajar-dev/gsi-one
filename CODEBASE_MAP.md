@@ -1,160 +1,69 @@
-# Codebase Map - GSI One
+# Peta codebase GSI One
 
-Berkas ini menyediakan peta arsitektur dan panduan navigasi struktur folder serta file untuk mempermudah onboarding developer berikutnya pada proyek GSI One.
+Peta ini mengikuti struktur hasil refactor Oktober 2026. Aplikasi React Native berbagi domain dan workflow dengan versi web melalui adapter platform.
 
----
+## Alur aplikasi
 
-## Ikhtisar Arsitektur
+`index.js` → `App.tsx` → `useAppSession` dan `AppNavigator` → screen → hook/store/service → repository Supabase → PostgreSQL, Auth, Storage, dan Realtime.
 
-Aplikasi GSI One menganut pola **Clean Architecture & Layered Domain Design (OOP)**:
+`App.tsx` memasang ErrorBoundary, SafeAreaProvider, indikator inisialisasi, dan frame web. `src/navigation/AppNavigator.tsx` mendefinisikan stack bertipe; `AuthenticatedTabs.tsx` menangani tab pengguna. `src/hooks/useAppSession.ts` menangani pemulihan sesi, deep link reset kata sandi, pembersihan data privat, serta langganan notifikasi.
 
-1. **Frontend (React Native & TypeScript)**:
-   - **Domain Layer (`src/domain/`)**: Entitas OOP bisnis (`ProjectEntity.ts`, `SurveyRequestEntity.ts`) dan Value Objects/Enums (`ProjectStatus.ts`, `UserRole.ts`).
-   - **Repository Pattern (`src/services/repositories/`)**: `SupabaseProjectRepository.ts` adalah façade atas sub-repository query, stage, file, dan command; `projectMapper.ts` memetakan DTO database secara eksplisit. `storageService.ts` menangani signed URL bucket privat dan `notificationService.ts` menangani notifikasi berhalaman.
-   - **Custom Hooks (`src/hooks/`)**: State isolation hooks (`useSurveyRequests`, `useProjectDetail`, `useEditProjectForm`, `useStructureDetail`, `useProfile`, `useProjectRealtime`, `useAuth`).
-   - **State Management**: Zustand Stores (`authStore.ts`, `projectStore.ts`).
-   - **UI Component Layer (`src/screens/` & `src/components/`)**: Visual rendering presentation layer yang sepenuhnya *decoupled* dari logika akses data.
+## Batas modul
 
-2. **Layanan Supabase**:
-   - `supabase/migrations/` menyimpan skema, policy RLS, indeks, dan trigger.
-   - `supabase/functions/admin-create-user/` menangani pembuatan akun oleh admin.
-   - `supabase/seed.sql` menyediakan data demo mandiri.
+| Direktori | Tanggung jawab |
+| --- | --- |
+| `src/domain/models/` | Model autentikasi/proyek/notifikasi, progres tahapan, dan statistik proyek |
+| `src/domain/entities/`, `enums/`, `validation/` | Aturan bisnis, peran, status, dan validasi pendaftaran |
+| `src/domain/repositories/` | Kontrak repository proyek dan booking survey |
+| `src/infrastructure/supabase/` | Implementasi autentikasi, notifikasi, repository, profil, dan Storage |
+| `src/infrastructure/supabase/projects/` | Pemisahan query proyek, mutasi master, tahapan, dan file |
+| `src/infrastructure/supabase/mappers/` | Pemetaan row database menjadi model domain |
+| `src/services/` | Facade aplikasi yang mendelegasikan operasi ke infrastruktur |
+| `src/store/` | Zustand auth, proyek, dan notifikasi; isolasi respons antar sesi |
+| `src/hooks/` | Lifecycle sesi, data proyek, survey, realtime, dan pendaftaran pengguna |
+| `src/screens/` | Halaman per fitur; hook dan style khusus fitur berada dekat pemakainya |
+| `src/components/` | Komponen reusable, ErrorBoundary, ErrorNotice, dan ActionButton |
+| `src/theme/` | `tokens.ts`, `colors.ts`, dan `roleTheme.ts` |
+| `src/platform/` | Registrasi font dan adapter browser untuk picker/gradient |
+| `src/config/` | Client Supabase dan persistensi sesi |
+| `src/types/` | Tipe database, navigasi, environment, dan aset |
+| `src/data/` | Katalog layanan, struktur, dan artikel publik |
+| `test/mocks/`, `__tests__/` | Mock khusus pengujian dan suite Jest |
+| `supabase/migrations/` | Riwayat skema, policy RLS, indeks, dan trigger |
+| `supabase/functions/admin-create-user/` | Pendaftaran pengguna dengan pemeriksaan peran admin |
+| `supabase/seed.sql` | Seed SQL mandiri untuk akun dan proyek demo |
+| `scripts/` | Pemeriksaan arsitektur/graf modul, fixture Storage, dan benchmark |
+| `android/`, `ios/` | Proyek platform native |
 
----
+Domain tidak mengimpor UI, store, service, maupun SDK. Screen tidak mengimpor Supabase atau AsyncStorage. Implementasi infrastruktur tidak bergantung pada presentation layer. `npm run audit:architecture` menegakkan batas tersebut dan menolak explicit `any` di source aplikasi. Integrasi SDK autentikasi dan notifikasi juga berada di infrastruktur; facade service menjaga pemanggilan dari hook/store tetap sederhana.
 
-## Modul Theme & Design Tokens (`assets/` & `src/theme/`)
+## Halaman dan workflow
 
-- **`assets/styles/Colors.tsx`**: Modul pusat Design Tokens yang mendefinisikan:
-  - `roleColors`: Warna tema per role (`admin`, `marketing`, `engineer`, `client`) — semua role saat ini berbagi palet teal/hijau yang seragam (`#002239` → `#0F9F67`).
-  - `neutral`: Skala warna netral dari `neutral[50]` hingga `neutral[900]` (berbasis Material Design).
-  - `surface`: Token latar belakang (`surface.primary`, `surface.secondary`, `surface.screen`, `surface.card`).
-  - `overlay`: Token semi-transparan (`overlay.white20`, `overlay.white85`, `overlay.black06`, dll.).
-  - `colors`: Palet warna legasi logo GSI One (dipertahankan untuk kompatibilitas ke belakang).
-- **`assets/styles/GlobalStyle.tsx`**: Objek `Gs` berupa `StyleSheet` utilitas komposisi — tipografi (`Gs.h1`–`Gs.h5`), layout (`Gs.flexRow`, `Gs.itemsCenter`), dan corner radius asimetris (`Gs.cornerXS`–`Gs.cornerXL`, tiga sudut saja).
-- **`src/theme/roleTheme.ts`**:
-  - `useRoleTheme()`: Hook React yang secara otomatis mendeteksi role pengguna aktif dan mengembalikan `gradient`, `accent`, `accentLight`, dan bendera boolean per-role (`isAdmin`, `isMarketing`, `isEngineer`, `isClient`, `isInternal`).
-  - `getRoleTheme(role)`: Helper murni untuk resolusi tema di luar komponen React (utility/navigasi).
+- `Home`, `Services`, `Structures`, `Insight`, `AboutUs`, dan `Partners`: katalog dan konten publik.
+- `Login`: login staf/klien, bantuan registrasi, permintaan email reset, dan penyimpanan kata sandi baru.
+- `Dashboard`: tampilan admin, marketing, engineer, dan klien. Statistik klien dihitung dari data tahapan tersimpan.
+- `BookSurvey`: formulir publik, konfirmasi, daftar permohonan, klaim, dan penghapusan sesuai peran.
+- `Projects`: daftar/pencarian/filter/pagination, pembuatan/edit proyek, tahapan, catatan, dan file privat.
+- `Profile`: profil, edit nama, dan pendaftaran pengguna oleh admin melalui `useUserRegistration`.
+- `Notifications`: daftar berhalaman dan status baca; notifikasi dibuat oleh trigger server.
 
----
+Model bersama diimpor langsung dari domain. Token UI digunakan melalui theme; `ActionButton` menetapkan target sentuh dasar 44, dan `ErrorNotice` menyediakan status gagal serta retry. `*.styles.ts` memisahkan style statis halaman yang panjang.
 
-## Direktori Frontend (`src/`)
+## Pengembangan dan verifikasi
 
-### 1. `domain/` (OOP Entities & Value Objects)
-- **`ProjectEntity.ts`**: Kelas Entitas OOP Proyek (`getProgressPercentage()`, `isOverdue()`, `getFormattedBudget()`).
-- **`SurveyRequestEntity.ts`**: Kelas Entitas OOP Booking Survey (`claimBy()`, `getWhatsAppUrl()`).
-- **`ProjectStatus.ts`**: Value Object & Enum status proyek (`on_progress`, `pending`, `completed`, `delayed`).
-- **`UserRole.ts`**: Value Object & Enum per-role (`admin`, `marketing`, `engineer`, `client`).
-
-### 2. `services/` (Services & Repositories)
-- **`repositories/IProjectRepository.ts`**: Interface kontrak dasar pengaksesan data proyek.
-- **`repositories/SupabaseProjectRepository.ts`**: Façade implementasi proyek; mendelegasikan query, stage, file, dan command ke `repositories/sub/`.
-- **`mappers/projectMapper.ts`**: Pemetaan eksplisit row Supabase ke model proyek.
-- **`storageService.ts`**: Generator signed URL untuk file di bucket `projects` privat.
-- **`notificationService.ts`**: Query notifikasi dengan filter server-side, pagination, dan mutasi yang mendeteksi penolakan RLS.
-- **`projectService.ts`**: Facade pembungkus (backward compatible).
-- **`authService.ts`**: Layanan otentikasi login, register, dan admin user creation.
-
-### 3. `hooks/` (Custom React Hooks)
-- **`useSurveyRequests.ts`**: Hook pengelola pengajuan survey & claim status.
-- **`useProjectDetail.ts`**: Hook pengelola detail proyek, timeline tahapan, dan updates.
-- **`useEditProjectForm.ts`**: Hook pengelola modal edit proyek.
-- **`useStructureDetail.ts`**: Hook pengelola detail bangunan/struktur.
-- **`useProfile.ts`**: Hook pengelola profil user & pengubahan preferensi.
-- **`useProjectRealtime.ts`**: Subscription listener WebSocket Supabase.
-- **`useRoleTheme.ts`**: Resolusi tema dinamis berbasis role pengguna.
-- **`useAuth.ts`**: Hook pengakses `authStore`.
-
-### 4. `utils/` (Helper Utilities)
-- **`userHelpers.ts`**: Fungsi `getUserInitials()` murni untuk inisial nama avatar user.
-- **`projectHelpers.ts`**: Utility helper proyek (`getProjectImage`, `getProjectLocation`, `getProjectDuration`, `getBridgeStats`, `getProgressSubtext`).
-- **`responsive.ts`**: Scaling responsif berbasis lebar referensi 390px — `scale(n)`, `fontScale(n)` (max 130%), `wp(pct)`, `hp(pct)`, serta konstanta `SCREEN_WIDTH` dan `SCREEN_HEIGHT`.
-- **`errorHelpers.ts`**: Helper terpusat `getErrorMessage(error, fallback)` untuk normalisasi error di setiap catch block.
-- **`formatters.ts`**: Helper terpusat `formatDateDisplay(date)`, `formatDateDb(date)`, `formatCurrency(val)` untuk konsistensi pemformatan.
-
-### 5. `store/` (State Management Zustand)
-- **`authStore.ts`**: State global otentikasi, pendaftaran, pemulihan kata sandi, dan penyimpanan cache profil di AsyncStorage.
-- **`projectStore.ts`**: State global daftar proyek, tahapan, log catatan, upload berkas, serta selector granular agar komponen tidak berlangganan seluruh store.
-- **`notificationStore.ts`**: State notifikasi dengan optimistic update dan rollback saat mutasi ditolak/gagal.
-
-### 6. `components/` (Komponen Reusable)
-- **`common/ScreenHeader.tsx`**: Shared gradient header yang auto-resolve warna gradient dari `useRoleTheme()`. Mendukung props `title`, `subtitle`, `showBackButton`, `rightAction`, dan `gradientColors` override. Menggunakan `useSafeAreaInsets()` untuk safe area otomatis.
-- **`common/Header.tsx`**: Header non-gradient untuk layar publik — menampilkan logo, nama perusahaan, dan border line dekoratif.
-- **`common/SupportCard.tsx`**: Card reusable "Dukungan & Bantuan" yang menampilkan nomor telepon (tap-to-call) dan situs web resmi. Digunakan oleh Admin, Engineer, dan Profile screen.
-- **`common/SkeletonBox.tsx`**: Komponen placeholder loading atomic berbasis animated opacity.
-- **`BottomNav/index.tsx`**: Komponen navigasi bawah publik.
-- **`ErrorBoundary/`**: Komponen pengaman aplikasi dari error fatal render tree.
-
----
-
-## Pemetaan Modul Halaman (`src/screens/`)
-
-### 1. `Dashboard/` (Dashboard Akun Per-Role)
-- **`index.tsx`**: Router sederhana yang mengarahkan ke tampilan per-role berdasarkan `user?.role`.
-- **`AdminDashboard.tsx`**: Tampilan Administrator (pendaftaran user baru, kontrol sistem).
-- **`MarketingDashboard.tsx`**: Tampilan Marketing (daftar reservasi survey & claim status).
-- **`EngineerDashboard.tsx`**: Tampilan Field Engineer (update progres & upload berkas teknis).
-- **`ClientDashboard.tsx`**: Tampilan Klien (monitoring jembatan/gedung & timeline progres).
-- **`components/DashboardHeader.tsx`**: Header gradient shared dengan background image sync.
-- **`components/QuickAccessGrid.tsx`**: Grid tombol akses cepat per-role.
-- **`components/ProjectSummary.tsx`**: Ringkasan statistik & Donut Chart SVG.
-- **`components/RecentProjects.tsx`**: Section preview daftar proyek terbaru.
-- **`components/AdminRegisterModal.tsx`**: Modal pendaftaran akun pengguna baru oleh Admin.
-
-### 2. `BookSurvey/` (Survey & Form Pemesanan)
-- **`BookSurvey.tsx`**: Formulir pemesanan survey struktur bangunan.
-- **`SuccessScreen.tsx`**: Tampilan notifikasi pengajuan survey berhasil.
-- **`SurveyRequestsScreen.tsx`**: Halaman "Daftar Survey" (Marketing & Admin view).
-
-### 3. `Projects/` (Manajemen Proyek & Detail)
-- **`ProjectListScreen.tsx`**: Daftar proyek dengan pencarian, filter status, dan infinite scroll pagination.
-- **`ProjectDetailScreen.tsx`**: Linimasa tahapan detail proyek, progress bar, log catatan, serta dokumen teknis.
-- **`CreateProjectScreen.tsx`**: Halaman pendaftaran proyek baru (Admin-only).
-- **`EditProjectModal.tsx`**: Modal pengeditan detail proyek.
-- **`components/`**:
-  - `StatusUpdateModal.tsx`: Modal pembaruan status tahapan.
-  - `AddNoteModal.tsx`: Modal penambahan catatan progres harian.
-  - `UploadFileModal.tsx`: Modal pengunggahan berkas teknis.
-  - `CreateStageModal.tsx`: Modal pembuatan tahapan baru.
-  - `StageTimeline.tsx`: Penampil tahapan garis vertikal.
-  - `StatusBadge.tsx`: Badge status proyek/tahapan.
-
-### 4. `Services/` (Katalog Layanan Publik)
-- **`LayananKamiScreen.tsx`**: Halaman utama katalog 6 layanan resmi PT Graha Survei Indonesia (GSI).
-- **`LayananDetailScreen.tsx`**: Layar detail interaktif kaya informasi untuk tiap layanan (Deskripsi, Kapan Membutuhkan/Cocok Untuk, Risiko/Permasalahan, Solusi GSI, Manfaat, Output Client, & Gambar Detail).
-- **`ServiceDetailTemplate.tsx`**: Template reusable untuk halaman detail layanan pendukung.
-- **`ServiceNDT.tsx`, `ServiceSHMS.tsx`, `ServiceUnderwater.tsx`, `ServiceLoadingTest.tsx`**: Halaman detail spesifik yang dikonsolidasikan menggunakan `ServiceDetailTemplate`.
-
-### 5. `data/` (Katalog & Static Data)
-- **`layanan.ts`**: Data terstruktur 6 katalog layanan utama GSI (Forensic Engineering, Risk Asset Integrity, Repair & Strengthening, Natural Hazard, SHMS, EEWS) beserta gambar banner & detail.
-- **`services.ts`**: Data kategori struktur & asesmen untuk section *Our Experience*.
-
-### 5. `Structures/` (Studi Kasus & Detail Struktur)
-- **`StructureDetail.tsx`**: Halaman detail struktur gedung/jembatan dengan `useStructureDetail`.
-- **`components/StructureCarousel.tsx`**: Komponen komparasi slider/carousel gambar struktur.
-
-### 6. `Login/` & `Profile/`
-- **`Login/index.tsx`**, **`RegisterScreen.tsx`**, **`ForgotPasswordScreen.tsx`**: Layar autentikasi.
-- **`Profile/index.tsx`**: Halaman profil pengguna dengan `useProfile`.
-
----
-
-## Panduan Perintah Pengembangan & Verifikasi
+Gunakan Node.js 24 (`.nvmrc`), minimum 22.15.0, dan JDK 17. Environment diambil dari `.env`; jangan masukkan service-role key ke aplikasi.
 
 ```bash
-# Menjalankan Mobile App (Android)
+npm ci
+npm run check
+npm audit --audit-level=moderate
+npm run build:web
+npm run start
 npm run android
-
-# Pengecekan Type Safety TypeScript (0 error)
-npx tsc --noEmit
-
-# Pengecekan ESLint (0 error)
-npm run lint
-
-# Kompilasi Dokumentasi HTML Interactive
-cd docs && node generate_docs.js
-
-# Menjalankan quality gate yang juga dijalankan CI
-npm run lint
-npm run typecheck
-npm run test:ci
 ```
+
+Jika ADB tersambung ulang, jalankan `adb devices -l` dan `adb reverse tcp:8081 tcp:8081`. APK debug memerlukan Metro. Build native: `cd android` lalu `./gradlew :app:assembleDebug -PreactNativeArchitectures=arm64-v8a --max-workers=2`.
+
+`npm run audit:modules` memeriksa modul aplikasi yang tidak terjangkau dan siklus impor, termasuk adapter platform. TypeScript menolak local/parameter yang tidak digunakan. Tes konkurensi mencakup login/logout, mutasi proyek, dan antrean notifikasi; reset sesi membatalkan penerapan respons lama.
+
+Quality gate lokal tidak membuktikan seluruh perangkat/platform atau jaringan bebas masalah. Laporan JSON di `audit/` menyimpan hasil dan keterbatasan tiap pengujian; laporan lama tetap menjadi bukti historis.

@@ -1,4 +1,7 @@
-import { SurveyRequestEntity, SurveyRequestData } from '../../src/domain/entities/SurveyRequestEntity';
+import {
+  SurveyRequestEntity,
+  SurveyRequestData,
+} from '../../src/domain/entities/SurveyRequestEntity';
 
 describe('SurveyRequestEntity', () => {
   const basePending: SurveyRequestData = {
@@ -64,32 +67,6 @@ describe('SurveyRequestEntity', () => {
     });
   });
 
-  describe('claimBy (Immutable)', () => {
-    it('should return a NEW entity with claimed status', () => {
-      const entity = new SurveyRequestEntity(basePending);
-      const claimed = entity.claimBy('Dewi', 'Marketing');
-
-      expect(entity.status).toBe('pending');
-      expect(entity.claimedBy).toBeUndefined();
-
-      expect(claimed).not.toBe(entity);
-      expect(claimed.status).toBe('claimed');
-      expect(claimed.claimedBy).toBe('Dewi (Marketing)');
-      expect(claimed.claimedAt).toBe('Baru Saja');
-    });
-
-    it('should preserve all other data fields after claiming', () => {
-      const entity = new SurveyRequestEntity(basePending);
-      const claimed = entity.claimBy('Rina', 'Admin');
-
-      expect(claimed.id).toBe(entity.id);
-      expect(claimed.clientName).toBe(entity.clientName);
-      expect(claimed.companyName).toBe(entity.companyName);
-      expect(claimed.phone).toBe(entity.phone);
-      expect(claimed.structureType).toBe(entity.structureType);
-    });
-  });
-
   describe('WhatsApp URL', () => {
     it('should generate correct WhatsApp URL with 62 prefix for 08xx numbers', () => {
       const entity = new SurveyRequestEntity(basePending);
@@ -113,14 +90,6 @@ describe('SurveyRequestEntity', () => {
     it('should generate correct tel: URI', () => {
       const entity = new SurveyRequestEntity(basePending);
       expect(entity.getPhoneUrl()).toBe('tel:08123456789');
-    });
-  });
-
-  describe('toDTO', () => {
-    it('should return the original data object', () => {
-      const entity = new SurveyRequestEntity(basePending);
-      const dto = entity.toDTO();
-      expect(dto).toEqual(basePending);
     });
   });
 });

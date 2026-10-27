@@ -11,7 +11,7 @@ Aplikasi **GSI One Mobile** memadukan estetika modern premium dengan keandalan v
 
 ## 2. Design Tokens & Design System
 
-### 2.1 Palet Warna Terpusat (`src/assets/styles/Colors.tsx`)
+### 2.1 Palet Warna Terpusat (`src/src/theme/colors.ts`)
 - **Primary Color (Navy GSI)**: `#0F172A` / `#1E293B` - Memberikan kesan profesional, kokoh, dan tepercaya.
 - **Secondary Color (Gold / Amber GSI)**: `#D97706` / `#F59E0B` - Aksen warna industri inspeksi dan highlighting.
 - **Role-based Accent Gradients**:
@@ -20,7 +20,7 @@ Aplikasi **GSI One Mobile** memadukan estetika modern premium dengan keandalan v
   - **Field Engineer**: Gradient Amber/Orange (`#D97706` ke `#F59E0B`) - Melambangkan kewaspadaan operasional lapangan.
   - **Client**: Gradient Blue/Indigo (`#2563EB` ke `#3B82F6`) - Melambangkan kejelasan dan kenyamanan layanan.
 
-### 2.2 Geometri & Corner Radius Asimetris (`src/assets/styles/GlobalStyle.tsx`)
+### 2.2 Geometri & Corner Radius Asimetris (`src/src/theme/globalStyles.ts`)
 - **Card Asymmetric Radius**: Sudut kanan atas dan kiri bawah `20px`, sudut kiri atas dan kanan bawah `6px` untuk memberikan sentuhan identitas visual modern khas GSI.
 - **Elevasi & Shadow**: Soft Drop Shadows (`shadowOpacity: 0.08`, `elevation: 4` hingga `12`).
 

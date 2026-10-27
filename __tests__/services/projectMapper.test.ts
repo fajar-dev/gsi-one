@@ -1,4 +1,4 @@
-import { projectMapper } from '../../src/services/mappers/projectMapper';
+import { projectMapper } from '../../src/infrastructure/supabase/mappers/projectMapper';
 
 describe('projectMapper - Pure DTO Mapping', () => {
   it('should map ProjectRow correctly to Project domain entity', () => {

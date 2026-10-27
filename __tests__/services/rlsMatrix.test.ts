@@ -1,4 +1,4 @@
-import { SupabaseProjectRepository } from '../../src/services/repositories/SupabaseProjectRepository';
+import { SupabaseProjectRepository } from '../../src/infrastructure/supabase/SupabaseProjectRepository';
 import { supabase } from '../../src/config/supabase';
 
 jest.mock('../../src/config/supabase', () => ({
@@ -25,7 +25,9 @@ describe('RLS Authorization Matrix & Strict ID Filtering', () => {
     await repository.getProjects('usr-client-123', 'client');
 
     expect(supabase.from).toHaveBeenCalledWith('projects_with_budget');
-    expect(mockOr).toHaveBeenCalledWith('client_id.eq.usr-client-123,created_by.eq.usr-client-123');
+    expect(mockOr).toHaveBeenCalledWith(
+      'client_id.eq.usr-client-123,created_by.eq.usr-client-123',
+    );
   });
 
   it('should query marketing projects strictly using marketing_id and created_by', async () => {
@@ -38,7 +40,9 @@ describe('RLS Authorization Matrix & Strict ID Filtering', () => {
     await repository.getProjects('usr-mkt-456', 'marketing');
 
     expect(supabase.from).toHaveBeenCalledWith('projects_with_budget');
-    expect(mockOr).toHaveBeenCalledWith('marketing_id.eq.usr-mkt-456,created_by.eq.usr-mkt-456');
+    expect(mockOr).toHaveBeenCalledWith(
+      'marketing_id.eq.usr-mkt-456,created_by.eq.usr-mkt-456',
+    );
   });
 
   it('should query engineer projects strictly using engineer_id and created_by', async () => {
@@ -51,6 +55,8 @@ describe('RLS Authorization Matrix & Strict ID Filtering', () => {
     await repository.getProjects('usr-eng-789', 'engineer');
 
     expect(supabase.from).toHaveBeenCalledWith('projects_with_budget');
-    expect(mockOr).toHaveBeenCalledWith('engineer_id.eq.usr-eng-789,created_by.eq.usr-eng-789');
+    expect(mockOr).toHaveBeenCalledWith(
+      'engineer_id.eq.usr-eng-789,created_by.eq.usr-eng-789',
+    );
   });
 });

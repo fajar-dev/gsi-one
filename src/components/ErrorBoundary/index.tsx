@@ -1,5 +1,14 @@
+import { ActionButton } from '../ui/ActionButton';
+import {
+  buttonMetrics,
+  palette,
+  touchTarget,
+  spacing,
+  typography,
+  radius,
+} from '../../theme/tokens';
 import React, { ReactNode, Component } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 
 interface Props {
   children: ReactNode;
@@ -28,7 +37,6 @@ export class ErrorBoundary extends Component<Props, State> {
       console.error('Error caught by boundary:', error);
       console.error('Error info:', errorInfo);
     }
-
   }
 
   resetError = () => {
@@ -41,16 +49,20 @@ export class ErrorBoundary extends Component<Props, State> {
         <View style={styles.container}>
           <View style={styles.errorContainer}>
             <Text style={styles.emoji}>⚠️</Text>
-            <Text style={styles.title}>Oops! Something went wrong</Text>
+            <Text style={styles.title}>Terjadi Kesalahan</Text>
             <Text style={styles.message}>
               {__DEV__ && this.state.error
                 ? this.state.error.toString()
-                : 'We encountered an unexpected error. Please try again.'}
+                : 'Aplikasi mengalami kendala. Silakan coba lagi.'}
             </Text>
 
-            <TouchableOpacity style={styles.button} onPress={this.resetError}>
-              <Text style={styles.buttonText}>Try Again</Text>
-            </TouchableOpacity>
+            <ActionButton
+              style={styles.button}
+              onPress={this.resetError}
+              accessibilityRole="button"
+            >
+              <Text style={styles.buttonText}>Coba Lagi</Text>
+            </ActionButton>
           </View>
         </View>
       );
@@ -63,10 +75,10 @@ export class ErrorBoundary extends Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: palette.white,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 16,
+    padding: spacing.lg,
   },
   errorContainer: {
     alignItems: 'center',
@@ -74,31 +86,34 @@ const styles = StyleSheet.create({
   },
   emoji: {
     fontSize: 60,
-    marginBottom: 16,
+    marginBottom: spacing.lg,
   },
   title: {
-    fontSize: 20,
+    fontSize: typography.title,
     fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 8,
+    color: palette.black,
+    marginBottom: spacing.sm,
     textAlign: 'center',
   },
   message: {
-    fontSize: 14,
+    fontSize: typography.body,
     color: '#666',
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: spacing.xxl,
     lineHeight: 20,
   },
   button: {
+    alignItems: 'center',
+    minHeight: touchTarget.minSize,
+    minWidth: touchTarget.minSize,
     backgroundColor: '#007AFF',
-    paddingHorizontal: 32,
-    paddingVertical: 12,
-    borderRadius: 8,
+    paddingHorizontal: spacing.section,
+    paddingVertical: buttonMetrics.paddingVertical,
+    borderRadius: radius.sm,
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 16,
+    color: palette.white,
+    fontSize: typography.bodyLarge,
     fontWeight: '600',
   },
 });

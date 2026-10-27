@@ -1,9 +1,17 @@
-import React, { JSX, useCallback } from 'react';
-import { View, ScrollView, Text, TouchableOpacity, RefreshControl, StyleSheet } from 'react-native';
+import { ActionButton } from '../../components/ui/ActionButton';
+import { palette, touchTarget, spacing, typography } from '../../theme/tokens';
+import { JSX, useCallback } from 'react';
+import {
+  View,
+  ScrollView,
+  Text,
+  RefreshControl,
+  StyleSheet,
+} from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Feather';
 import { AuthenticatedNavigationProp } from '../../types/navigation';
-import { colors, roleColors, surface } from '../../../assets/styles/Colors';
+import { colors, roleColors, surface } from '../../theme/colors';
 import { scale, fontScale } from '../../utils/responsive';
 import { useAuthStore } from '../../store/authStore';
 import { useProjectStore } from '../../store/projectStore';
@@ -29,7 +37,7 @@ function EngineerDashboard(): JSX.Element {
   useFocusEffect(
     useCallback(() => {
       fetchProjects();
-    }, [fetchProjects])
+    }, [fetchProjects]),
   );
 
   const initials = getUserInitials(user?.full_name);
@@ -39,52 +47,71 @@ function EngineerDashboard(): JSX.Element {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={isLoading} onRefresh={fetchProjects} colors={['#0F9F67']} />
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={fetchProjects}
+            colors={[palette.brand]}
+          />
         }
       >
         <DashboardHeader
-          gradientColors={[roleColors.engineer.gradientStart, roleColors.engineer.gradientEnd]}
+          gradientColors={[
+            roleColors.engineer.gradientStart,
+            roleColors.engineer.gradientEnd,
+          ]}
           userName={user?.full_name || 'Engineer Lapangan'}
           initials={initials}
           roleLabel="Engineer Lapangan"
           roleIcon="tool"
-          rolePillStyle={{ backgroundColor: 'rgba(15, 159, 103, 0.4)' }}
+          rolePillStyle={styles.staticStyle1}
           subtitle="Kelola perbaruan progres proyek di lapangan serta hasil pengujian & inspeksi NDT."
         />
 
         <View style={styles.body}>
           <View style={styles.actionCard}>
-            <Text style={styles.actionCardTitle}>Menu Tim Teknis / Engineer</Text>
+            <Text style={styles.actionCardTitle}>
+              Menu Tim Teknis / Engineer
+            </Text>
             <View style={styles.quickActionList}>
-              <TouchableOpacity
+              <ActionButton
                 style={styles.actionBtn}
                 activeOpacity={0.85}
                 onPress={() => navigation.navigate('Projects')}
+                accessibilityRole="button"
               >
                 <View style={styles.actionIconWrapper}>
-                  <Icon name="check-square" size={20} color="#0F9F67" />
+                  <Icon name="check-square" size={20} color={palette.brand} />
                 </View>
                 <View style={styles.actionTextWrapper}>
-                  <Text style={styles.actionBtnTitle}>Update Progress Lapangan</Text>
-                  <Text style={styles.actionBtnSub}>Perbarui status tahapan & progres proyek</Text>
+                  <Text style={styles.actionBtnTitle}>
+                    Update Progress Lapangan
+                  </Text>
+                  <Text style={styles.actionBtnSub}>
+                    Perbarui status tahapan & progres proyek
+                  </Text>
                 </View>
-                <Icon name="chevron-right" size={20} color="#0F9F67" />
-              </TouchableOpacity>
+                <Icon name="chevron-right" size={20} color={palette.brand} />
+              </ActionButton>
 
-              <TouchableOpacity
+              <ActionButton
                 style={[styles.actionBtn, styles.quickActionMarginTop]}
                 activeOpacity={0.85}
                 onPress={() => navigation.navigate('Projects')}
+                accessibilityRole="button"
               >
                 <View style={styles.actionIconWrapper}>
-                  <Icon name="file-text" size={20} color="#0F9F67" />
+                  <Icon name="file-text" size={20} color={palette.brand} />
                 </View>
                 <View style={styles.actionTextWrapper}>
-                  <Text style={styles.actionBtnTitle}>Unggah Hasil Pengujian (NDT)</Text>
-                  <Text style={styles.actionBtnSub}>Upload dokumen PDF laporan atau foto inspeksi</Text>
+                  <Text style={styles.actionBtnTitle}>
+                    Unggah Hasil Pengujian (NDT)
+                  </Text>
+                  <Text style={styles.actionBtnSub}>
+                    Upload dokumen PDF laporan atau foto inspeksi
+                  </Text>
                 </View>
-                <Icon name="chevron-right" size={20} color="#0F9F67" />
-              </TouchableOpacity>
+                <Icon name="chevron-right" size={20} color={palette.brand} />
+              </ActionButton>
             </View>
           </View>
 
@@ -109,20 +136,22 @@ function EngineerDashboard(): JSX.Element {
 }
 
 const styles = StyleSheet.create({
+  staticStyle1: { backgroundColor: 'rgba(15, 159, 103, 0.4)' },
+
   container: { flex: 1, backgroundColor: surface.screen },
-  scrollContent: { paddingBottom: scale(24) },
+  scrollContent: { paddingBottom: scale(spacing.xxl) },
   body: {
-    paddingHorizontal: scale(16),
-    paddingTop: scale(8),
+    paddingHorizontal: scale(spacing.xl),
+    paddingTop: scale(spacing.sm),
   },
   actionCard: {
     backgroundColor: colors.white,
     borderRadius: scale(14),
-    padding: scale(16),
-    marginTop: scale(12),
-    marginBottom: scale(16),
+    padding: scale(spacing.lg),
+    marginTop: scale(spacing.md),
+    marginBottom: scale(spacing.lg),
     borderLeftWidth: 4,
-    borderLeftColor: '#0F9F67',
+    borderLeftColor: palette.brand,
     elevation: 2,
     shadowColor: colors.black,
     shadowOffset: { width: 0, height: 1 },
@@ -130,20 +159,22 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   actionCardTitle: {
-    fontSize: fontScale(12),
+    fontSize: fontScale(typography.caption),
     fontWeight: '700',
     color: colors.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: scale(10),
   },
-  quickActionList: { gap: scale(8) },
-  quickActionMarginTop: { marginTop: scale(8) },
+  quickActionList: { gap: scale(spacing.sm) },
+  quickActionMarginTop: { marginTop: scale(spacing.sm) },
   actionBtn: {
+    minHeight: touchTarget.minSize,
+    minWidth: touchTarget.minSize,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#F5F8F7',
-    padding: scale(12),
+    padding: scale(spacing.md),
     borderRadius: scale(10),
   },
   actionIconWrapper: {
@@ -156,15 +187,15 @@ const styles = StyleSheet.create({
   },
   actionTextWrapper: {
     flex: 1,
-    marginLeft: scale(12),
+    marginLeft: scale(spacing.md),
   },
   actionBtnTitle: {
-    fontSize: fontScale(14),
+    fontSize: fontScale(typography.body),
     fontWeight: '700',
     color: colors.textPrimary,
   },
   actionBtnSub: {
-    fontSize: fontScale(11),
+    fontSize: fontScale(typography.caption),
     color: colors.textSecondary,
     marginTop: scale(2),
   },

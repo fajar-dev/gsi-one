@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import { colors } from '../../../assets/styles/Colors';
+import { colors } from '../../theme/colors';
 import { useAuthStore } from '../../store/authStore';
 import AdminDashboard from './AdminDashboard';
 import MarketingDashboard from './MarketingDashboard';

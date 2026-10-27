@@ -7,7 +7,7 @@ SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-public-key
 ```
 
-`src/config/supabase.ts` membaca kedua variabel melalui `@env`. Babel memuat `.env` saat bundling; restart Metro dengan `npm start -- --reset-cache` setelah perubahan. Web memakai konfigurasi Babel pada `webpack.config.js`; `src/config/web/EnvWeb.ts` menyediakan adapter environment web.
+`src/config/supabase.ts` membaca kedua variabel melalui `@env`. Babel memuat `.env` saat bundling; restart Metro dengan `npm start -- --reset-cache` setelah perubahan. Web memakai konfigurasi Babel pada `webpack.config.js`; `src/platform/web/Environment.ts` menyediakan adapter environment web.
 
 Gunakan project Supabase terpisah untuk development, staging, dan produksi dengan mengganti kedua nilai tersebut. Aplikasi tidak membutuhkan server lokal tambahan.
 

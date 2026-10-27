@@ -91,7 +91,7 @@ Aturan berikut memastikan konsistensi visual dan kemudahan maintainability:
 
 ### 6.1 Token Warna
 
-**JANGAN** melakukan hardcode nilai warna di file screen atau komponen individual. Semua warna harus berasal dari `assets/styles/Colors.tsx`:
+**JANGAN** melakukan hardcode nilai warna di file screen atau komponen individual. Semua warna harus berasal dari `src/theme/colors.ts`:
 
 ```typescript
 // BENAR
@@ -104,7 +104,7 @@ backgroundColor: '#F8F9FA'
 
 ### 6.2 Global Style Utility (`Gs`)
 
-Gunakan `Gs` dari `assets/styles/GlobalStyle.tsx` untuk styling yang bersifat utilitas:
+Gunakan `Gs` dari `src/theme/globalStyles.ts` untuk styling yang bersifat utilitas:
 
 ```typescript
 import { Gs } from '../../../assets/styles/GlobalStyle';
@@ -155,8 +155,8 @@ Untuk konteks di luar React (navigasi, helper), gunakan `getRoleTheme(role)` dar
 | `src/hooks/` | Custom hooks (useRoleTheme, useProjectDetail, useSurveyRequests) | TypeScript |
 | `src/store/` | Zustand state management (authStore, projectStore) | TypeScript |
 | `src/services/` | Service facade (authService, projectService, surveyService, notificationService, storageService) | TypeScript |
-| `src/services/repositories/` | Repository pattern (IProjectRepository, SupabaseProjectRepository, SupabaseSurveyRepository) | TypeScript |
-| `src/services/repositories/sub/` | Sub-repository facade (ProjectQueryRepository, ProjectStageRepository, ProjectFileRepository, ProjectCommandRepository) | TypeScript |
+| `src/infrastructure/supabase/` | Repository pattern (IProjectRepository, SupabaseProjectRepository, SupabaseSurveyRepository) | TypeScript |
+| `src/infrastructure/supabase/projects/` | Sub-repository facade (ProjectQueryRepository, ProjectStageRepository, ProjectFileRepository, ProjectCommandRepository) | TypeScript |
 | `src/services/mappers/` | DTO mapper (projectMapper) | TypeScript |
 | `src/types/` | Definisi tipe data global & database types | TypeScript |
 | `src/utils/` | Utility functions (errorHelpers, formatters, statusMapper, responsive, logger) | TypeScript |

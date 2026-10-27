@@ -1,262 +1,292 @@
 import { create } from 'zustand';
-import { projectService, Project, ProjectDetail, ProjectFileType, ProjectStageStatus } from '../services/projectService';
+import type {
+  Project,
+  ProjectDetail,
+  ProjectFileType,
+  ProjectStageStatus,
+} from '../domain/models/project';
+import { projectService } from '../services/projectService';
 import { useAuthStore } from './authStore';
 import { getErrorMessage } from '../utils/errorHelpers';
-import { ProjectStatusEnum } from '../domain/enums/ProjectStatus';
-
-
-interface DashboardStats {
-  total: number;
-  on_progress: number;
-  done: number;
-  pending: number;
-  on_hold: number;
-}
+import {
+  calculateProjectStatistics,
+  ProjectStatistics,
+} from '../domain/models/projectStatistics';
+import type { AuthUser } from '../domain/models/auth';
 
 interface ProjectState {
   projects: Project[];
   selectedProject: ProjectDetail | null;
-  stats: DashboardStats | null;
+  stats: ProjectStatistics | null;
   isLoading: boolean;
   isLoadingDetail: boolean;
   detailRequestId: number;
+  listRequestId: number;
   error: string | null;
 
   fetchProjects: () => Promise<void>;
   fetchProjectDetail: (projectId: string) => Promise<void>;
-  updateStageStatus: (stageId: string, status: ProjectStageStatus) => Promise<void>;
-  addStageUpdate: (stageId: string, description: string, progress: number) => Promise<void>;
-  uploadFile: (projectId: string, stageId: string | null, fileName: string, fileType: ProjectFileType, fileUri?: string) => Promise<void>;
-  createProject: (project: Omit<Project, 'id' | 'created_at' | 'status'>) => Promise<void>;
-  createProjectStage: (projectId: string, title: string, description: string) => Promise<void>;
-  updateProject: (projectId: string, updates: Omit<Project, 'id' | 'created_at' | 'created_by'>) => Promise<void>;
-  updateProjectStage: (stageId: string, updates: { title: string; description: string }) => Promise<void>;
+  updateStageStatus: (
+    stageId: string,
+    status: ProjectStageStatus,
+  ) => Promise<void>;
+  addStageUpdate: (
+    stageId: string,
+    description: string,
+    progress: number,
+  ) => Promise<void>;
+  uploadFile: (
+    projectId: string,
+    stageId: string | null,
+    fileName: string,
+    fileType: ProjectFileType,
+    fileUri?: string,
+  ) => Promise<void>;
+  createProject: (
+    project: Omit<Project, 'id' | 'created_at' | 'status'>,
+  ) => Promise<void>;
+  createProjectStage: (
+    projectId: string,
+    title: string,
+    description: string,
+  ) => Promise<void>;
+  updateProject: (
+    projectId: string,
+    updates: Omit<Project, 'id' | 'created_at' | 'created_by'>,
+  ) => Promise<void>;
+  updateProjectStage: (
+    stageId: string,
+    updates: { title: string; description: string },
+  ) => Promise<void>;
   deleteProject: (projectId: string) => Promise<void>;
   deleteProjectStage: (stageId: string) => Promise<void>;
-  computeStats: () => void;
   clearSelectedProject: () => void;
-  clearError: () => void;
+  resetForSession: () => void;
 }
 
-export const useProjectStore = create<ProjectState>((set, get) => ({
-  projects: [],
-  selectedProject: null,
-  stats: null,
-  isLoading: false,
-  isLoadingDetail: false,
-  detailRequestId: 0,
-  error: null,
+function requireProjectUser() {
+  const user = useAuthStore.getState().user;
+  if (!user)
+    throw new Error('Sesi pengguna tidak ditemukan. Silakan masuk kembali.');
+  return user;
+}
 
-  fetchProjects: async () => {
-    const fetchingUserId = useAuthStore.getState().user?.id;
-    set({ isLoading: true, error: null });
+interface MutationOptions {
+  loading?: 'list' | 'detail';
+  refreshList?: boolean;
+  detailId?: string;
+  clearDetail?: boolean;
+}
+
+export const useProjectStore = create<ProjectState>((set, get) => {
+  let sessionRevision = 0;
+  // A completed request may outlive its screen or the account that started it.
+  const runMutation = async (
+    operation: (user: AuthUser) => Promise<void>,
+    options: MutationOptions = {},
+  ): Promise<void> => {
+    const user = requireProjectUser();
+    const revision = sessionRevision;
+    const detailVersion = get().detailRequestId;
+    const listVersion = get().listRequestId;
+    const initialDetailId = get().selectedProject?.id;
+    const ownsSession = () =>
+      revision === sessionRevision &&
+      useAuthStore.getState().user?.id === user.id;
+    const ownsDetail = () =>
+      !options.detailId ||
+      get().selectedProject?.id === options.detailId ||
+      (!initialDetailId &&
+        !get().selectedProject &&
+        get().detailRequestId === detailVersion);
+    if (options.loading === 'list') set({ isLoading: true, error: null });
+    if (options.loading === 'detail')
+      set({ isLoadingDetail: true, error: null });
     try {
-      const { user } = useAuthStore.getState();
-      const projects = await projectService.getProjects(user?.id, user?.role);
-      if (useAuthStore.getState().user?.id !== fetchingUserId) return;
-      set({ projects, isLoading: false });
-      get().computeStats();
-    } catch (err: unknown) {
-      set({ error: getErrorMessage(err), isLoading: false });
+      await operation(user);
+      if (!ownsSession()) return;
+      if (options.refreshList) await get().fetchProjects();
+      if (!ownsSession()) return;
+      if (options.clearDetail && ownsDetail()) get().clearSelectedProject();
+      else if (options.detailId && ownsDetail())
+        await get().fetchProjectDetail(options.detailId);
+      if (!ownsSession()) return;
+      if (options.loading === 'list' && get().listRequestId === listVersion)
+        set({ isLoading: false });
+      if (
+        options.loading === 'detail' &&
+        get().detailRequestId === detailVersion
+      )
+        set({ isLoadingDetail: false });
+    } catch (error: unknown) {
+      if (ownsSession() && ownsDetail())
+        set({
+          error: getErrorMessage(error),
+          ...(options.loading === 'list' ? { isLoading: false } : {}),
+          ...(options.loading === 'detail' ? { isLoadingDetail: false } : {}),
+        });
+      throw error;
     }
-  },
+  };
+  const selectedDetail = () => get().selectedProject?.id;
+  return {
+    projects: [],
+    selectedProject: null,
+    stats: null,
+    isLoading: false,
+    isLoadingDetail: false,
+    detailRequestId: 0,
+    listRequestId: 0,
+    error: null,
 
-  fetchProjectDetail: async (projectId: string) => {
-    const requestId = get().detailRequestId + 1;
-    const userId = useAuthStore.getState().user?.id;
-    set({ isLoadingDetail: true, selectedProject: null, error: null, detailRequestId: requestId });
-    try {
-      const { user } = useAuthStore.getState();
-      const detail = await projectService.getProjectDetail(projectId, user?.role);
-      if (get().detailRequestId === requestId && useAuthStore.getState().user?.id === userId) {
-        set({ selectedProject: detail, isLoadingDetail: false });
+    fetchProjects: async () => {
+      const requestId = get().listRequestId + 1;
+      const fetchingUserId = useAuthStore.getState().user?.id;
+      set({ isLoading: true, error: null, listRequestId: requestId });
+      try {
+        const { user } = useAuthStore.getState();
+        const projects = await projectService.getProjects(user?.id, user?.role);
+        if (
+          useAuthStore.getState().user?.id !== fetchingUserId ||
+          get().listRequestId !== requestId
+        )
+          return;
+        set({
+          projects,
+          stats: calculateProjectStatistics(projects),
+          isLoading: false,
+        });
+      } catch (err: unknown) {
+        if (
+          useAuthStore.getState().user?.id === fetchingUserId &&
+          get().listRequestId === requestId
+        )
+          set({ error: getErrorMessage(err), isLoading: false });
       }
-    } catch (err: unknown) {
-      if (get().detailRequestId === requestId) {
-        set({ selectedProject: null, error: getErrorMessage(err), isLoadingDetail: false });
+    },
+
+    fetchProjectDetail: async (projectId: string) => {
+      const requestId = get().detailRequestId + 1;
+      const userId = useAuthStore.getState().user?.id;
+      set({
+        isLoadingDetail: true,
+        selectedProject: null,
+        error: null,
+        detailRequestId: requestId,
+      });
+      try {
+        const { user } = useAuthStore.getState();
+        const detail = await projectService.getProjectDetail(
+          projectId,
+          user?.role,
+        );
+        if (
+          get().detailRequestId === requestId &&
+          useAuthStore.getState().user?.id === userId
+        ) {
+          set({ selectedProject: detail, isLoadingDetail: false });
+        }
+      } catch (err: unknown) {
+        if (
+          get().detailRequestId === requestId &&
+          useAuthStore.getState().user?.id === userId
+        ) {
+          set({
+            selectedProject: null,
+            error: getErrorMessage(err),
+            isLoadingDetail: false,
+          });
+        }
       }
-    }
-  },
+    },
 
-  updateStageStatus: async (stageId, status) => {
-    const { user } = useAuthStore.getState();
-    // Melempar, bukan `return` seperti sebelumnya: dengan `return` operasi tidak
-    // terjadi apa-apa tetapi UI tetap melaporkan "berhasil" (promise resolve).
-    if (!user) { throw new Error('Sesi pengguna tidak ditemukan. Silakan masuk kembali.'); }
-    try {
-      await projectService.updateStageStatus(stageId, status, user.id);
-      const { selectedProject } = get();
-      if (selectedProject) {
-        await get().fetchProjectDetail(selectedProject.id);
-      }
-    } catch (err: unknown) {
-      set({ error: getErrorMessage(err) });
-      throw err;
-    }
-  },
+    updateStageStatus: (stageId, status) =>
+      runMutation(
+        user => projectService.updateStageStatus(stageId, status, user.id),
+        { detailId: selectedDetail() },
+      ),
+    addStageUpdate: (stageId, description, progress) =>
+      runMutation(
+        user =>
+          projectService.addStageUpdate(
+            stageId,
+            description,
+            progress,
+            user.id,
+          ),
+        { detailId: selectedDetail() },
+      ),
+    uploadFile: (projectId, stageId, fileName, fileType, fileUri) =>
+      runMutation(
+        user =>
+          projectService.uploadFieldFile(
+            projectId,
+            stageId,
+            fileName,
+            fileType,
+            user.id,
+            fileUri,
+          ),
+        { detailId: selectedDetail() },
+      ),
+    createProject: project =>
+      runMutation(user => projectService.createProject(project, user.id), {
+        loading: 'list',
+        refreshList: true,
+      }),
+    createProjectStage: (projectId, title, description) =>
+      runMutation(
+        user =>
+          projectService.createProjectStage(
+            projectId,
+            title,
+            description,
+            user.id,
+          ),
+        { loading: 'detail', detailId: projectId },
+      ),
+    updateProject: (projectId, updates) =>
+      runMutation(() => projectService.updateProject(projectId, updates), {
+        loading: 'list',
+        refreshList: true,
+        detailId: projectId,
+      }),
+    updateProjectStage: (stageId, updates) =>
+      runMutation(() => projectService.updateProjectStage(stageId, updates), {
+        loading: 'detail',
+        detailId: selectedDetail(),
+      }),
+    deleteProject: projectId =>
+      runMutation(() => projectService.deleteProject(projectId), {
+        loading: 'list',
+        refreshList: true,
+        detailId: projectId,
+        clearDetail: true,
+      }),
+    deleteProjectStage: stageId =>
+      runMutation(() => projectService.deleteProjectStage(stageId), {
+        loading: 'detail',
+        detailId: selectedDetail(),
+      }),
 
-  addStageUpdate: async (stageId, description, progress) => {
-    const { user } = useAuthStore.getState();
-    if (!user) { throw new Error('Sesi pengguna tidak ditemukan. Silakan masuk kembali.'); }
-    try {
-      await projectService.addStageUpdate(stageId, description, progress, user.id);
-      const { selectedProject } = get();
-      if (selectedProject) {
-        await get().fetchProjectDetail(selectedProject.id);
-      }
-    } catch (err: unknown) {
-      set({ error: getErrorMessage(err) });
-      throw err;
-    }
-  },
-
-  uploadFile: async (projectId, stageId, fileName, fileType, fileUri) => {
-    const { user } = useAuthStore.getState();
-    if (!user) { throw new Error('Sesi pengguna tidak ditemukan. Silakan masuk kembali.'); }
-    try {
-      await projectService.uploadFieldFile(projectId, stageId, fileName, fileType, user.id, fileUri);
-      const { selectedProject } = get();
-      if (selectedProject) {
-        await get().fetchProjectDetail(selectedProject.id);
-      }
-    } catch (err: unknown) {
-      set({ error: getErrorMessage(err) });
-      throw err;
-    }
-  },
-
-  createProject: async (project) => {
-    const { user } = useAuthStore.getState();
-    if (!user) { throw new Error('Sesi pengguna tidak ditemukan. Silakan masuk kembali.'); }
-    set({ isLoading: true, error: null });
-    try {
-      await projectService.createProject(project, user.id);
-      await get().fetchProjects();
-    } catch (err: unknown) {
-      set({ error: getErrorMessage(err), isLoading: false });
-      throw err;
-    }
-  },
-
-  createProjectStage: async (projectId, title, description) => {
-    const { user } = useAuthStore.getState();
-    if (!user) { throw new Error('Sesi pengguna tidak ditemukan. Silakan masuk kembali.'); }
-    set({ isLoadingDetail: true, error: null });
-    try {
-      await projectService.createProjectStage(projectId, title, description, user.id);
-      await get().fetchProjectDetail(projectId);
-    } catch (err: unknown) {
-      set({ error: getErrorMessage(err), isLoadingDetail: false });
-      throw err;
-    }
-  },
-
-  updateProject: async (projectId, updates) => {
-    const { user } = useAuthStore.getState();
-    if (!user) { throw new Error('Sesi pengguna tidak ditemukan. Silakan masuk kembali.'); }
-    set({ isLoading: true, error: null });
-    try {
-      await projectService.updateProject(projectId, updates, user.id);
-      await get().fetchProjects();
-      await get().fetchProjectDetail(projectId);
-    } catch (err: unknown) {
-      set({ error: getErrorMessage(err), isLoading: false });
-      throw err;
-    }
-  },
-
-  updateProjectStage: async (stageId, updates) => {
-    const { user } = useAuthStore.getState();
-    if (!user) { throw new Error('Sesi pengguna tidak ditemukan. Silakan masuk kembali.'); }
-    set({ isLoadingDetail: true, error: null });
-    try {
-      await projectService.updateProjectStage(stageId, updates, user.id);
-      const { selectedProject } = get();
-      if (selectedProject) {
-        await get().fetchProjectDetail(selectedProject.id);
-      }
-    } catch (err: unknown) {
-      set({ error: getErrorMessage(err), isLoadingDetail: false });
-      throw err;
-    }
-  },
-
-  deleteProject: async (projectId) => {
-    const { user } = useAuthStore.getState();
-    if (!user) { throw new Error('Sesi pengguna tidak ditemukan. Silakan masuk kembali.'); }
-    set({ isLoading: true, error: null });
-    try {
-      await projectService.deleteProject(projectId);
-      await get().fetchProjects();
-      set({ selectedProject: null, isLoading: false });
-    } catch (err: unknown) {
-      set({ error: getErrorMessage(err), isLoading: false });
-      throw err;
-    }
-  },
-
-  deleteProjectStage: async (stageId) => {
-    const { user } = useAuthStore.getState();
-    if (!user) { throw new Error('Sesi pengguna tidak ditemukan. Silakan masuk kembali.'); }
-    set({ isLoadingDetail: true, error: null });
-    try {
-      await projectService.deleteProjectStage(stageId);
-      const { selectedProject } = get();
-      if (selectedProject) {
-        await get().fetchProjectDetail(selectedProject.id);
-      }
-    } catch (err: unknown) {
-      set({ error: getErrorMessage(err), isLoadingDetail: false });
-      throw err;
-    }
-  },
-
-  computeStats: () => {
-    const { projects } = get();
-    const stats = projects.reduce<DashboardStats>(
-      (acc, p) => {
-        acc.total++;
-        if (p.status === ProjectStatusEnum.ON_PROGRESS) acc.on_progress++;
-        else if (p.status === ProjectStatusEnum.DONE) acc.done++;
-        else if (p.status === ProjectStatusEnum.PENDING) acc.pending++;
-        else if (p.status === ProjectStatusEnum.ON_HOLD) acc.on_hold++;
-        return acc;
-      },
-      { total: 0, on_progress: 0, done: 0, pending: 0, on_hold: 0 }
-    );
-    set({ stats });
-  },
-
-  clearSelectedProject: () => set({ selectedProject: null, isLoadingDetail: false, detailRequestId: get().detailRequestId + 1 }),
-  clearError: () => set({ error: null }),
-}));
-
-
-export const useProjectList = () => useProjectStore(state => state.projects);
-
-export const useProjectDetail = () => useProjectStore(state => state.selectedProject);
-
-export const useProjectListLoading = () => useProjectStore(state => state.isLoading);
-
-export const useProjectDetailLoading = () => useProjectStore(state => state.isLoadingDetail);
-
-export const useProjectError = () => useProjectStore(state => state.error);
-
-export const useProjectStats = () => useProjectStore(state => state.stats);
-
-export const useProjectActions = () => useProjectStore(state => ({
-  fetchProjects: state.fetchProjects,
-  fetchProjectDetail: state.fetchProjectDetail,
-  updateStageStatus: state.updateStageStatus,
-  addStageUpdate: state.addStageUpdate,
-  uploadFile: state.uploadFile,
-  createProject: state.createProject,
-  createProjectStage: state.createProjectStage,
-  updateProject: state.updateProject,
-  updateProjectStage: state.updateProjectStage,
-  deleteProject: state.deleteProject,
-  deleteProjectStage: state.deleteProjectStage,
-  computeStats: state.computeStats,
-  clearSelectedProject: state.clearSelectedProject,
-  clearError: state.clearError,
-}));
+    resetForSession: () => {
+      sessionRevision++;
+      set({
+        projects: [],
+        selectedProject: null,
+        stats: null,
+        error: null,
+        isLoading: false,
+        isLoadingDetail: false,
+        listRequestId: get().listRequestId + 1,
+        detailRequestId: get().detailRequestId + 1,
+      });
+    },
+    clearSelectedProject: () =>
+      set({
+        selectedProject: null,
+        isLoadingDetail: false,
+        detailRequestId: get().detailRequestId + 1,
+      }),
+  };
+});

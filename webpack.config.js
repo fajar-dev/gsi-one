@@ -12,7 +12,7 @@ const compileNodeModules = [
   '@react-navigation/elements',
   '@react-navigation/bottom-tabs',
   '@react-native-async-storage/async-storage',
-  '@react-native-community/datetimepicker'
+  '@react-native-community/datetimepicker',
 ].map(moduleName => path.resolve(appDirectory, `node_modules/${moduleName}`));
 
 const appBabelConfiguration = {
@@ -21,7 +21,7 @@ const appBabelConfiguration = {
     path.resolve(appDirectory, 'index.js'),
     path.resolve(appDirectory, 'App.tsx'),
     path.resolve(appDirectory, 'src'),
-    path.resolve(appDirectory, 'assets')
+    path.resolve(appDirectory, 'assets'),
   ],
   use: {
     loader: 'babel-loader',
@@ -31,7 +31,7 @@ const appBabelConfiguration = {
       configFile: false,
       presets: [
         'module:@react-native/babel-preset',
-        ['@babel/preset-env', { modules: false, loose: true }]
+        ['@babel/preset-env', { modules: false, loose: true }],
       ],
       plugins: [
         'react-native-web',
@@ -42,11 +42,11 @@ const appBabelConfiguration = {
             path: '.env',
             safe: false,
             allowUndefined: true,
-          }
-        ]
-      ]
-    }
-  }
+          },
+        ],
+      ],
+    },
+  },
 };
 
 const dependencyBabelConfiguration = {
@@ -61,93 +61,112 @@ const dependencyBabelConfiguration = {
       presets: [
         ['@babel/preset-env', { modules: false, loose: true }],
         '@babel/preset-flow',
-        '@babel/preset-react'
+        '@babel/preset-react',
       ],
       plugins: [
         'react-native-web',
         '@babel/plugin-transform-flow-strip-types',
         ['@babel/plugin-transform-class-properties', { loose: true }],
         ['@babel/plugin-transform-private-methods', { loose: true }],
-        ['@babel/plugin-transform-private-property-in-object', { loose: true }]
-      ]
-    }
-  }
+        ['@babel/plugin-transform-private-property-in-object', { loose: true }],
+      ],
+    },
+  },
 };
 
 const imageLoaderConfiguration = {
   test: /\.(gif|jpe?g|png|svg|webp)$/,
-  use: {
-    loader: 'url-loader',
-    options: {
-      name: '[name].[ext]',
-      esModule: false,
-    }
-  }
+  type: 'asset',
+  parser: { dataUrlCondition: { maxSize: 8192 } },
+  generator: { filename: 'assets/[name].[contenthash:8][ext]' },
 };
 
-module.exports = {
-  entry: [
-    path.join(appDirectory, 'index.js')
-  ],
+module.exports = (_env, argv = {}) => {
+  const isProduction =
+    argv.mode === 'production' || process.env.NODE_ENV === 'production';
+  return {
+    entry: [path.join(appDirectory, 'index.js')],
 
-  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+    mode: isProduction ? 'production' : 'development',
 
-  output: {
-    path: path.resolve(appDirectory, 'dist'),
-    filename: 'bundle.js',
-    publicPath: '/'
-  },
-
-  module: {
-    rules: [
-      appBabelConfiguration,
-      dependencyBabelConfiguration,
-      imageLoaderConfiguration,
-      {
-        test: /\.html$/,
-        use: ['html-loader']
-      },
-      {
-        test: /\.m?js/,
-        resolve: {
-          fullySpecified: false
-        }
-      }
-    ]
-  },
-
-  resolve: {
-    alias: {
-      'react-native$': 'react-native-web',
-      'react-native-webview$': 'react-native-web-webview',
-      'react-native-linear-gradient$': path.resolve(appDirectory, 'src/config/LinearGradientMock.tsx'),
-      'react-native-image-picker$': path.resolve(appDirectory, 'src/config/web/ImagePickerWeb.ts'),
-      '@react-native-documents/picker$': path.resolve(appDirectory, 'src/config/web/DocumentPickerWeb.ts'),
-      '@env$': path.resolve(appDirectory, 'src/config/web/EnvWeb.ts')
+    output: {
+      path: path.resolve(appDirectory, 'dist'),
+      filename: 'bundle.js',
+      publicPath: '/',
     },
-    mainFields: ['browser', 'module', 'main'],
-    extensions: ['.web.js', '.web.tsx', '.web.ts', '.js', '.jsx', '.ts', '.tsx']
-  },
 
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: path.join(appDirectory, 'index.html'),
-      inject: true
-    }),
-    new webpack.DefinePlugin({
-      __DEV__: JSON.stringify(process.env.NODE_ENV !== 'production')
-    })
-  ],
+    module: {
+      rules: [
+        appBabelConfiguration,
+        dependencyBabelConfiguration,
+        imageLoaderConfiguration,
+        {
+          test: /\.ttf$/,
+          type: 'asset/resource',
+          generator: { filename: 'assets/[name].[contenthash:8][ext]' },
+        },
+        {
+          test: /\.html$/,
+          use: ['html-loader'],
+        },
+        {
+          test: /\.m?js/,
+          resolve: {
+            fullySpecified: false,
+          },
+        },
+      ],
+    },
 
-  devServer: {
-    historyApiFallback: true,
-    port: 8080,
-    hot: true,
-    client: {
-      overlay: {
-        errors: true,
-        warnings: false
-      }
-    }
-  }
+    resolve: {
+      alias: {
+        'react-native$': 'react-native-web',
+        'react-native-webview$': 'react-native-web-webview',
+        'react-native-linear-gradient$': path.resolve(
+          appDirectory,
+          'src/platform/web/LinearGradient.tsx',
+        ),
+        'react-native-image-picker$': path.resolve(
+          appDirectory,
+          'src/platform/web/ImagePicker.ts',
+        ),
+        '@react-native-documents/picker$': path.resolve(
+          appDirectory,
+          'src/platform/web/DocumentPicker.ts',
+        ),
+      },
+      mainFields: ['browser', 'module', 'main'],
+      extensions: [
+        '.web.js',
+        '.web.tsx',
+        '.web.ts',
+        '.js',
+        '.jsx',
+        '.ts',
+        '.tsx',
+      ],
+    },
+
+    plugins: [
+      new HtmlWebpackPlugin({
+        template: path.join(appDirectory, 'index.html'),
+        inject: true,
+      }),
+      new webpack.DefinePlugin({
+        __DEV__: JSON.stringify(!isProduction),
+      }),
+    ],
+
+    devServer: {
+      historyApiFallback: true,
+      port: 8080,
+      hot: true,
+      client: {
+        overlay: {
+          errors: true,
+          warnings: false,
+        },
+      },
+    },
+  };
 };

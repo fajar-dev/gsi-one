@@ -55,68 +55,46 @@ Aplikasi dibangun menganut pola **Clean Architecture & Layered Domain Design (OO
 
 ### Lapisan Utama Codebase:
 1. **Domain Layer (`src/domain/`)**:
-   - Mengandalkan kelas OOP Domain Entity (`ProjectEntity.ts`, `SurveyRequestEntity.ts`) dan Value Objects (`ProjectStatus.ts`, `UserRole.ts`).
-   - Menyediakan metode logika bisnis terisolasi (misal: `getProgressPercentage()`, `isOverdue()`, `getFormattedBudget()`).
+   - Menyediakan model bertipe, `SurveyRequestEntity.ts`, status, peran, dan validasi.
+   - Perhitungan progres berada di `domain/models/projectProgress.ts`, statistik di `domain/models/projectStatistics.ts`, dan format tampilan di `utils/formatters.ts`.
 
-2. **Repository Pattern (`src/services/repositories/`)**:
-   - `SupabaseProjectRepository.ts` berlaku sebagai façade yang mendelegasikan kueri spesifik ke sub-repository (`sub/ProjectQueryRepository.ts`, `sub/ProjectStageRepository.ts`, `sub/ProjectFileRepository.ts`, `sub/ProjectCommandRepository.ts`).
+2. **Repository Pattern (`src/infrastructure/supabase/`)**:
+   - `SupabaseProjectRepository.ts` berlaku sebagai façade yang mendelegasikan kueri spesifik ke sub-repository (`projects/ProjectQueryRepository.ts`, `projects/ProjectStageRepository.ts`, `projects/ProjectFileRepository.ts`, `projects/ProjectCommandRepository.ts`).
    - Data Transfer Object (DTO) dari database dipetakan secara terpusat oleh `projectMapper.ts`.
 
 3. **Custom Hooks Isolation (`src/hooks/`)**:
    - Memisahkan logika state UI dari komponen presentasi. Contoh: `useProjectDetail`, `useSurveyRequests`, `useProfile`, `useEditProjectForm`, `useProjectRealtime`.
 
-4. **Design Token & Dynamic Theme (`assets/styles/` & `src/theme/`)**:
-   - Sistem warna terpusat di `assets/styles/Colors.tsx`.
+4. **Design Token & Dynamic Theme (`src/theme/`)**:
+   - Sistem warna terpusat di `src/theme/colors.ts`.
    - Resolusi tema warna dinamis per-role dikelola via `useRoleTheme()`.
 
 ---
 
 ## 3. Struktur Direktori Repository
 
-Berikut peta navigasi direktori proyek:
-
-```
-d:\GSI One - Copy\
-├── __tests__/               -- Automated Unit Test Suites (Jest)
-├── assets/                  -- Image assets, icons, dan Design Tokens (Colors.tsx)
-├── supabase/                -- Migrasi, seed, dan Edge Functions
-├── docs/                    -- Dokumentasi teknis lengkap & generator dokumen HTML
-├── src/
-│   ├── components/          -- Shared UI components (ScreenHeader, SupportCard, SkeletonBox, dll)
-│   ├── config/              -- Supabase client config & API base URL
-│   ├── domain/              -- OOP Domain Entities & Value Objects
-│   ├── hooks/               -- React Custom Hooks
-│   ├── navigation/          -- React Navigation (Auth Stack & Bottom Tabs)
-│   ├── screens/             -- Tampilan Layar Utama (BookSurvey, Dashboard, Login, Profile, Projects, Services, Structures)
-│   ├── services/            -- Service Layer & Sub-Repositories
-│   ├── store/               -- State Management (authStore, projectStore, notificationStore)
-│   ├── types/               -- Definitions & Database Types
-│   └── utils/               -- Centralized helper functions (errorHelpers, formatters, responsive, projectHelpers)
-├── App.tsx                  -- Entry Point Aplikasi Mobile
-├── CODEBASE_MAP.md          -- Peta rinci per file dan modul
-└── package.json             -- Manifes dependensi & npm scripts
-```
+Peta direktori terkini tersedia di [CODEBASE_MAP.md](CODEBASE_MAP.md). Domain, implementasi Supabase, UI, theme, adapter browser, dan mock pengujian dipisah sesuai tanggung jawab.
 
 ---
 
 ## 4. Persiapan Lingkungan Pengembangan (Getting Started)
 
 ### Prasyarat Environment
-- **Node.js**: `v20.x` atau lebih baru
+- **Node.js**: `24.x` (lihat `.nvmrc`), minimum 22.15.0
 - **Java Development Kit (JDK)**: OpenJDK 17
-- **Android Studio & SDK**: Android SDK Platform 34 / API 35, Build Tools, NDK
+- **Android Studio & SDK**: Android SDK Platform 36, Build Tools 36.0.0, NDK 27.1.12297006
 - **React Native CLI**: `@react-native-community/cli`
 
 ### Langkah Pengoperasian Pertama
 
 1. **Kloning / Navigasi ke Folder Proyek**:
    ```powershell
-   cd "d:\GSI One - Copy"
+   cd gsi-one
    ```
 
 2. **Instalasi Dependensi**:
    ```powershell
-   npm install
+   npm ci
    ```
 
 3. **Pengaturan Berkas Konfigurasi (`.env`)**:
@@ -148,15 +126,15 @@ Data aplikasi berada di PostgreSQL Supabase. Tabel utama: `users`, `projects`, `
 - Login memakai Supabase Auth; pembuatan akun oleh admin melalui `supabase/functions/admin-create-user/`.
 - `supabase/seed.sql` berisi data demo mandiri dan tidak menghapus data.
 - Detail proyek berlangganan perubahan proyek, tahapan, serta catatan melalui `useProjectRealtime`.
-- Upload mengirim data langsung ke bucket `projects` dan menyimpan metadata di PostgreSQL. Migrasi terbaru memakai bucket publik; UI membuka URL tersimpan.
-- Notifikasi booking dibuat trigger database. Pemanggilan notifikasi dari client merupakan no-op.
+- Upload mengirim data langsung ke bucket `projects` dan menyimpan metadata di PostgreSQL. Bucket `projects` privat; UI membuka signed URL sementara.
+- Notifikasi booking dan aktivitas proyek dibuat trigger database; API pembuatan notifikasi dari client telah dihapus.
 
 Lihat [spesifikasi API](docs/03_Architecture_Design/API_SPECIFICATION_Full.md) untuk kontrak aktif. RLS dapat memberi akses staf yang lebih luas daripada kontrol UI; uji kedua lapisan saat mengubah hak akses.
 
 
 ## 6. Standar Penulisan Kode & Konvensi (Coding Standards)
 
-Untuk menjaga skor kualitas codebase tetap di **Grade A**:
+Untuk menjaga quality gate proyek:
 
 1. **Strict TypeScript (Tanpa Casting `any`)**:
    - Semua respons database harus menggunakan pemetaan dari `src/types/database.types.ts` atau DTO eksplisit.
@@ -165,14 +143,14 @@ Untuk menjaga skor kualitas codebase tetap di **Grade A**:
 2. **Centralized Helpers (Jangan Membuat Logika Duplikat)**:
    - Pengolahan pesan error: Gunakan `getErrorMessage(error, fallback)` dari `src/utils/errorHelpers.ts`.
    - Pemformatan tanggal & mata uang: Gunakan `formatDateDisplay()`, `formatDateDb()`, `formatCurrency()` dari `src/utils/formatters.ts`.
-   - Layout responsif: Gunakan `scale()`, `fontScale()`, `wp()`, `hp()` dari `src/utils/responsive.ts`.
+   - Layout responsif: Gunakan `scale()`, `fontScale()`, serta token layout dari `src/utils/responsive.ts`.
 
 3. **Isolasi Repository**:
    - Jangan pernah melakukan kueri `supabase.from(...)` langsung di dalam komponen UI (`src/screens/` atau `src/components/`).
    - Selalu gunakan `SupabaseProjectRepository` atau custom hook pengelola.
 
 4. **Manajemen Tema Warna**:
-   - Selalu gunakan `useRoleTheme()` atau token dari `assets/styles/Colors.tsx` agar tampilan konsisten saat berganti akun role.
+   - Selalu gunakan `useRoleTheme()` atau token dari `src/theme/colors.ts` agar tampilan konsisten saat berganti akun role.
 
 ---
 
@@ -180,16 +158,13 @@ Untuk menjaga skor kualitas codebase tetap di **Grade A**:
 
 ### 1. Pengecekan Tipe & Linter (Harus Clean sebelum Commit)
 ```powershell
-# Type checking
-npm run typecheck
-
-# Code Linting
-npm run lint
+# Arsitektur, graf modul, tipe, lint, format, dan test
+npm run check
 ```
 
 ### 2. Menjalankan Unit Test (Jest)
 ```powershell
-# Menjalankan seluruh test suite (59+ tests)
+# Menjalankan seluruh test suite
 npm test
 
 # Menjalankan test dengan laporan cakupan (coverage)
@@ -234,7 +209,7 @@ Dokumentasi proyek lainnya yang tersedia di codebase:
 - **`README.md`**: Ringkasan umum proyek dan panduan pengoperasian cepat.
 - **`CODEBASE_MAP.md`**: Detail pemetaan menyeluruh setiap file dan modul.
 - **`CHANGELOG.md`**: Riwayat perubahan versi aplikasi.
-- **`AGENT_HANDOFF.md`**: Catatan sesi pekerjaan dan perbaikan bug terkini.
+- **`audit/`**: Bukti pemeriksaan dan keterbatasan pengujian per sesi.
 - **`docs/`**: Dokumentasi sistem formal (SDLC, SRS, Architecture Document, Administrator & User Manual).
 
 ---

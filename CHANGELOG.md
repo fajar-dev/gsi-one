@@ -2,6 +2,14 @@
 
 Semua perubahan dan pembaruan pada proyek GSI One Mobile dicatat di berkas ini.
 
+## [3.1.0] - 2026-10-27
+
+- Merapikan batas domain, service, dan repository Supabase serta menghapus kode dan style tidak terpakai.
+- Memperbaiki isolasi sesi, mutasi proyek, konkurensi notifikasi, dan validasi penyimpanan klaim survei.
+- Menyempurnakan padding tombol, layout formulir, dan lebar maksimum versi web.
+- Menambahkan pemeriksaan modul tidak terjangkau/siklus impor dan memperluas pengujian regresi.
+- Menyamakan versi Android, iOS, package, dan tampilan profil ke 3.1.0; nomor build native 12.
+
 ## 26 Oktober 2026
 
 - Menghapus layanan server aplikasi terpisah dan seluruh konfigurasi endpoint yang tidak digunakan.

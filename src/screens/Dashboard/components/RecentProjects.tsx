@@ -1,9 +1,11 @@
-import React, { JSX } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { ActionButton } from '../../../components/ui/ActionButton';
+import { spacing, typography } from '../../../theme/tokens';
+import { JSX } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { AuthenticatedNavigationProp } from '../../../types/navigation';
-import { Project } from '../../../services/projectService';
-import { colors, neutral } from '../../../../assets/styles/Colors';
+import type { Project } from '../../../domain/models/project';
+import { colors, neutral } from '../../../theme/colors';
 import { scale, fontScale } from '../../../utils/responsive';
 import ProjectPreviewCard from './ProjectPreviewCard';
 
@@ -13,7 +15,11 @@ interface RecentProjectsProps {
   accentColor?: string;
 }
 
-function RecentProjects({ projects, isLoading, accentColor = colors.primary }: RecentProjectsProps): JSX.Element {
+function RecentProjects({
+  projects,
+  isLoading,
+  accentColor = colors.primary,
+}: RecentProjectsProps): JSX.Element {
   const navigation = useNavigation<AuthenticatedNavigationProp>();
   const recentProjects = projects.slice(0, 3);
 
@@ -21,9 +27,14 @@ function RecentProjects({ projects, isLoading, accentColor = colors.primary }: R
     <View>
       <View style={styles.headerRow}>
         <Text style={styles.sectionTitle}>Proyek Terbaru</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Projects')}>
-          <Text style={[styles.seeAll, { color: accentColor }]}>Lihat Semua</Text>
-        </TouchableOpacity>
+        <ActionButton
+          onPress={() => navigation.navigate('Projects')}
+          accessibilityRole="button"
+        >
+          <Text style={[styles.seeAll, { color: accentColor }]}>
+            Lihat Semua
+          </Text>
+        </ActionButton>
       </View>
 
       {recentProjects.length === 0 && !isLoading ? (
@@ -33,10 +44,12 @@ function RecentProjects({ projects, isLoading, accentColor = colors.primary }: R
           <ProjectPreviewCard
             key={project.id}
             project={project}
-            onPress={() => navigation.navigate('ProjectDetail', {
-              projectId: project.id,
-              projectName: project.project_name,
-            })}
+            onPress={() =>
+              navigation.navigate('ProjectDetail', {
+                projectId: project.id,
+                projectName: project.project_name,
+              })
+            }
           />
         ))
       )}
@@ -49,11 +62,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: scale(20),
-    marginBottom: scale(12),
+    marginTop: scale(spacing.xl),
+    marginBottom: scale(spacing.md),
   },
   sectionTitle: {
-    fontSize: fontScale(16),
+    fontSize: fontScale(typography.bodyLarge),
     fontWeight: '800',
     color: neutral[900],
   },
@@ -62,10 +75,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   emptyText: {
-    fontSize: fontScale(14),
+    fontSize: fontScale(typography.body),
     color: neutral[600],
     textAlign: 'center',
-    marginVertical: scale(20),
+    marginVertical: scale(spacing.xl),
   },
 });
 

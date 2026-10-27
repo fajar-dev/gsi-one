@@ -1,19 +1,28 @@
-import { Dimensions } from 'react-native';
+import { Dimensions, Platform } from 'react-native';
+import { layout } from '../theme/tokens';
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const screen = Dimensions.get('window');
+const contentWidth = (width: number): number =>
+  Platform.OS === 'web' ? Math.min(width, layout.webMaxWidth) : width;
+const SCREEN_WIDTH = contentWidth(screen.width);
 
 const BASE_WIDTH = 390;
 
 export const scale = (size: number): number =>
-    Math.round((SCREEN_WIDTH / BASE_WIDTH) * size);
+  Math.round(
+    Math.min(contentWidth(Dimensions.get('window').width) / BASE_WIDTH, 1.25) *
+      size,
+  );
 
 export const fontScale = (size: number): number =>
-    Math.round(Math.min((SCREEN_WIDTH / BASE_WIDTH) * size, size * 1.3));
+  Math.round(
+    Math.max(
+      12,
+      Math.min(
+        (contentWidth(Dimensions.get('window').width) / BASE_WIDTH) * size,
+        size * 1.15,
+      ),
+    ),
+  );
 
-export const wp = (percentage: number): number =>
-    Math.round((SCREEN_WIDTH * percentage) / 100);
-
-export const hp = (percentage: number): number =>
-    Math.round((SCREEN_HEIGHT * percentage) / 100);
-
-export { SCREEN_WIDTH, SCREEN_HEIGHT };
+export { SCREEN_WIDTH };

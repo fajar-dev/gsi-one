@@ -1,41 +1,79 @@
-import { useAuthStore, invalidateAuthInitialization } from '../../src/store/authStore';
-import { supabase } from '../../src/config/supabase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  useAuthStore,
+  invalidateAuthInitialization,
+} from '../../src/store/authStore';
+import { authService } from '../../src/services/authService';
 
-jest.mock('../../src/config/supabase', () => ({ supabase: { auth: { getSession: jest.fn() }, from: jest.fn() } }));
-jest.mock('../../src/services/authService', () => ({ authService: {}, normalizeAuthRole: (role: string) => role }));
-
-const session = (id: string) => ({ data: { session: { user: { id, email: `${id}@example.com` }, access_token: id } } });
-const profile = (name: string) => ({ data: { name, role: 'client' }, error: null });
+jest.mock('../../src/services/authService', () => ({
+  authService: { restoreSession: jest.fn() },
+}));
+const session = (id: string) => ({
+  userId: id,
+  token: id,
+  profileUnavailable: false,
+  user: {
+    id,
+    email: `${id}@example.com`,
+    full_name: id,
+    role: 'client' as const,
+  },
+});
 describe('auth initialization race protection', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
+    await AsyncStorage.clear();
     invalidateAuthInitialization();
     useAuthStore.setState({ user: null, token: null, isInitialized: false });
   });
   it('ignores an old profile after a newer session has initialized', async () => {
     let resolveOld!: (value: unknown) => void;
-    const oldProfile = new Promise(resolve => { resolveOld = resolve; });
-    (supabase.auth.getSession as jest.Mock).mockResolvedValueOnce(session('old')).mockResolvedValueOnce(session('new'));
-    const maybeSingle = jest.fn().mockReturnValueOnce(oldProfile).mockResolvedValueOnce(profile('New Client'));
-    (supabase.from as jest.Mock).mockReturnValue({ select: () => ({ eq: () => ({ maybeSingle }) }) });
+    (authService.restoreSession as jest.Mock)
+      .mockReturnValueOnce(
+        new Promise(resolve => {
+          resolveOld = resolve;
+        }),
+      )
+      .mockResolvedValueOnce(session('new'));
     const old = useAuthStore.getState().initialize();
-    await Promise.resolve();
     await useAuthStore.getState().initialize();
-    resolveOld(profile('Old Client'));
+    resolveOld(session('old'));
     await old;
     expect(useAuthStore.getState().user?.id).toBe('new');
   });
-  it('does not restore a profile after the signed-out event invalidates initialization', async () => {
+  it('does not restore a profile after signed-out invalidates initialization', async () => {
     let resolveProfile!: (value: unknown) => void;
-    (supabase.auth.getSession as jest.Mock).mockResolvedValue(session('old'));
-    (supabase.from as jest.Mock).mockReturnValue({ select: () => ({ eq: () => ({ maybeSingle: () => new Promise(resolve => { resolveProfile = resolve; }) }) }) });
+    (authService.restoreSession as jest.Mock).mockReturnValue(
+      new Promise(resolve => {
+        resolveProfile = resolve;
+      }),
+    );
     const pending = useAuthStore.getState().initialize();
-    await Promise.resolve();
     invalidateAuthInitialization();
     useAuthStore.setState({ user: null, token: null });
-    resolveProfile(profile('Old Client'));
+    resolveProfile(session('old'));
     await pending;
     expect(useAuthStore.getState().user).toBeNull();
     expect(useAuthStore.getState().token).toBeNull();
+  });
+  it('uses a cached profile only for the same authenticated user when the profile query fails', async () => {
+    await AsyncStorage.setItem(
+      'auth_user',
+      JSON.stringify(session('known').user),
+    );
+    (authService.restoreSession as jest.Mock).mockResolvedValue({
+      ...session('known'),
+      user: null,
+      profileUnavailable: true,
+    });
+    await useAuthStore.getState().initialize();
+    expect(useAuthStore.getState().user?.id).toBe('known');
+    (authService.restoreSession as jest.Mock).mockResolvedValue({
+      ...session('other'),
+      user: null,
+      profileUnavailable: true,
+    });
+    await useAuthStore.getState().initialize();
+    expect(useAuthStore.getState().user).toBeNull();
   });
 });

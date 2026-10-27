@@ -1,4 +1,8 @@
-import { UserRoleEnum, isInternalRole, canEditProjectRole } from '../../src/domain/enums/UserRole';
+import {
+  UserRoleEnum,
+  isInternalRole,
+  canEditProjectRole,
+} from '../../src/domain/enums/UserRole';
 
 describe('UserRole Enum & Helpers', () => {
   describe('UserRoleEnum values', () => {

@@ -1,14 +1,27 @@
+import { ActionButton } from '../../../components/ui/ActionButton';
+import {
+  buttonMetrics,
+  palette,
+  touchTarget,
+  radius,
+  spacing,
+  typography,
+} from '../../../theme/tokens';
 import React, { useState } from 'react';
 import {
-  Modal, View, Text, TextInput, TouchableOpacity,
-  StyleSheet, ActivityIndicator, Pressable, Alert
+  Modal,
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  ActivityIndicator,
+  Pressable,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
-import { colors } from '../../../../assets/styles/Colors';
+import { colors } from '../../../theme/colors';
 import { scale, fontScale } from '../../../utils/responsive';
 import { useAuthStore } from '../../../store/authStore';
-import { supabase } from '../../../config/supabase';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface EditProfileModalProps {
   visible: boolean;
@@ -16,7 +29,7 @@ interface EditProfileModalProps {
 }
 
 export function EditProfileModal({ visible, onClose }: EditProfileModalProps) {
-  const { user, sendPasswordReset } = useAuthStore();
+  const { user, sendPasswordReset, updateProfileName } = useAuthStore();
   const [fullName, setFullName] = useState(user?.full_name || '');
   const [isSaving, setIsSaving] = useState(false);
 
@@ -34,31 +47,13 @@ export function EditProfileModal({ visible, onClose }: EditProfileModalProps) {
 
     setIsSaving(true);
     try {
-      if (user?.id) {
-        const newName = fullName.trim();
-        const { error } = await supabase
-          .from('users')
-          .update({ name: newName })
-          .eq('id', user.id);
-
-        if (error) {
-          throw new Error(error.message);
-        }
-
-        const store = useAuthStore.getState();
-        if (store.user) {
-          const updatedUser = { ...store.user, full_name: newName };
-          await AsyncStorage.setItem('auth_user', JSON.stringify(updatedUser));
-          useAuthStore.setState({
-            user: updatedUser,
-          });
-        }
-      }
+      await updateProfileName(fullName);
 
       Alert.alert('Sukses', 'Nama profil berhasil diperbarui');
       onClose();
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Gagal memperbarui profil';
+      const message =
+        err instanceof Error ? err.message : 'Gagal memperbarui profil';
       Alert.alert('Error', message);
     } finally {
       setIsSaving(false);
@@ -70,9 +65,15 @@ export function EditProfileModal({ visible, onClose }: EditProfileModalProps) {
     setIsSaving(true);
     try {
       await sendPasswordReset(user.email);
-      Alert.alert('Email Terkirim', `Tautan reset password telah dikirimkan ke email ${user.email}`);
+      Alert.alert(
+        'Email Terkirim',
+        `Tautan reset password telah dikirimkan ke email ${user.email}`,
+      );
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Gagal mengirim email reset password';
+      const message =
+        err instanceof Error
+          ? err.message
+          : 'Gagal mengirim email reset password';
       Alert.alert('Error', message);
     } finally {
       setIsSaving(false);
@@ -80,14 +81,27 @@ export function EditProfileModal({ visible, onClose }: EditProfileModalProps) {
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable style={styles.overlay} onPress={onClose}>
-        <Pressable style={styles.content} onPress={() => {}}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
+      <Pressable style={styles.overlay} onPress={onClose} accessible={false}>
+        <Pressable
+          style={styles.content}
+          onPress={event => event.stopPropagation()}
+          accessible={false}
+        >
           <View style={styles.header}>
             <Text style={styles.title}>Edit Profil Pengguna</Text>
-            <TouchableOpacity onPress={onClose}>
+            <ActionButton
+              onPress={onClose}
+              accessibilityRole="button"
+              accessibilityLabel="Tutup"
+            >
               <Icon name="x" size={20} color={colors.grey} />
-            </TouchableOpacity>
+            </ActionButton>
           </View>
 
           <Text style={styles.label}>Nama Lengkap</Text>
@@ -97,22 +111,38 @@ export function EditProfileModal({ visible, onClose }: EditProfileModalProps) {
             onChangeText={setFullName}
             placeholder="Masukkan nama lengkap"
             placeholderTextColor={colors.grey}
+            accessibilityLabel="Masukkan nama lengkap"
           />
 
-          <TouchableOpacity style={styles.saveBtn} onPress={handleUpdateName} disabled={isSaving}>
+          <ActionButton
+            style={styles.saveBtn}
+            onPress={handleUpdateName}
+            disabled={isSaving}
+            accessibilityRole="button"
+          >
             {isSaving ? (
-              <ActivityIndicator color="#FFF" />
+              <ActivityIndicator color={palette.white} />
             ) : (
               <Text style={styles.saveBtnText}>Simpan Perubahan</Text>
             )}
-          </TouchableOpacity>
+          </ActionButton>
 
           <View style={styles.divider} />
 
-          <TouchableOpacity style={styles.resetBtn} onPress={handleResetPassword} disabled={isSaving}>
-            <Icon name="key" size={16} color="#0F9F67" style={{ marginRight: 6 }} />
+          <ActionButton
+            style={styles.resetBtn}
+            onPress={handleResetPassword}
+            disabled={isSaving}
+            accessibilityRole="button"
+          >
+            <Icon
+              name="key"
+              size={16}
+              color={palette.brand}
+              style={styles.staticStyle1}
+            />
             <Text style={styles.resetBtnText}>Kirim Email Reset Password</Text>
-          </TouchableOpacity>
+          </ActionButton>
         </Pressable>
       </Pressable>
     </Modal>
@@ -120,6 +150,8 @@ export function EditProfileModal({ visible, onClose }: EditProfileModalProps) {
 }
 
 const styles = StyleSheet.create({
+  staticStyle1: { marginRight: 6 },
+
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
@@ -128,18 +160,18 @@ const styles = StyleSheet.create({
   },
   content: {
     width: '88%',
-    backgroundColor: '#FFF',
-    borderRadius: scale(16),
-    padding: scale(20),
+    backgroundColor: palette.white,
+    borderRadius: scale(radius.lg),
+    padding: scale(spacing.xl),
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: scale(16),
+    marginBottom: scale(spacing.lg),
   },
   title: {
-    fontSize: fontScale(16),
+    fontSize: fontScale(typography.bodyLarge),
     fontWeight: 'bold',
     color: '#002239',
   },
@@ -160,13 +192,15 @@ const styles = StyleSheet.create({
     marginBottom: scale(14),
   },
   saveBtn: {
-    backgroundColor: '#0F9F67',
+    minHeight: touchTarget.minSize,
+    minWidth: touchTarget.minSize,
+    backgroundColor: palette.brand,
     borderRadius: scale(10),
-    paddingVertical: scale(12),
+    paddingVertical: buttonMetrics.paddingVertical,
     alignItems: 'center',
   },
   saveBtnText: {
-    color: '#FFF',
+    color: palette.white,
     fontWeight: 'bold',
     fontSize: fontScale(13.5),
   },
@@ -176,6 +210,8 @@ const styles = StyleSheet.create({
     marginVertical: scale(14),
   },
   resetBtn: {
+    minHeight: touchTarget.minSize,
+    minWidth: touchTarget.minSize,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -184,7 +220,7 @@ const styles = StyleSheet.create({
     paddingVertical: scale(10),
   },
   resetBtnText: {
-    color: '#0F9F67',
+    color: palette.brand,
     fontWeight: '700',
     fontSize: fontScale(12.5),
   },

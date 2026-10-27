@@ -1,9 +1,13 @@
-import { formatDateDisplay, formatDateDb, formatCurrency } from '../../src/utils/formatters';
+import {
+  formatDateDisplay,
+  formatDateDb,
+  formatCurrency,
+} from '../../src/utils/formatters';
 
 describe('formatters utility', () => {
   describe('formatDateDisplay', () => {
     it('should format Date object to Indonesian local date string', () => {
-      const date = new Date(2026, 6, 24); 
+      const date = new Date(2026, 6, 24);
       const result = formatDateDisplay(date);
       expect(result).toContain('24');
       expect(result).toContain('2026');

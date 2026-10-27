@@ -14,12 +14,21 @@
     }
   </script>
   <style>
-    /* Absolute full screen layout */
+    #app-root { display: flex; flex-direction: column; }
+    html, body { overflow: hidden; }
+    /* RN Web modals render in a portal outside the application frame. */
+    body [aria-modal="true"] {
+      width: 100%;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    /* The native navigation tree needs a flex parent with a definite height. */
     html, body, #app-root {
       height: 100%;
       margin: 0;
       padding: 0;
-      background-color: #0b0f19;
+      background-color: #F8F9FA;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
   </style>

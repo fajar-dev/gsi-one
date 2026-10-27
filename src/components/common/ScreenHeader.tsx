@@ -1,11 +1,13 @@
-import React, { JSX, ReactNode } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { ActionButton } from '../ui/ActionButton';
+import { palette, touchTarget, spacing, typography } from '../../theme/tokens';
+import { JSX, ReactNode } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/Feather';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { scale, fontScale } from '../../utils/responsive';
-import { overlay } from '../../../assets/styles/Colors';
+import { overlay } from '../../theme/colors';
 import { useRoleTheme } from '../../theme/roleTheme';
 
 interface ScreenHeaderProps {
@@ -41,32 +43,34 @@ function ScreenHeader({
     >
       <View style={styles.topRow}>
         {showBackButton ? (
-          <TouchableOpacity
+          <ActionButton
             onPress={() => navigation.goBack()}
             style={styles.backBtn}
             activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel="Kembali"
           >
-            <Icon name="arrow-left" size={scale(20)} color="#FFF" />
-          </TouchableOpacity>
-        ) : (
-          rightAction ? <View style={styles.spacer} /> : null
-        )}
+            <Icon name="arrow-left" size={scale(20)} color={palette.white} />
+          </ActionButton>
+        ) : rightAction ? (
+          <View style={styles.spacer} />
+        ) : null}
 
         <Text
-          style={[
-            styles.title,
-            showBackButton && styles.titleCentered,
-          ]}
+          style={[styles.title, showBackButton && styles.titleCentered]}
           numberOfLines={1}
         >
           {title}
         </Text>
 
-        {rightAction ?? (showBackButton ? <View style={styles.spacer} /> : null)}
+        {rightAction ??
+          (showBackButton ? <View style={styles.spacer} /> : null)}
       </View>
 
       {subtitle ? (
-        <Text style={[styles.subtitle, showBackButton && styles.subtitleCentered]}>
+        <Text
+          style={[styles.subtitle, showBackButton && styles.subtitleCentered]}
+        >
           {subtitle}
         </Text>
       ) : null}
@@ -76,8 +80,8 @@ function ScreenHeader({
 
 const styles = StyleSheet.create({
   gradient: {
-    paddingHorizontal: scale(16),
-    paddingBottom: scale(20),
+    paddingHorizontal: scale(spacing.xl),
+    paddingBottom: scale(spacing.xl),
   },
   topRow: {
     flexDirection: 'row',
@@ -86,8 +90,10 @@ const styles = StyleSheet.create({
     marginBottom: scale(6),
   },
   backBtn: {
-    width: scale(36),
-    height: scale(36),
+    minHeight: touchTarget.minSize,
+    minWidth: touchTarget.minSize,
+    width: touchTarget.minSize,
+    height: touchTarget.minSize,
     borderRadius: scale(18),
     backgroundColor: overlay.white20,
     justifyContent: 'center',
@@ -99,15 +105,15 @@ const styles = StyleSheet.create({
   title: {
     fontSize: fontScale(18),
     fontWeight: '800',
-    color: '#FFF',
+    color: palette.white,
     flex: 1,
   },
   titleCentered: {
     textAlign: 'center',
-    marginHorizontal: scale(8),
+    marginHorizontal: scale(spacing.sm),
   },
   subtitle: {
-    fontSize: fontScale(12),
+    fontSize: fontScale(typography.caption),
     color: overlay.white85,
   },
   subtitleCentered: {

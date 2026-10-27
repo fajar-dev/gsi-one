@@ -1,9 +1,10 @@
-import React, { JSX, useState, useMemo, useCallback } from 'react';
+import { ActionButton } from '../../components/ui/ActionButton';
+import { styles } from './NotificationsScreen.styles';
+
+import { JSX, useState, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
-  TouchableOpacity,
   FlatList,
   ActivityIndicator,
   RefreshControl,
@@ -15,16 +16,20 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { useAuthStore } from '../../store/authStore';
 import { useNotificationStore } from '../../store/notificationStore';
-import { AppNotification } from '../../services/notificationService';
+import type { AppNotification } from '../../domain/models/notification';
 import { RootStackParamList } from '../../types/navigation';
-import { colors, neutral } from '../../../assets/styles/Colors';
-import { scale, fontScale } from '../../utils/responsive';
+import { colors, neutral } from '../../theme/colors';
+import { scale } from '../../utils/responsive';
 
 type NotificationNavProp = NativeStackNavigationProp<RootStackParamList>;
 
 type FilterType = 'all' | 'unread';
 
-function getNotificationIcon(type: string): { icon: string; color: string; bgColor: string } {
+function getNotificationIcon(type: string): {
+  icon: string;
+  color: string;
+  bgColor: string;
+} {
   switch (type) {
     case 'book_survey':
       return { icon: 'clipboard', color: '#2563EB', bgColor: '#EFF6FF' };
@@ -86,7 +91,7 @@ function NotificationsScreen(): JSX.Element {
       if (user) {
         fetchNotifications(user.id, user.role);
       }
-    }, [user, fetchNotifications])
+    }, [user, fetchNotifications]),
   );
 
   const handleRefresh = async () => {
@@ -98,7 +103,7 @@ function NotificationsScreen(): JSX.Element {
 
   const filteredNotifications = useMemo(() => {
     if (activeFilter === 'unread') {
-      return notifications.filter((item) => !item.is_read);
+      return notifications.filter(item => !item.is_read);
     }
     return notifications;
   }, [notifications, activeFilter]);
@@ -124,10 +129,11 @@ function NotificationsScreen(): JSX.Element {
     const { icon, color, bgColor } = getNotificationIcon(item.type);
 
     return (
-      <TouchableOpacity
+      <ActionButton
         style={[styles.card, !item.is_read && styles.unreadCard]}
         activeOpacity={0.8}
         onPress={() => handleNotificationPress(item)}
+        accessibilityRole="button"
       >
         <View style={[styles.iconContainer, { backgroundColor: bgColor }]}>
           <Icon name={icon} size={scale(20)} color={color} />
@@ -135,7 +141,10 @@ function NotificationsScreen(): JSX.Element {
 
         <View style={styles.cardContent}>
           <View style={styles.cardHeader}>
-            <Text style={[styles.cardTitle, !item.is_read && styles.unreadText]} numberOfLines={1}>
+            <Text
+              style={[styles.cardTitle, !item.is_read && styles.unreadText]}
+              numberOfLines={1}
+            >
               {item.title}
             </Text>
             {!item.is_read && <View style={styles.unreadBadgeDot} />}
@@ -146,28 +155,32 @@ function NotificationsScreen(): JSX.Element {
           <Text style={styles.cardTime}>{formatTimeAgo(item.created_at)}</Text>
         </View>
 
-        <TouchableOpacity
+        <ActionButton
           style={styles.deleteButton}
           activeOpacity={0.6}
           onPress={() => deleteNotification(item.id)}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          accessibilityRole="button"
+          accessibilityLabel="Hapus"
         >
           <Icon name="trash-2" size={scale(16)} color={neutral[400]} />
-        </TouchableOpacity>
-      </TouchableOpacity>
+        </ActionButton>
+      </ActionButton>
     );
   };
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
-        <TouchableOpacity
+        <ActionButton
           style={styles.backButton}
           onPress={() => navigation.goBack()}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel="Kembali"
         >
           <Icon name="arrow-left" size={scale(20)} color={colors.textPrimary} />
-        </TouchableOpacity>
+        </ActionButton>
 
         <View style={styles.headerTitleWrapper}>
           <Text style={styles.headerTitle}>Notifikasi</Text>
@@ -179,23 +192,30 @@ function NotificationsScreen(): JSX.Element {
         </View>
 
         {unreadCount > 0 ? (
-          <TouchableOpacity
+          <ActionButton
+            compact
             style={styles.markAllButton}
             onPress={() => user && markAllAsRead(user.id, user.role)}
             activeOpacity={0.7}
+            accessibilityRole="button"
           >
             <Text style={styles.markAllText}>Baca Semua</Text>
-          </TouchableOpacity>
+          </ActionButton>
         ) : (
           <View style={{ width: scale(70) }} />
         )}
       </View>
 
       <View style={styles.filterRow}>
-        <TouchableOpacity
-          style={[styles.filterChip, activeFilter === 'all' && styles.filterChipActive]}
+        <ActionButton
+          compact
+          style={[
+            styles.filterChip,
+            activeFilter === 'all' && styles.filterChipActive,
+          ]}
           onPress={() => setActiveFilter('all')}
           activeOpacity={0.8}
+          accessibilityRole="button"
         >
           <Text
             style={[
@@ -205,12 +225,17 @@ function NotificationsScreen(): JSX.Element {
           >
             Semua ({notifications.length})
           </Text>
-        </TouchableOpacity>
+        </ActionButton>
 
-        <TouchableOpacity
-          style={[styles.filterChip, activeFilter === 'unread' && styles.filterChipActive]}
+        <ActionButton
+          compact
+          style={[
+            styles.filterChip,
+            activeFilter === 'unread' && styles.filterChipActive,
+          ]}
           onPress={() => setActiveFilter('unread')}
           activeOpacity={0.8}
+          accessibilityRole="button"
         >
           <Text
             style={[
@@ -220,13 +245,21 @@ function NotificationsScreen(): JSX.Element {
           >
             Belum Dibaca ({unreadCount})
           </Text>
-        </TouchableOpacity>
+        </ActionButton>
       </View>
 
-      {!!error && <TouchableOpacity onPress={handleRefresh} style={styles.emptyContainer}>
-        <Text style={styles.emptyTitle}>Notifikasi belum dimuat</Text>
-        <Text style={styles.emptySubtitle}>{error} Ketuk untuk mencoba lagi.</Text>
-      </TouchableOpacity>}
+      {!!error && (
+        <ActionButton
+          onPress={handleRefresh}
+          style={styles.emptyContainer}
+          accessibilityRole="button"
+        >
+          <Text style={styles.emptyTitle}>Notifikasi belum dimuat</Text>
+          <Text style={styles.emptySubtitle}>
+            {error} Ketuk untuk mencoba lagi.
+          </Text>
+        </ActionButton>
+      )}
       {isLoading && notifications.length === 0 ? (
         <View style={styles.loadingWrapper}>
           <ActivityIndicator size="large" color={colors.secondary} />
@@ -242,13 +275,14 @@ function NotificationsScreen(): JSX.Element {
               : 'Belum ada notifikasi'}
           </Text>
           <Text style={styles.emptySubtitle}>
-            Pemberitahuan aktivitas proyek dan permohonan survey akan tampil di sini.
+            Pemberitahuan aktivitas proyek dan permohonan survey akan tampil di
+            sini.
           </Text>
         </View>
       ) : (
         <FlatList
           data={filteredNotifications}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           renderItem={renderItem}
           contentContainerStyle={styles.listContent}
           refreshControl={
@@ -264,189 +298,5 @@ function NotificationsScreen(): JSX.Element {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F8FAFC',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: scale(16),
-    paddingVertical: scale(14),
-    backgroundColor: colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
-  },
-  backButton: {
-    padding: scale(8),
-    borderRadius: scale(20),
-    backgroundColor: '#F1F5F9',
-  },
-  headerTitleWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: scale(8),
-  },
-  headerTitle: {
-    fontSize: fontScale(18),
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  headerBadge: {
-    backgroundColor: '#EF4444',
-    paddingHorizontal: scale(8),
-    paddingVertical: scale(2),
-    borderRadius: scale(10),
-  },
-  headerBadgeText: {
-    color: colors.white,
-    fontSize: fontScale(11),
-    fontWeight: '800',
-  },
-  markAllButton: {
-    paddingVertical: scale(6),
-    paddingHorizontal: scale(10),
-    borderRadius: scale(8),
-    backgroundColor: '#EFF6FF',
-  },
-  markAllText: {
-    color: colors.secondary,
-    fontSize: fontScale(12),
-    fontWeight: '600',
-  },
-  filterRow: {
-    flexDirection: 'row',
-    paddingHorizontal: scale(16),
-    paddingVertical: scale(12),
-    gap: scale(10),
-    backgroundColor: colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
-  },
-  filterChip: {
-    paddingHorizontal: scale(14),
-    paddingVertical: scale(7),
-    borderRadius: scale(20),
-    backgroundColor: '#F1F5F9',
-  },
-  filterChipActive: {
-    backgroundColor: colors.secondary,
-  },
-  filterChipText: {
-    fontSize: fontScale(12),
-    fontWeight: '600',
-    color: neutral[600],
-  },
-  filterChipTextActive: {
-    color: colors.white,
-  },
-  listContent: {
-    padding: scale(16),
-    gap: scale(12),
-  },
-  card: {
-    flexDirection: 'row',
-    padding: scale(14),
-    backgroundColor: colors.white,
-    borderRadius: scale(14),
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 2,
-    alignItems: 'flex-start',
-  },
-  unreadCard: {
-    backgroundColor: '#F0F9FF',
-    borderColor: '#BAE6FD',
-  },
-  iconContainer: {
-    width: scale(42),
-    height: scale(42),
-    borderRadius: scale(12),
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: scale(12),
-  },
-  cardContent: {
-    flex: 1,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: scale(4),
-  },
-  cardTitle: {
-    fontSize: fontScale(14),
-    fontWeight: '600',
-    color: neutral[800],
-    flex: 1,
-    marginRight: scale(6),
-  },
-  unreadText: {
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  unreadBadgeDot: {
-    width: scale(8),
-    height: scale(8),
-    borderRadius: scale(4),
-    backgroundColor: '#2563EB',
-  },
-  cardMessage: {
-    fontSize: fontScale(12),
-    color: neutral[600],
-    lineHeight: scale(17),
-    marginBottom: scale(6),
-  },
-  cardTime: {
-    fontSize: fontScale(10),
-    fontWeight: '500',
-    color: neutral[400],
-  },
-  deleteButton: {
-    padding: scale(4),
-    marginLeft: scale(6),
-  },
-  loadingWrapper: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: scale(32),
-  },
-  emptyIconCircle: {
-    width: scale(72),
-    height: scale(72),
-    borderRadius: scale(36),
-    backgroundColor: '#F1F5F9',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: scale(16),
-  },
-  emptyTitle: {
-    fontSize: fontScale(15),
-    fontWeight: '700',
-    color: neutral[800],
-    marginBottom: scale(6),
-    textAlign: 'center',
-  },
-  emptySubtitle: {
-    fontSize: fontScale(12),
-    color: neutral[500],
-    textAlign: 'center',
-    lineHeight: scale(18),
-  },
-});
 
 export default NotificationsScreen;

@@ -1,167 +1,210 @@
-import { useState, useEffect, useCallback } from 'react';
+import { getErrorMessage } from '../utils/errorHelpers';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Alert, Linking } from 'react-native';
 import { useAuthStore } from '../store/authStore';
-import { SurveyRequestEntity, SurveyRequestData } from '../domain/entities/SurveyRequestEntity';
+import {
+  SurveyRequestEntity,
+  SurveyRequestData,
+} from '../domain/entities/SurveyRequestEntity';
 import { surveyService } from '../services/surveyService';
-import { canManageSurveyBookingsRole } from '../domain/enums/UserRole';
-
-export type SurveyRequestItem = SurveyRequestEntity;
+import {
+  canManageSurveyBookingsRole,
+  canViewSurveysRole,
+} from '../domain/enums/UserRole';
 
 export type SurveyFilterType = 'all' | 'pending' | 'claimed';
 
 export function useSurveyRequests() {
-    const { user } = useAuthStore();
-    const [entities, setEntities] = useState<SurveyRequestEntity[]>([]);
-    const [search, setSearch] = useState('');
-    const [activeFilter, setActiveFilter] = useState<SurveyFilterType>('all');
-    const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuthStore();
+  const [entities, setEntities] = useState<SurveyRequestEntity[]>([]);
+  const [search, setSearch] = useState('');
+  const [activeFilter, setActiveFilter] = useState<SurveyFilterType>('all');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const requestId = useRef({ id: 0 });
 
-    const fetchRequests = useCallback(async () => {
-        setIsLoading(true);
-        try {
-            const data: SurveyRequestData[] = await surveyService.getBookings();
-            setEntities(data.map(d => new SurveyRequestEntity(d)));
-        } catch {
-            setEntities([]);
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        fetchRequests();
-    }, [fetchRequests]);
-
-    const handleClaim = (entity: SurveyRequestEntity) => {
-        const roleTitle = user?.role === 'admin' ? 'Admin' : 'Marketing';
-        const uName = user?.full_name || `${roleTitle} GSI`;
-        Alert.alert(
-            'Konfirmasi Ambil Survey',
-            `Apakah Anda yakin ingin mengambil & menghubungi ${entity.clientName} (${entity.companyName})?`,
-            [
-                { text: 'Batal', style: 'cancel' },
-                {
-                    text: 'Ya, Ambil',
-                    onPress: async () => {
-                        const dbId = entity.rawDbId;
-                        if (dbId !== undefined) {
-                            try {
-                                setIsLoading(true);
-                                await surveyService.claimBooking(dbId, {
-                                    status: 'claimed',
-                                    claimed_by: `${uName} (${roleTitle})`,
-                                    claimed_at: new Date().toISOString(),
-                                });
-                                await fetchRequests();
-                                Alert.alert('Berhasil', `Pengajuan survey ${entity.id} berhasil Anda ambil.`);
-                            } catch (error: any) {
-                                Alert.alert('Gagal Mengklaim', error?.message || 'Terjadi kesalahan saat menyimpan status klaim ke database.');
-                                fetchRequests();
-                            } finally {
-                                setIsLoading(false);
-                            }
-                        } else {
-                            setEntities(prev =>
-                                prev.map(item => (item.id === entity.id ? item.claimBy(uName, roleTitle) : item))
-                            );
-                            Alert.alert('Berhasil', `Pengajuan survey ${entity.id} berhasil Anda ambil.`);
-                        }
-                    },
-                },
-            ]
-        );
-    };
-
-    const handleCallPhone = (phone: string) => {
-        Linking.openURL(`tel:${phone}`).catch(() => {
-            Alert.alert('Info', `Nomor telepon: ${phone}`);
-        });
-    };
-
-    const handleWhatsApp = (entity: SurveyRequestEntity) => {
-        Linking.openURL(entity.getWhatsAppUrl()).catch(() => {
-            Alert.alert('Info', `Silakan hubungi WhatsApp ke: ${entity.phone}`);
-        });
-    };
-
-    const filteredRequests = entities.filter(item => {
-        const matchesFilter =
-            activeFilter === 'all'
-                ? true
-                : activeFilter === 'pending'
-                    ? item.isPending()
-                    : item.isClaimed();
-
-        const q = search.toLowerCase();
-        const matchesSearch =
-            item.clientName.toLowerCase().includes(q) ||
-            item.companyName.toLowerCase().includes(q) ||
-            item.structureType.toLowerCase().includes(q) ||
-            item.location.toLowerCase().includes(q) ||
-            item.id.toLowerCase().includes(q);
-
-        return matchesFilter && matchesSearch;
-    });
-
-    let pendingCount = 0;
-    let claimedCount = 0;
-    for (const e of entities) {
-        if (e.isPending()) pendingCount++;
-        else if (e.isClaimed()) claimedCount++;
+  const fetchRequests = useCallback(async () => {
+    const request = ++requestId.current.id;
+    setError(null);
+    setIsLoading(true);
+    try {
+      const data: SurveyRequestData[] = await surveyService.getBookings();
+      if (request === requestId.current.id)
+        setEntities(data.map(d => new SurveyRequestEntity(d)));
+    } catch (err: unknown) {
+      if (request === requestId.current.id) setError(getErrorMessage(err));
+    } finally {
+      if (request === requestId.current.id) setIsLoading(false);
     }
-    const totalCount = entities.length;
+  }, []);
 
-    const handleDelete = (entity: SurveyRequestEntity) => {
-        if (!canManageSurveyBookingsRole(user?.role)) {
-            Alert.alert('Akses Ditolak', 'Hanya Admin yang memiliki hak akses untuk menghapus pengajuan survey.');
-            return;
-        }
-
-        Alert.alert(
-            'Konfirmasi Hapus Survey',
-            `Apakah Anda yakin ingin menghapus pengajuan survey dari ${entity.clientName} (${entity.companyName})?`,
-            [
-                { text: 'Batal', style: 'cancel' },
-                {
-                    text: 'Hapus',
-                    style: 'destructive',
-                    onPress: async () => {
-                        setEntities(prev => prev.filter(item => item.id !== entity.id));
-
-                        const dbId = entity.rawDbId;
-                        if (dbId !== undefined) {
-                            try {
-                                await surveyService.deleteBooking(dbId);
-                            } catch {
-                                Alert.alert('Gagal', 'Gagal menghapus pengajuan survey dari database.');
-                                fetchRequests(); 
-                                return;
-                            }
-                        }
-
-                        Alert.alert('Berhasil', `Pengajuan survey ${entity.id} telah dihapus.`);
-                    },
-                },
-            ]
-        );
+  useEffect(() => {
+    setEntities([]);
+    fetchRequests();
+    const tracker = requestId.current;
+    return () => {
+      tracker.id++;
     };
+  }, [fetchRequests, user?.id]);
 
-    return {
-        user,
-        search,
-        setSearch,
-        activeFilter,
-        setActiveFilter,
-        isLoading,
-        refreshRequests: fetchRequests,
-        filteredRequests,
-        totalCount,
-        pendingCount,
-        claimedCount,
-        handleClaim,
-        handleDelete,
-        handleCallPhone,
-        handleWhatsApp,
-        handleOpenWhatsApp: handleWhatsApp,
-    };
+  const persistedBookingId = (entity: SurveyRequestEntity): number | null => {
+    const id = entity.rawDbId;
+    if (typeof id !== 'number' || !Number.isSafeInteger(id) || id <= 0) {
+      Alert.alert(
+        'Data Survei Tidak Valid',
+        'Identitas data survei tidak ditemukan. Muat ulang daftar sebelum mencoba lagi.',
+      );
+      return null;
+    }
+    return id;
+  };
+
+  const handleClaim = (entity: SurveyRequestEntity) => {
+    if (!canViewSurveysRole(user?.role)) {
+      Alert.alert(
+        'Akses Ditolak',
+        'Hanya Admin dan Marketing yang dapat mengambil pengajuan survei.',
+      );
+      return;
+    }
+    const id = persistedBookingId(entity);
+    if (id === null) return;
+    const roleTitle = user?.role === 'admin' ? 'Admin' : 'Marketing';
+    const userName = user?.full_name || `${roleTitle} GSI`;
+    Alert.alert(
+      'Konfirmasi Ambil Survey',
+      `Apakah Anda yakin ingin mengambil & menghubungi ${entity.clientName} (${entity.companyName})?`,
+      [
+        { text: 'Batal', style: 'cancel' },
+        {
+          text: 'Ya, Ambil',
+          onPress: async () => {
+            setIsLoading(true);
+            try {
+              await surveyService.claimBooking(id, {
+                status: 'claimed',
+                claimed_by: `${userName} (${roleTitle})`,
+                claimed_at: new Date().toISOString(),
+              });
+              await fetchRequests();
+              Alert.alert(
+                'Berhasil',
+                `Pengajuan survey ${entity.id} berhasil Anda ambil.`,
+              );
+            } catch (requestError: unknown) {
+              Alert.alert(
+                'Gagal Mengklaim',
+                getErrorMessage(
+                  requestError,
+                  'Terjadi kesalahan saat menyimpan status klaim ke database.',
+                ),
+              );
+              await fetchRequests();
+            } finally {
+              setIsLoading(false);
+            }
+          },
+        },
+      ],
+    );
+  };
+
+  const handleCallPhone = (entity: SurveyRequestEntity) => {
+    Linking.openURL(entity.getPhoneUrl()).catch(() => {
+      Alert.alert('Info', `Nomor telepon: ${entity.phone}`);
+    });
+  };
+
+  const handleOpenWhatsApp = (entity: SurveyRequestEntity) => {
+    Linking.openURL(entity.getWhatsAppUrl()).catch(() => {
+      Alert.alert('Info', `Silakan hubungi WhatsApp ke: ${entity.phone}`);
+    });
+  };
+
+  const filteredRequests = entities.filter(item => {
+    const matchesFilter =
+      activeFilter === 'all'
+        ? true
+        : activeFilter === 'pending'
+        ? item.isPending()
+        : item.isClaimed();
+
+    const q = search.toLowerCase();
+    const matchesSearch =
+      item.clientName.toLowerCase().includes(q) ||
+      item.companyName.toLowerCase().includes(q) ||
+      item.structureType.toLowerCase().includes(q) ||
+      item.location.toLowerCase().includes(q) ||
+      item.id.toLowerCase().includes(q);
+
+    return matchesFilter && matchesSearch;
+  });
+
+  let pendingCount = 0;
+  let claimedCount = 0;
+  for (const e of entities) {
+    if (e.isPending()) pendingCount++;
+    else if (e.isClaimed()) claimedCount++;
+  }
+  const totalCount = entities.length;
+
+  const handleDelete = (entity: SurveyRequestEntity) => {
+    if (!canManageSurveyBookingsRole(user?.role)) {
+      Alert.alert(
+        'Akses Ditolak',
+        'Hanya Admin yang memiliki hak akses untuk menghapus pengajuan survey.',
+      );
+      return;
+    }
+    const id = persistedBookingId(entity);
+    if (id === null) return;
+    Alert.alert(
+      'Konfirmasi Hapus Survey',
+      `Apakah Anda yakin ingin menghapus pengajuan survey dari ${entity.clientName} (${entity.companyName})?`,
+      [
+        { text: 'Batal', style: 'cancel' },
+        {
+          text: 'Hapus',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await surveyService.deleteBooking(id);
+              await fetchRequests();
+              Alert.alert(
+                'Berhasil',
+                `Pengajuan survey ${entity.id} telah dihapus.`,
+              );
+            } catch (requestError: unknown) {
+              Alert.alert(
+                'Gagal',
+                getErrorMessage(
+                  requestError,
+                  'Gagal menghapus pengajuan survey dari database.',
+                ),
+              );
+            }
+          },
+        },
+      ],
+    );
+  };
+
+  return {
+    user,
+    search,
+    setSearch,
+    activeFilter,
+    setActiveFilter,
+    isLoading,
+    error,
+    refreshRequests: fetchRequests,
+    filteredRequests,
+    totalCount,
+    pendingCount,
+    claimedCount,
+    handleClaim,
+    handleDelete,
+    handleCallPhone,
+    handleOpenWhatsApp,
+  };
 }

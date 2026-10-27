@@ -1,4 +1,3 @@
-
 export function getUserInitials(fullName?: string | null): string {
   if (!fullName) return '?';
   return fullName

@@ -1,19 +1,15 @@
-import React, { JSX } from 'react';
+import { palette, typography, spacing } from '../../../theme/tokens';
+import { JSX } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
-import { colors, neutral } from '../../../../assets/styles/Colors';
+import { colors, neutral } from '../../../theme/colors';
 import { scale, fontScale } from '../../../utils/responsive';
 import StatCard from './StatCard';
+import Svg, { Circle } from 'react-native-svg';
 
-interface DashboardStats {
-  total: number;
-  on_progress: number;
-  done: number;
-  pending: number;
-  on_hold: number;
-}
+import type { ProjectStatistics } from '../../../domain/models/projectStatistics';
 
 interface ProjectSummaryProps {
-  stats: DashboardStats | null;
+  stats: ProjectStatistics | null;
   isLoading: boolean;
   statColors?: {
     onProgress: string;
@@ -28,7 +24,7 @@ const DEFAULT_STAT_COLORS = {
   onProgress: colors.secondary,
   done: '#2E7D32',
   pending: colors.primary,
-  onHold: '#9E9E9E',
+  onHold: palette.grey,
 };
 
 function ProjectSummary({
@@ -45,20 +41,34 @@ function ProjectSummary({
         <ActivityIndicator color={loaderColor} style={styles.loader} />
       ) : stats ? (
         <>
-          {}
           <View style={styles.chartCard}>
             <MiniDonutChart stats={stats} />
           </View>
 
-          {}
           <View style={styles.statsRow}>
-            <StatCard label="Berjalan" value={stats.on_progress} color={statColors.onProgress} />
+            <StatCard
+              label="Berjalan"
+              value={stats.on_progress}
+              color={statColors.onProgress}
+            />
             <View style={styles.statGap} />
-            <StatCard label="Selesai" value={stats.done} color={statColors.done} />
+            <StatCard
+              label="Selesai"
+              value={stats.done}
+              color={statColors.done}
+            />
             <View style={styles.statGap} />
-            <StatCard label="Menunggu" value={stats.pending} color={statColors.pending} />
+            <StatCard
+              label="Menunggu"
+              value={stats.pending}
+              color={statColors.pending}
+            />
             <View style={styles.statGap} />
-            <StatCard label="Ditunda" value={stats.on_hold} color={statColors.onHold} />
+            <StatCard
+              label="Ditunda"
+              value={stats.on_hold}
+              color={statColors.onHold}
+            />
           </View>
         </>
       ) : null}
@@ -66,49 +76,61 @@ function ProjectSummary({
   );
 }
 
-function MiniDonutChart({ stats }: { stats: DashboardStats }) {
+function MiniDonutChart({ stats }: { stats: ProjectStatistics }) {
   const total = stats.total;
-  if (total === 0) return null;
+  if (total === 0)
+    return (
+      <Text style={donutStyles.centerLbl}>
+        Belum ada proyek untuk diringkas.
+      </Text>
+    );
 
   const segments = [
     { value: stats.on_progress, color: colors.secondary, label: 'Berjalan' },
     { value: stats.done, color: '#2E7D32', label: 'Selesai' },
     { value: stats.pending, color: colors.primary, label: 'Menunggu' },
-    { value: stats.on_hold, color: '#9E9E9E', label: 'Ditunda' },
+    { value: stats.on_hold, color: palette.grey, label: 'Ditunda' },
   ].filter(s => s.value > 0);
 
   const size = 110;
   const strokeWidth = 18;
   const innerSize = size - strokeWidth * 2;
+  const ringRadius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * ringRadius;
+  let offset = 0;
 
   return (
     <View style={donutStyles.wrapper}>
       <View style={[donutStyles.ringWrap, { width: size, height: size }]}>
-        {segments.map((seg, idx) => {
-          const pct = seg.value / total;
-          const deg = pct * 360;
-          const right = deg >= 90 ? seg.color : 'transparent';
-          const bottom = deg >= 180 ? seg.color : 'transparent';
-          const left = deg >= 270 ? seg.color : 'transparent';
-          return (
-            <View
-              key={idx}
-              style={[
-                donutStyles.arcBorder,
-                {
-                  width: size,
-                  height: size,
-                  borderRadius: size / 2,
-                  borderWidth: strokeWidth,
-                  borderTopColor: seg.color,
-                  borderRightColor: right,
-                  borderBottomColor: bottom,
-                  borderLeftColor: left,
-                },
-              ]}
-            />
-          );
-        })}
+        <Svg
+          width={size}
+          height={size}
+          accessible
+          accessibilityLabel={`${total} proyek: ${segments
+            .map(segment => `${segment.label} ${segment.value}`)
+            .join(', ')}`}
+        >
+          {segments.map(segment => {
+            const length = (segment.value / total) * circumference;
+            const startOffset = offset;
+            offset += length;
+            return (
+              <Circle
+                key={segment.label}
+                cx={size / 2}
+                cy={size / 2}
+                r={ringRadius}
+                fill="none"
+                stroke={segment.color}
+                strokeWidth={strokeWidth}
+                strokeDasharray={[length, circumference - length]}
+                strokeDashoffset={-startOffset}
+                rotation={-90}
+                origin={`${size / 2}, ${size / 2}`}
+              />
+            );
+          })}
+        </Svg>
         <View
           style={[
             donutStyles.centerHole,
@@ -125,11 +147,13 @@ function MiniDonutChart({ stats }: { stats: DashboardStats }) {
       </View>
 
       <View style={donutStyles.legend}>
-        {segments.map((seg, idx) => (
-          <View key={idx} style={donutStyles.legendRow}>
+        {segments.map(seg => (
+          <View key={seg.label} style={donutStyles.legendRow}>
             <View style={[donutStyles.dot, { backgroundColor: seg.color }]} />
             <Text style={donutStyles.legendLabel}>{seg.label}</Text>
-            <Text style={[donutStyles.legendVal, { color: seg.color }]}>{seg.value}</Text>
+            <Text style={[donutStyles.legendVal, { color: seg.color }]}>
+              {seg.value}
+            </Text>
           </View>
         ))}
       </View>
@@ -139,37 +163,48 @@ function MiniDonutChart({ stats }: { stats: DashboardStats }) {
 
 const styles = StyleSheet.create({
   sectionTitle: {
-    fontSize: fontScale(16),
+    fontSize: fontScale(typography.bodyLarge),
     fontWeight: '800',
     color: neutral[900],
-    marginTop: scale(16),
-    marginBottom: scale(12),
+    marginTop: scale(spacing.lg),
+    marginBottom: scale(spacing.md),
   },
   chartCard: {
     backgroundColor: colors.white,
     borderRadius: scale(14),
-    padding: scale(16),
-    marginBottom: scale(12),
+    padding: scale(spacing.lg),
+    marginBottom: scale(spacing.md),
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: palette.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.06,
     shadowRadius: 4,
   },
   statsRow: {
     flexDirection: 'row',
-    marginBottom: scale(4),
+    marginBottom: scale(spacing.xs),
   },
   statGap: { width: scale(8) },
   loader: {
-    marginVertical: scale(20),
+    marginVertical: scale(spacing.xl),
   },
 });
 
 const donutStyles = StyleSheet.create({
-  wrapper: { flexDirection: 'row', alignItems: 'center', gap: 16, paddingVertical: 8 },
-  ringWrap: { alignItems: 'center', justifyContent: 'center', position: 'relative' },
-  arcBorder: { position: 'absolute' },
+  wrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 480,
+    alignSelf: 'center',
+    gap: spacing.lg,
+    paddingVertical: spacing.sm,
+  },
+  ringWrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
   centerHole: {
     position: 'absolute',
     backgroundColor: 'white',
@@ -177,12 +212,27 @@ const donutStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   centerNum: { fontSize: 22, fontWeight: '800', color: colors.textPrimary },
-  centerLbl: { fontSize: 10, color: colors.textSecondary, fontWeight: '600', marginTop: 2 },
-  legend: { flex: 1, gap: 8 },
-  legendRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  centerLbl: {
+    fontSize: typography.caption,
+    color: colors.textSecondary,
+    fontWeight: '600',
+    marginTop: 2,
+  },
+  legend: { flex: 1, gap: spacing.sm },
+  legendRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   dot: { width: 9, height: 9, borderRadius: 5 },
-  legendLabel: { fontSize: 12, color: colors.textSecondary, flex: 1, fontWeight: '500' },
-  legendVal: { fontSize: 14, fontWeight: '800', minWidth: 20, textAlign: 'right' },
+  legendLabel: {
+    fontSize: typography.caption,
+    color: colors.textSecondary,
+    flex: 1,
+    fontWeight: '500',
+  },
+  legendVal: {
+    fontSize: typography.body,
+    fontWeight: '800',
+    minWidth: 20,
+    textAlign: 'right',
+  },
 });
 
 export default ProjectSummary;

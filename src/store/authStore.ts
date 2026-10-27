@@ -1,7 +1,11 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { authService, AuthUser, normalizeAuthRole, CreateUserRole } from '../services/authService';
-import { supabase } from '../config/supabase';
+import {
+  AuthUser,
+  normalizeAuthRole,
+  CreateUserRole,
+} from '../domain/models/auth';
+import { authService } from '../services/authService';
 
 import { getErrorMessage } from '../utils/errorHelpers';
 
@@ -21,29 +25,35 @@ interface AuthState {
   error: string | null;
 
   initialize: () => Promise<void>;
+  updateProfileName: (name: string) => Promise<void>;
+  completePasswordRecovery: (password: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  register: (email: string, password: string, fullName?: string) => Promise<void>;
   sendPasswordReset: (email: string) => Promise<void>;
-  adminCreateUser: (name: string, email: string, password: string, role: CreateUserRole) => Promise<AuthUser | undefined>;
-  clearError: () => void;
+  adminCreateUser: (
+    name: string,
+    email: string,
+    password: string,
+    role: CreateUserRole,
+  ) => Promise<AuthUser>;
 }
 
 function sanitizeAuthUser(rawUser: unknown): AuthUser | null {
   if (!rawUser || typeof rawUser !== 'object') return null;
   const obj = rawUser as Record<string, unknown>;
   if (typeof obj.id !== 'string' || !obj.id) return null;
-  
+
   return {
     id: obj.id,
     email: typeof obj.email === 'string' ? obj.email : '',
     full_name: typeof obj.full_name === 'string' ? obj.full_name : 'User GSI',
     role: normalizeAuthRole(obj.role),
-    ticket_number: typeof obj.ticket_number === 'string' ? obj.ticket_number : undefined,
+    ticket_number:
+      typeof obj.ticket_number === 'string' ? obj.ticket_number : undefined,
   };
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>(set => ({
   user: null,
   token: null,
   isLoading: false,
@@ -51,34 +61,54 @@ export const useAuthStore = create<AuthState>((set) => ({
   isPasswordRecovery: false,
   error: null,
 
+  updateProfileName: async name => {
+    const user = useAuthStore.getState().user;
+    if (!user) throw new Error('Sesi pengguna tidak ditemukan.');
+    const cleanName = name.trim();
+    if (!cleanName) throw new Error('Nama lengkap tidak boleh kosong.');
+    await authService.updateProfileName(user.id, cleanName);
+    if (useAuthStore.getState().user?.id !== user.id)
+      throw new Error('Sesi telah berubah.');
+    const updatedUser = { ...user, full_name: cleanName };
+    await AsyncStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
+    if (useAuthStore.getState().user?.id === user.id)
+      set({ user: updatedUser });
+  },
+  completePasswordRecovery: async password => {
+    await authService.updatePassword(password);
+    await AsyncStorage.removeItem('auth_password_recovery');
+    set({ isPasswordRecovery: false });
+    await useAuthStore.getState().logout();
+  },
   initialize: async () => {
     const version = ++authVersion;
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-
-      if (session?.user) {
-        const { data: profile, error: profileError } = await supabase
-          .from('users').select('name, role, ticket_number')
-          .eq('id', session.user.id).maybeSingle();
-        let user: AuthUser | null = profile ? {
-          id: session.user.id,
-          email: session.user.email || '',
-          full_name: profile.name || 'User GSI',
-          role: normalizeAuthRole(profile.role),
-          ticket_number: profile.ticket_number || undefined,
-        } : null;
-        if (!user && profileError) {
+      const session = await authService.restoreSession();
+      if (session) {
+        let user: AuthUser | null = session.user;
+        if (!user && session.profileUnavailable) {
           const cachedJson = await AsyncStorage.getItem(USER_KEY);
-          const cached = cachedJson ? sanitizeAuthUser(JSON.parse(cachedJson)) : null;
-          if (cached?.id === session.user.id) user = cached;
+          const cached = cachedJson
+            ? sanitizeAuthUser(JSON.parse(cachedJson))
+            : null;
+          if (cached?.id === session.userId) user = cached;
         }
-        if (!user) throw new Error('Profil pengguna tidak ditemukan. Silakan login kembali.');
+        if (!user)
+          throw new Error(
+            'Profil pengguna tidak ditemukan. Silakan login kembali.',
+          );
 
         if (version !== authVersion) return;
         await AsyncStorage.setItem(USER_KEY, JSON.stringify(user));
-        const isPasswordRecovery = await AsyncStorage.getItem('auth_password_recovery') === 'true';
+        const isPasswordRecovery =
+          (await AsyncStorage.getItem('auth_password_recovery')) === 'true';
         if (version !== authVersion) return;
-        set({ user, token: session.access_token, isInitialized: true, isPasswordRecovery });
+        set({
+          user,
+          token: session.token,
+          isInitialized: true,
+          isPasswordRecovery,
+        });
       } else {
         if (version !== authVersion) return;
         await AsyncStorage.removeItem(USER_KEY);
@@ -94,42 +124,54 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   login: async (email, password) => {
-    ++authVersion;
-    set({ user: null, token: null, isLoading: true, error: null, isPasswordRecovery: false });
+    const version = ++authVersion;
+    set({
+      user: null,
+      token: null,
+      isLoading: true,
+      error: null,
+      isPasswordRecovery: false,
+    });
     try {
       const result = await authService.login({ email, password });
+      if (version !== authVersion) return;
       await AsyncStorage.setItem(USER_KEY, JSON.stringify(result.user));
+      if (version !== authVersion) return;
       set({ user: result.user, token: result.token, isLoading: false });
     } catch (err: unknown) {
-      set({ user: null, token: null, error: getErrorMessage(err), isLoading: false });
+      if (version !== authVersion) return;
+      set({
+        user: null,
+        token: null,
+        error: getErrorMessage(err),
+        isLoading: false,
+      });
       throw err;
     }
   },
 
   logout: async () => {
-    ++authVersion;
-    await AsyncStorage.removeItem(USER_KEY).catch(() => {});
-    await AsyncStorage.removeItem('auth_password_recovery').catch(() => {});
-    set({ user: null, token: null, isLoading: true, error: null, isPasswordRecovery: false });
+    const version = ++authVersion;
+    set({
+      user: null,
+      token: null,
+      isLoading: true,
+      error: null,
+      isPasswordRecovery: false,
+    });
+    await Promise.all([
+      AsyncStorage.removeItem(USER_KEY).catch(() => {}),
+      AsyncStorage.removeItem('auth_password_recovery').catch(() => {}),
+    ]);
+    if (version !== authVersion) return;
     try {
       await authService.logout();
     } finally {
-      set({ user: null, token: null, isLoading: false });
+      if (version === authVersion) set({ isLoading: false });
     }
   },
 
-  register: async (email, password, fullName) => {
-    set({ isLoading: true, error: null });
-    try {
-      await authService.register({ email, password, full_name: fullName });
-      set({ isLoading: false });
-    } catch (err: unknown) {
-      set({ error: getErrorMessage(err), isLoading: false });
-      throw err;
-    }
-  },
-
-  sendPasswordReset: async (email) => {
+  sendPasswordReset: async email => {
     set({ isLoading: true, error: null });
     try {
       await authService.sendPasswordResetEmail(email);
@@ -147,7 +189,12 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
     set({ isLoading: true, error: null });
     try {
-      const createdUser = await authService.adminCreateUser(name, email, password, role);
+      const createdUser = await authService.adminCreateUser(
+        name,
+        email,
+        password,
+        role,
+      );
       set({ isLoading: false });
       return createdUser;
     } catch (err: unknown) {
@@ -155,7 +202,4 @@ export const useAuthStore = create<AuthState>((set) => ({
       throw err;
     }
   },
-
-  clearError: () => set({ error: null }),
 }));
-

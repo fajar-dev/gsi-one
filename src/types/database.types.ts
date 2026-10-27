@@ -1,4 +1,3 @@
-
 export type Json =
   | string
   | number
@@ -125,7 +124,14 @@ export interface Database {
           stage_id: string | null;
           file_name: string;
           file_url: string | null;
-          file_type: 'image' | 'report' | 'invoice' | 'drawing' | 'contract' | 'video' | 'other';
+          file_type:
+            | 'image'
+            | 'report'
+            | 'invoice'
+            | 'drawing'
+            | 'contract'
+            | 'video'
+            | 'other';
           uploaded_by: string | null;
           created_at: string;
         };
@@ -135,7 +141,14 @@ export interface Database {
           stage_id?: string | null;
           file_name: string;
           file_url?: string | null;
-          file_type?: 'image' | 'report' | 'invoice' | 'drawing' | 'contract' | 'video' | 'other';
+          file_type?:
+            | 'image'
+            | 'report'
+            | 'invoice'
+            | 'drawing'
+            | 'contract'
+            | 'video'
+            | 'other';
           uploaded_by?: string | null;
           created_at?: string;
         };
@@ -145,7 +158,14 @@ export interface Database {
           stage_id?: string | null;
           file_name?: string;
           file_url?: string | null;
-          file_type?: 'image' | 'report' | 'invoice' | 'drawing' | 'contract' | 'video' | 'other';
+          file_type?:
+            | 'image'
+            | 'report'
+            | 'invoice'
+            | 'drawing'
+            | 'contract'
+            | 'video'
+            | 'other';
           uploaded_by?: string | null;
           created_at?: string;
         };
@@ -237,9 +257,12 @@ export interface Database {
 }
 
 export type ProjectRow = Database['public']['Tables']['projects']['Row'];
-export type ProjectStageRow = Database['public']['Tables']['project_stages']['Row'];
-export type StageUpdateRow = Database['public']['Tables']['stage_updates']['Row'];
-export type ProjectFileRow = Database['public']['Tables']['project_files']['Row'];
+export type ProjectStageRow =
+  Database['public']['Tables']['project_stages']['Row'];
+export type StageUpdateRow =
+  Database['public']['Tables']['stage_updates']['Row'];
+export type ProjectFileRow =
+  Database['public']['Tables']['project_files']['Row'];
 export type BookingRow = Database['public']['Tables']['bookings']['Row'];
-export type NotificationRow = Database['public']['Tables']['notifications']['Row'];
-
+export type NotificationRow =
+  Database['public']['Tables']['notifications']['Row'];

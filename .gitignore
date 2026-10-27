@@ -1,10 +1,66 @@
-# OSX
-#
+# macOS and editor temporary files
 .DS_Store
+.AppleDouble
+._*
+.idea/
+*.swp
+*.swo
+*~
+*.tmp
+*.bak
+*.orig
+*.rej
 
-# Xcode
-#
+# Node.js dependencies, caches, and logs
+node_modules/
+.cache/
+.parcel-cache/
+.eslintcache
+*.tsbuildinfo
+*.log
+.pnp.*
+.expo/
+
+# Private environment files; keep shareable templates
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Build outputs and test reports
 build/
+dist/
+/coverage/
+/test-results/
+/playwright-report/
+*.jsbundle
+*.apk
+*.aab
+*.ipa
+
+# Local audit evidence and scratch screenshots
+/audit/
+scratch/
+screenshot_*.png
+screencap*.png
+
+# Generated documentation; keep the viewer and Markdown sources
+/docs/**/*.html
+!/docs/index.html
+/docs/docs_data.js
+
+# Android / Gradle local state
+.gradle/
+.kotlin/
+.cxx/
+local.properties
+*.iml
+*.hprof
+*.jks
+*.keystore
+!debug.keystore
+
+# Xcode local state and signing files
 *.pbxuser
 !default.pbxuser
 *.mode1v3
@@ -13,81 +69,36 @@ build/
 !default.mode2v3
 *.perspectivev3
 !default.perspectivev3
-xcuserdata
+xcuserdata/
 *.xccheckout
 *.moved-aside
-DerivedData
+DerivedData/
 *.hmap
-*.ipa
 *.xcuserstate
 **/.xcode.env.local
+*.p12
+*.mobileprovision
 
-# Android/IntelliJ
-#
-build/
-.idea
-.gradle
-local.properties
-*.iml
-*.hprof
-.cxx/
-*.keystore
-!debug.keystore
-.kotlin/
-# Simpan password keystore di ~/.gradle/gradle.properties atau environment CI.
-
-# node.js
-#
-node_modules/
-npm-debug.log
-yarn-error.log
-
-# Environment Variables (JANGAN commit ke Git - berisi API keys dan secrets)
-.env
-.env.local
-.env.development
-.env.production
-
-# fastlane
-#
-# It is recommended to not store the screenshots in the git repo. Instead, use fastlane to re-generate the
-# screenshots whenever they are needed.
-# For more information about the recommended setup visit:
-# https://docs.fastlane.tools/best-practices/source-control/
-
-**/fastlane/report.xml
-**/fastlane/Preview.html
-**/fastlane/screenshots
-**/fastlane/test_output
-
-# Bundle artifact
-*.jsbundle
-
-# Build output web (dist/bundle.js berisi kunci Supabase yang ter-bake + seluruh source)
-dist/
-
-# Ruby / CocoaPods
+# CocoaPods / Ruby dependencies
 **/Pods/
 /vendor/bundle/
 
-# Temporary files created by Metro to check the health of the file watcher
+# Fastlane outputs
+**/fastlane/report.xml
+**/fastlane/Preview.html
+**/fastlane/screenshots/
+**/fastlane/test_output/
+
+# Metro temporary health checks
 .metro-health-check*
 
-# testing
-/coverage
+# Supabase CLI local state
+supabase/.temp/
+supabase/.branches/
 
-# Yarn
+# Yarn: retain project-managed releases, plugins, and patches
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/sdks
-# Scratch & Temporary Screenshots
-scratch/
-screenshot_*.png
-screencap*.png
-
-# Supabase CLI Temporary Files
-supabase/.temp/
-
-dist/

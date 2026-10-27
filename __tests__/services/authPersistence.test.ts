@@ -1,7 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { authStorage, setRememberSession } from '../../src/config/authPersistence';
+import {
+  authStorage,
+  setRememberSession,
+} from '../../src/config/authPersistence';
 describe('session persistence preference', () => {
-  beforeEach(async () => { await AsyncStorage.clear(); });
+  beforeEach(async () => {
+    await AsyncStorage.clear();
+  });
   it('persists remembered sessions and deletes credentials on sign out', async () => {
     await setRememberSession(true);
     await authStorage.setItem('session-test', 'token');

@@ -1,4 +1,4 @@
-import { SupabaseProjectRepository } from '../../src/services/repositories/SupabaseProjectRepository';
+import { SupabaseProjectRepository } from '../../src/infrastructure/supabase/SupabaseProjectRepository';
 import { notificationService } from '../../src/services/notificationService';
 import { supabase } from '../../src/config/supabase';
 
@@ -29,18 +29,26 @@ describe('Integration Flow - Project & Notification Cycle', () => {
       },
     ];
 
-    const mockOrderProj = jest.fn().mockResolvedValue({ data: mockProjectsData, error: null });
+    const mockOrderProj = jest
+      .fn()
+      .mockResolvedValue({ data: mockProjectsData, error: null });
     const mockSelectProj = jest.fn().mockReturnValue({ order: mockOrderProj });
-    (supabase.from as jest.Mock).mockReturnValueOnce({ select: mockSelectProj });
+    (supabase.from as jest.Mock).mockReturnValueOnce({
+      select: mockSelectProj,
+    });
 
     const projects = await repository.getProjects('usr-admin', 'admin');
     expect(projects).toHaveLength(1);
     expect(projects[0].project_code).toBe('GSI-FLOW-001');
 
-    const mockSelectNotif = jest.fn().mockResolvedValue({ data: [{ id: 'notif-999' }], error: null });
+    const mockSelectNotif = jest
+      .fn()
+      .mockResolvedValue({ data: [{ id: 'notif-999' }], error: null });
     const mockEqNotif = jest.fn().mockReturnValue({ select: mockSelectNotif });
     const mockUpdateNotif = jest.fn().mockReturnValue({ eq: mockEqNotif });
-    (supabase.from as jest.Mock).mockReturnValueOnce({ update: mockUpdateNotif });
+    (supabase.from as jest.Mock).mockReturnValueOnce({
+      update: mockUpdateNotif,
+    });
 
     await notificationService.markAsRead('notif-999');
     expect(mockUpdateNotif).toHaveBeenCalledWith({ is_read: true });

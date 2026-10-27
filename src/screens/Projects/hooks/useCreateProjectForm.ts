@@ -1,3 +1,4 @@
+import type { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useState, useEffect } from 'react';
 import { Alert, Platform } from 'react-native';
 import { useProjectStore } from '../../../store/projectStore';
@@ -10,7 +11,12 @@ export type UserOption = { id: string; name: string; email: string };
 
 export function useCreateProjectForm(
   onSuccess?: () => void,
-  initialValues?: { initialProjectName?: string; initialClientName?: string; initialServiceType?: string; surveyBookingId?: number }
+  initialValues?: {
+    initialProjectName?: string;
+    initialClientName?: string;
+    initialServiceType?: string;
+    surveyBookingId?: number;
+  },
 ) {
   const currentYear = new Date().getFullYear();
   const projectCodePrefix = `GSI-${currentYear}-`;
@@ -19,13 +25,17 @@ export function useCreateProjectForm(
   const [isLoading, setIsLoading] = useState(false);
 
   const [projectCodeSuffix, setProjectCodeSuffix] = useState('');
-  const [projectName, setProjectName] = useState(initialValues?.initialProjectName || '');
+  const [projectName, setProjectName] = useState(
+    initialValues?.initialProjectName || '',
+  );
   const [budget, setBudget] = useState('');
   const [startDate, setStartDate] = useState<Date | null>(new Date());
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
-  const [clientNotRegisteredNotice, setClientNotRegisteredNotice] = useState<string | null>(null);
+  const [clientNotRegisteredNotice, setClientNotRegisteredNotice] = useState<
+    string | null
+  >(null);
 
   const [clientsList, setClientsList] = useState<UserOption[]>([]);
   const [marketingsList, setMarketingsList] = useState<UserOption[]>([]);
@@ -33,8 +43,12 @@ export function useCreateProjectForm(
   const [isLoadingLists, setIsLoadingLists] = useState(false);
 
   const [selectedClient, setSelectedClient] = useState<UserOption | null>(null);
-  const [selectedMarketing, setSelectedMarketing] = useState<UserOption | null>(null);
-  const [selectedEngineer, setSelectedEngineer] = useState<UserOption | null>(null);
+  const [selectedMarketing, setSelectedMarketing] = useState<UserOption | null>(
+    null,
+  );
+  const [selectedEngineer, setSelectedEngineer] = useState<UserOption | null>(
+    null,
+  );
 
   const [pickerModal, setPickerModal] = useState<{
     visible: boolean;
@@ -59,7 +73,9 @@ export function useCreateProjectForm(
         if (initialValues?.initialClientName) {
           const targetName = initialValues.initialClientName.toLowerCase();
           const match = clients.find(
-            c => c.name.toLowerCase().includes(targetName) || targetName.includes(c.name.toLowerCase())
+            c =>
+              c.name.toLowerCase().includes(targetName) ||
+              targetName.includes(c.name.toLowerCase()),
           );
           if (match) {
             setSelectedClient(match);
@@ -67,12 +83,15 @@ export function useCreateProjectForm(
           } else {
             setSelectedClient(null);
             setClientNotRegisteredNotice(
-              `Akun Klien "${initialValues.initialClientName}" belum didaftarkan oleh Admin di aplikasi GSI. Silakan daftarkan akun Klien terlebih dahulu sebelum membuat proyek.`
+              `Akun Klien "${initialValues.initialClientName}" belum didaftarkan oleh Admin di aplikasi GSI. Silakan daftarkan akun Klien terlebih dahulu sebelum membuat proyek.`,
             );
           }
         }
       } catch (err: unknown) {
-        Alert.alert('Error', getErrorMessage(err, 'Gagal memuat daftar Klien/Staff'));
+        Alert.alert(
+          'Error',
+          getErrorMessage(err, 'Gagal memuat daftar Klien/Staff'),
+        );
       } finally {
         setIsLoadingLists(false);
       }
@@ -106,7 +125,10 @@ export function useCreateProjectForm(
     return `${projectCodePrefix}${clean}`;
   };
 
-  const handleStartDateChange = (event: any, selectedDate?: Date) => {
+  const handleStartDateChange = (
+    _event: DateTimePickerEvent,
+    selectedDate?: Date,
+  ) => {
     if (Platform.OS === 'android') {
       setShowStartPicker(false);
     }
@@ -115,7 +137,10 @@ export function useCreateProjectForm(
     }
   };
 
-  const handleEndDateChange = (event: any, selectedDate?: Date) => {
+  const handleEndDateChange = (
+    _event: DateTimePickerEvent,
+    selectedDate?: Date,
+  ) => {
     if (Platform.OS === 'android') {
       setShowEndPicker(false);
     }
@@ -136,14 +161,14 @@ export function useCreateProjectForm(
     if (initialValues?.initialClientName && clientNotRegisteredNotice) {
       Alert.alert(
         'Akun Klien Belum Didaftarkan',
-        `Akun Klien untuk permohonan survey "${initialValues.initialClientName}" belum dibuat / didaftarkan oleh Admin di aplikasi GSI.\n\nSilakan daftarkan akun Klien terlebih dahulu sebelum proyek dapat dibuat.`
+        `Akun Klien untuk permohonan survey "${initialValues.initialClientName}" belum dibuat / didaftarkan oleh Admin di aplikasi GSI.\n\nSilakan daftarkan akun Klien terlebih dahulu sebelum proyek dapat dibuat.`,
       );
       return;
     }
     if (!selectedClient) {
       Alert.alert(
         'Klien Belum Terdaftar / Dipilih',
-        'Proyek hanya dapat dibuat setelah Admin mendaftarkan Klien sebagai pengguna aplikasi GSI. Silakan daftarkan akun Klien terlebih dahulu atau pilih akun Klien yang sudah terdaftar.'
+        'Proyek hanya dapat dibuat setelah Admin mendaftarkan Klien sebagai pengguna aplikasi GSI. Silakan daftarkan akun Klien terlebih dahulu atau pilih akun Klien yang sudah terdaftar.',
       );
       return;
     }
@@ -169,7 +194,10 @@ export function useCreateProjectForm(
       return;
     }
     if (endDate < startDate) {
-      Alert.alert('Validasi', 'Tanggal estimasi selesai tidak boleh sebelum tanggal mulai');
+      Alert.alert(
+        'Validasi',
+        'Tanggal estimasi selesai tidak boleh sebelum tanggal mulai',
+      );
       return;
     }
 
@@ -194,22 +222,34 @@ export function useCreateProjectForm(
         try {
           await surveyService.deleteBooking(initialValues.surveyBookingId);
         } catch (deleteErr) {
-          if (__DEV__) { console.warn('Gagal menghapus booking survey terkonversi:', deleteErr); }
+          if (__DEV__) {
+            console.warn(
+              'Gagal menghapus booking survey terkonversi:',
+              deleteErr,
+            );
+          }
         }
       }
 
       await fetchProjects();
-      Alert.alert('Sukses', `Proyek baru (${fullProjectCode}) berhasil didaftarkan!`, [
-        {
-          text: 'OK',
-          onPress: () => {
-            resetForm();
-            if (onSuccess) onSuccess();
+      Alert.alert(
+        'Sukses',
+        `Proyek baru (${fullProjectCode}) berhasil didaftarkan!`,
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              resetForm();
+              if (onSuccess) onSuccess();
+            },
           },
-        },
-      ]);
+        ],
+      );
     } catch (err: unknown) {
-      Alert.alert('Gagal', getErrorMessage(err, 'Terjadi kesalahan saat menyimpan proyek baru'));
+      Alert.alert(
+        'Gagal',
+        getErrorMessage(err, 'Terjadi kesalahan saat menyimpan proyek baru'),
+      );
     } finally {
       setIsLoading(false);
     }

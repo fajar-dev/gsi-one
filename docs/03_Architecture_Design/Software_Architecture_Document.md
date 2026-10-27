@@ -17,7 +17,7 @@ GSI One menggunakan arsitektur **Clean Architecture & Layered Domain Design** pa
 - **Komponen**: Layar (`screens/`), komponen UI reusable (`components/`)
 - **Header Shared**: `ScreenHeader.tsx` (Gradient otomatis berbasis role via `useRoleTheme`)
 - **Navigasi**: React Navigation (Native Stack + Authenticated Bottom Tabs)
-- **Styling System**: `assets/styles/Colors.tsx` (Design tokens terpusat), `assets/styles/GlobalStyle.tsx` (`Gs` utility & corner radius asimetris), `src/utils/responsive.ts` (scaling 390px basis)
+- **Styling System**: `src/theme/colors.ts` (Design tokens terpusat), `src/theme/globalStyles.ts` (`Gs` utility & corner radius asimetris), `src/utils/responsive.ts` (scaling 390px basis)
 
 ### 2.2 Lapisan State Management & Hooks
 - **Teknologi**: Zustand 5.x

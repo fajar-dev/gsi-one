@@ -2,11 +2,6 @@
 
 Aplikasi Mobile Resmi **PT Graha Survei Indonesia (GSI)** untuk pemantauan proyek survei & penilaian forensic struktur bangunan (*Structural Health Monitoring System & Forensic Engineering*).
 
-[![Maintainability Score](https://img.shields.io/badge/Maintainability-Grade%20A-brightgreen)](#-maintainability--kualitas-kodebase)
-[![TypeScript](https://img.shields.io/badge/TypeScript-Strict%20Mode-blue)](https://www.typescriptlang.org/)
-[![CI](https://img.shields.io/badge/CI-Quality%20Gate%20Active-success)](.github/workflows/ci.yml)
-[![Architecture](https://img.shields.io/badge/Architecture-Clean%20%26%20Layered-orange)](#-dokumentasi-arsitektur--pengembang)
-
 ---
 
 ## Ikhtisar Aplikasi
@@ -22,11 +17,13 @@ Aplikasi Mobile Resmi **PT Graha Survei Indonesia (GSI)** untuk pemantauan proye
 
 ## Maintainability & Kualitas Codebase
 
-Codebase GSI One telah melalui audit maintainability komprehensif dan mencapai **Grade A (Sangat Baik)**:
-- **Zero Duplicate Logic**: Seluruh helper error, format tanggal, dan mata uang disentralisasi di `src/utils/errorHelpers.ts` dan `src/utils/formatters.ts`. Logika form pembuatan proyek disentralisasi di `src/screens/Projects/hooks/useCreateProjectForm.ts`.
-- **Zero Layer Leaks**: Panggilan Supabase SDK 100% diisolasi dalam Repository Pattern (`SupabaseProjectRepository`, `SupabaseSurveyRepository`) dan Service Facades (`projectService`, `surveyService`).
-- **Type-safe Database Schema**: Dilengkapi dengan pemetaan skema database Supabase di `src/types/database.types.ts` tanpa casting `as any`.
-- **No Magic Strings**: Penggunaan Enum terpusat (`ProjectStatusEnum`, `ProjectStageStatusEnum`, `UserRoleEnum`).
+Quality gate lokal memeriksa batas arsitektur, modul tidak terjangkau dan siklus impor, strict TypeScript, ESLint tanpa warning, format Prettier, serta unit dan integration test. Jalankan `npm run check` sebelum commit. Hasil pengujian lokal tidak menggantikan pengujian perangkat atau hasil CI GitHub.
+
+- Model, validasi, dan kontrak repository berada di `src/domain/`.
+- Implementasi query, mapper, profil, dan Storage berada di `src/infrastructure/supabase/`.
+- Screen menggunakan hook, store, atau service; tidak mengakses Supabase dan penyimpanan sesi langsung.
+- Token warna, spacing, radius, dan tipografi berada di `src/theme/`.
+- Mock pengujian berada di `test/mocks/`; adapter browser berada di `src/platform/web/`.
 
 ---
 
@@ -39,23 +36,26 @@ Codebase GSI One telah melalui audit maintainability komprehensif dan mencapai *
 - **Database & Realtime Sync**: Supabase PostgreSQL + Realtime WebSockets + Storage Buckets
 - **Operasi admin**: Supabase Edge Function `admin-create-user`
 - **Testing & CI**: Jest (unit dan integration test) + GitHub Actions quality gate (`lint`, `typecheck`, `test:ci`)
-- **UI & Iconography**: Custom Design System (`assets/styles/Colors.tsx`), React Native Vector Icons (Feather), Linear Gradient, SVG
+- **UI & Iconography**: Custom Design System (`src/theme/colors.ts`), React Native Vector Icons (Feather), Linear Gradient, SVG
 
 ---
 
 ## Struktur Proyek Utama
 
 ```
-d:\GSI One - Copy\
+gsi-one/
 ├── __tests__/               -- Automated Unit Test Suites (Domain, Utils, Service, UI)
-├── assets/                  -- Aset gambar, ikon, dan Design Tokens (Colors.tsx)
+├── assets/                  -- Aset gambar dan ikon
 ├── supabase/                -- Migrasi PostgreSQL, Edge Functions, dan seed.sql
 ├── docs/                    -- Dokumentasi teknis lengkap (SRS, SDLC, Architecture, Deployment)
 └── src/
     ├── components/          -- Reusable UI components (ScreenHeader, BottomNav, ErrorBoundary, dll)
-    ├── config/              -- Konfigurasi Supabase, API endpoints, dan mocks unit test
-    ├── domain/              -- OOP Domain Entities (ProjectEntity, SurveyRequestEntity, UserRole, ProjectStatus)
-    ├── hooks/               -- Custom hooks (useAuth, useProjectRealtime, useSurveyRequests, useProjectDetail, useProfile)
+    ├── config/              -- Konfigurasi Supabase dan persistensi autentikasi
+    ├── domain/              -- Model, kalkulasi progres/statistik, SurveyRequestEntity, role, dan validasi
+    ├── infrastructure/      -- Implementasi repository Supabase dan mapper
+    ├── platform/            -- Adapter native/web dan registrasi font
+    ├── theme/               -- Warna, spacing, tipografi, dan tema role
+    ├── hooks/               -- Custom hooks sesi, realtime, proyek, survey, dan pendaftaran
     ├── navigation/          -- AuthenticatedTabs & Root Stack Navigation
     ├── screens/
     │   ├── BookSurvey/      -- Form booking survey & SurveyRequestsScreen (Daftar Survey)
@@ -66,7 +66,7 @@ d:\GSI One - Copy\
     │   ├── Projects/        -- ProjectListScreen, ProjectDetailScreen, CreateProjectScreen, EditProjectModal
     │   ├── Services/        -- LayananKamiScreen (6 Katalog Layanan Resmi GSI), LayananDetailScreen, & ServicesScreen (Our Experience)
     │   └── Structures/      -- Detail struktur & carousel studi kasus (StructureDetail)
-    ├── services/            -- Repository Pattern & Services (SupabaseProjectRepository, SupabaseSurveyRepository, projectService, surveyService)
+    ├── services/            -- Service facade dan layanan autentikasi/notifikasi
     ├── store/               -- Global Zustand Stores (authStore.ts, projectStore.ts)
     ├── types/               -- TypeScript definitions (database.types.ts, navigation.ts)
     └── utils/               -- Centralized Helpers (errorHelpers, formatters, projectHelpers, userHelpers, responsive)
@@ -77,6 +77,7 @@ d:\GSI One - Copy\
 ## Panduan Pengoperasian & Verifikasi
 
 ### 1. Persiapan Environment (.env)
+Gunakan Node.js 24 (`.nvmrc`), JDK 17, dan Android SDK sesuai `android/build.gradle`. Instal dependensi dengan `npm ci`.
 Salin berkas `.env.example` menjadi `.env` pada folder root:
 ```bash
 cp .env.example .env
@@ -105,7 +106,7 @@ npm run test:ci
 
 ## Pengujian Otomatis
 
-Suite Jest mencakup unit test serta integration test untuk pemetaan proyek, pagination, matriks filter RLS per peran, lifecycle notifikasi, signed URL storage, dan alur proyek. CI menjalankan `npm ci`, `npm run lint`, `npm run typecheck`, dan `npm run test:ci` pada push/pull request ke `main`, `master`, `dev`, atau `develop`.
+Suite Jest mencakup unit test serta integration test untuk pemetaan proyek, pagination, matriks filter RLS per peran, lifecycle notifikasi, signed URL storage, dan alur proyek. CI dikonfigurasi menjalankan `npm ci`, `npm run check`, audit dependensi, build web, dan build APK debug pada push/pull request ke `main`, `master`, `dev`, atau `develop`.
 
 ---
 

@@ -63,7 +63,7 @@ src/
 Saat menambah fitur atau modul baru di GSI One Mobile, ikuti langkah wajib berikut:
 1. **Definisikan Tipe Data**: Tambahkan tipe skema database di `src/types/database.types.ts` dan tipe domain di `src/types/`.
 2. **Buat Entitas Domain / Enum**: Jika memerlukan logika bisnis khusus, buat kelas entitas di `src/domain/entities/`.
-3. **Tambahkan Kontrak Repositori**: Buat interface di `src/services/repositories/` dan implementasikan query Supabase pada repositori terkait.
+3. **Tambahkan Kontrak Repositori**: Buat interface di `src/infrastructure/supabase/` dan implementasikan query Supabase pada repositori terkait.
 4. **Buat Custom Hook**: Isolasi seluruh pemanggilan data di `src/hooks/`.
 5. **Buat Komponen UI**: Susun tampilan visual di `src/screens/` tanpa menyertakan kueri database langsung.
 6. **Tulis Unit Test**: Buat pengujian otomatis menggunakan Jest di folder `__tests__/`.

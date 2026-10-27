@@ -1,11 +1,18 @@
-import React, { JSX, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { ActionButton } from '../../../components/ui/ActionButton';
+import {
+  palette,
+  touchTarget,
+  spacing,
+  typography,
+} from '../../../theme/tokens';
+import { JSX, useEffect } from 'react';
+import { View, Text, Image, StyleSheet } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/Feather';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { AuthenticatedNavigationProp } from '../../../types/navigation';
-import { colors, overlay, neutral } from '../../../../assets/styles/Colors';
+import { colors, overlay, neutral } from '../../../theme/colors';
 import { scale, fontScale } from '../../../utils/responsive';
 import { useAuthStore } from '../../../store/authStore';
 import { useNotificationStore } from '../../../store/notificationStore';
@@ -72,26 +79,28 @@ function DashboardHeader({
           </View>
 
           <View style={styles.actions}>
-            <TouchableOpacity
+            <ActionButton
               style={styles.iconButton}
               activeOpacity={0.7}
               onPress={() => navigation.navigate('Notifications')}
+              accessibilityRole="button"
+              accessibilityLabel="Notifikasi"
             >
-              <Icon name="bell" size={scale(18)} color="#FFF" />
+              <Icon name="bell" size={scale(18)} color={palette.white} />
               {unreadCount > 0 && <View style={styles.notificationDot} />}
-            </TouchableOpacity>
-            <TouchableOpacity
+            </ActionButton>
+            <ActionButton
               style={styles.avatarButton}
               activeOpacity={0.8}
               onPress={() => navigation.navigate('Profile')}
+              accessibilityRole="button"
             >
               <View style={styles.avatar}>
                 <Text style={styles.avatarText}>{initials}</Text>
               </View>
-            </TouchableOpacity>
+            </ActionButton>
           </View>
         </View>
-
 
         <View style={styles.greetingSection}>
           <Text style={styles.greetingText}>{greetingLabel}</Text>
@@ -101,7 +110,12 @@ function DashboardHeader({
           ) : null}
           <View style={styles.badgeRow}>
             <View style={[styles.rolePill, rolePillStyle]}>
-              <Icon name={roleIcon} size={12} color="#FFF" style={styles.rolePillIcon} />
+              <Icon
+                name={roleIcon}
+                size={12}
+                color={palette.white}
+                style={styles.rolePillIcon}
+              />
               <Text style={styles.rolePillText}>{roleLabel}</Text>
             </View>
           </View>
@@ -130,13 +144,13 @@ const styles = StyleSheet.create({
   },
   headerGradientOverlay: {
     paddingBottom: scale(36),
-    paddingHorizontal: scale(20),
+    paddingHorizontal: scale(spacing.xl),
   },
   topRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: scale(20),
+    marginBottom: scale(spacing.xl),
   },
   brand: {
     flexDirection: 'row',
@@ -151,7 +165,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1.5,
     borderColor: 'rgba(255, 255, 255, 0.5)',
-    marginRight: scale(8),
+    marginRight: scale(spacing.sm),
     overflow: 'hidden',
   },
   logo: {
@@ -162,14 +176,14 @@ const styles = StyleSheet.create({
     transform: [{ scale: 1.35 }],
   },
   brandName: {
-    fontSize: fontScale(16),
+    fontSize: fontScale(typography.bodyLarge),
     fontWeight: '700',
     color: colors.white,
   },
   actions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: scale(12),
+    gap: scale(spacing.md),
   },
   iconButton: {
     width: scale(36),
@@ -189,9 +203,12 @@ const styles = StyleSheet.create({
     top: scale(6),
     right: scale(8),
     borderWidth: 1.5,
-    borderColor: '#0F9F67',
+    borderColor: palette.brand,
   },
-  avatarButton: {},
+  avatarButton: {
+    minHeight: touchTarget.minSize,
+    minWidth: touchTarget.minSize,
+  },
   avatar: {
     width: scale(36),
     height: scale(36),
@@ -206,14 +223,14 @@ const styles = StyleSheet.create({
     color: neutral[900],
   },
   greetingSection: {
-    marginTop: scale(8),
+    marginTop: scale(spacing.sm),
   },
   greetingText: {
-    fontSize: fontScale(14),
+    fontSize: fontScale(typography.body),
     color: 'rgba(255, 255, 255, 0.7)',
   },
   userName: {
-    fontSize: fontScale(24),
+    fontSize: fontScale(typography.heading),
     fontWeight: '800',
     color: colors.white,
     marginTop: scale(2),
@@ -222,33 +239,33 @@ const styles = StyleSheet.create({
     fontSize: fontScale(15),
     fontWeight: '700',
     color: '#FF9E6B',
-    marginTop: scale(4),
+    marginTop: scale(spacing.xs),
   },
   badgeRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: scale(6),
-    marginBottom: scale(4),
+    marginBottom: scale(spacing.xs),
   },
   rolePill: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: overlay.white20,
     paddingHorizontal: scale(10),
-    paddingVertical: scale(4),
+    paddingVertical: scale(spacing.xs),
     borderRadius: scale(14),
     borderWidth: 1,
     borderColor: overlay.white30,
   },
-  rolePillIcon: { marginRight: scale(4) },
+  rolePillIcon: { marginRight: scale(spacing.xs) },
   rolePillText: {
     color: colors.white,
-    fontSize: fontScale(11),
+    fontSize: fontScale(typography.caption),
     fontWeight: '700',
     letterSpacing: 0.5,
   },
   welcomeSub: {
-    fontSize: fontScale(11),
+    fontSize: fontScale(typography.caption),
     color: 'rgba(255, 255, 255, 0.65)',
     marginTop: scale(6),
   },

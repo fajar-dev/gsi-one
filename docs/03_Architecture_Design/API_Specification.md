@@ -9,7 +9,7 @@ Aplikasi mengakses Supabase melalui SDK pada `src/config/supabase.ts`. Konfigura
 | Login email/password | `supabase.auth.signInWithPassword` | `src/services/authService.ts` |
 | Resolusi tiket klien | RPC `get_email_by_ticket_number` | `src/services/authService.ts` |
 | Pembuatan pengguna | `supabase.functions.invoke('admin-create-user')` | `supabase/functions/admin-create-user/index.ts` |
-| Daftar/detail proyek | PostgREST tabel proyek dan relasinya | `src/services/repositories/sub/ProjectQueryRepository.ts` |
+| Daftar/detail proyek | PostgREST tabel proyek dan relasinya | `src/infrastructure/supabase/projects/ProjectQueryRepository.ts` |
 | Mutasi proyek | PostgREST `projects` | `ProjectCommandRepository.ts` |
 | Tahapan dan catatan | PostgREST `project_stages`, `stage_updates` | `ProjectStageRepository.ts` |
 | Upload | Storage bucket `projects` + metadata `project_files` | `ProjectFileRepository.ts` |

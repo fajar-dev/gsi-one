@@ -10,7 +10,7 @@ Dokumen ini disusun sebagai panduan menyeluruh (*comprehensive onboarding guide*
 * **Nama Aplikasi**: GSI One
 * **Pemilik Produk**: PT Graha Survei Indonesia (GSI)
 * **Domain Industri**: Inspeksi Teknis Struktur, *Forensic Engineering*, *Non-Destructive Testing (NDT)*, *Structural Health Monitoring System (SHMS)*, dan Penilaian Kerentanan Bencana.
-* **Versi Rilis Saat Ini**: `1.4.0` (Production Ready)
+* **Versi Android**: Lihat `versionName` dan `versionCode` di `android/app/build.gradle`
 * **Model Distribusi**: Android APK/AAB (Google Play Store) & Web Responsive (via `react-native-web`).
 
 ### 1.2 Matriks Akses Pengguna (Role-Based Access Control)
@@ -81,7 +81,8 @@ classDiagram
     }
     class DomainEntities {
         <<Domain Entities (OOP)>>
-        ProjectEntity
+        Project & ProjectDetail
+        projectProgress & projectStatistics
         SurveyRequestEntity
         UserRole & ProjectStatus
     }
@@ -103,23 +104,23 @@ classDiagram
 ### Penjelasan Lapisan Arsitektur:
 1. **Presentation Layer (`src/screens/`, `src/components/`)**:
    - Komponen UI murni deklaratif yang terisolasi dari kueri langsung ke database.
-   - Menggunakan token desain terpusat dari [Colors.tsx](assets/styles/Colors.tsx) dan utilitas tata letak [GlobalStyle.tsx](assets/styles/GlobalStyle.tsx).
+   - Menggunakan token desain terpusat dari [colors.ts](src/theme/colors.ts) dan [tokens.ts](src/theme/tokens.ts).
 2. **Logic & Hook Isolation Layer (`src/hooks/`)**:
    - Memisahkan *side-effects*, penanganan formulir, dan langganan WebSocket dari render tree UI.
    - Contoh: [useProjectDetail.ts](src/hooks/useProjectDetail.ts), [useSurveyRequests.ts](src/hooks/useSurveyRequests.ts), [useProjectRealtime.ts](src/hooks/useProjectRealtime.ts).
 3. **State Management (`src/store/`)**:
    - Dikelola oleh Zustand v5: [authStore.ts](src/store/authStore.ts), [projectStore.ts](src/store/projectStore.ts), dan [notificationStore.ts](src/store/notificationStore.ts).
    - Mendukung pembaruan optimistik (*optimistic update*) dengan *rollback* otomatis jika mutasi ditolak oleh server/RLS.
-4. **Repository Layer (`src/services/repositories/`)**:
-   - [SupabaseProjectRepository.ts](src/services/repositories/SupabaseProjectRepository.ts) bertindak sebagai façade yang mendelegasikan tanggung jawab kepada sub-repository:
-     - [ProjectQueryRepository.ts](src/services/repositories/sub/ProjectQueryRepository.ts): Kueri daftar proyek, detail, filtering, dan pagination.
-     - [ProjectStageRepository.ts](src/services/repositories/sub/ProjectStageRepository.ts): Penambahan/perubahan tahapan dan catatan harian.
-     - [ProjectFileRepository.ts](src/services/repositories/sub/ProjectFileRepository.ts): Pengunggahan berkas teknis dan pembuatan signed URL.
-     - [ProjectCommandRepository.ts](src/services/repositories/sub/ProjectCommandRepository.ts): Pembuatan dan pembaruan data master proyek.
-   - [projectMapper.ts](src/services/mappers/projectMapper.ts) memetakan raw row PostgreSQL ke instance model entitas.
+4. **Repository Layer (`src/infrastructure/supabase/`)**:
+   - [SupabaseProjectRepository.ts](src/infrastructure/supabase/SupabaseProjectRepository.ts) bertindak sebagai façade yang mendelegasikan tanggung jawab kepada sub-repository:
+     - [ProjectQueryRepository.ts](src/infrastructure/supabase/projects/ProjectQueryRepository.ts): Kueri daftar proyek, detail, filtering, dan pagination.
+     - [ProjectStageRepository.ts](src/infrastructure/supabase/projects/ProjectStageRepository.ts): Penambahan/perubahan tahapan dan catatan harian.
+     - [ProjectFileRepository.ts](src/infrastructure/supabase/projects/ProjectFileRepository.ts): Pengunggahan berkas teknis dan pembuatan signed URL.
+     - [ProjectCommandRepository.ts](src/infrastructure/supabase/projects/ProjectCommandRepository.ts): Pembuatan dan pembaruan data master proyek.
+   - [projectMapper.ts](src/infrastructure/supabase/mappers/projectMapper.ts) memetakan raw row PostgreSQL ke model domain bertipe.
 5. **Domain Entities (`src/domain/`)**:
-   - [ProjectEntity.ts](src/domain/entities/ProjectEntity.ts): Menyediakan kalkulasi bisnis mandiri seperti `getProgressPercentage()`, `isOverdue()`, dan `getFormattedBudget()`.
-   - [SurveyRequestEntity.ts](src/domain/entities/SurveyRequestEntity.ts): Menyediakan method klaim dan generator URL pesan WhatsApp otomatis.
+   - [projectProgress.ts](src/domain/models/projectProgress.ts) dan [projectStatistics.ts](src/domain/models/projectStatistics.ts): Menghitung progres tahapan dan statistik status proyek. Format tanggal/mata uang berada di `utils/formatters.ts`.
+   - [SurveyRequestEntity.ts](src/domain/entities/SurveyRequestEntity.ts): Menyediakan status permohonan serta generator URL telepon/WhatsApp. Klaim wajib disimpan melalui repository; ID database yang tidak valid ditolak.
 
 ---
 
@@ -199,59 +200,7 @@ erDiagram
 
 ## 4. Peta Struktur Direktori Codebase
 
-Berikut referensi navigasi berkas terpenting di repository:
-
-```
-d:/fajar/GSI One - Copy/
-├── assets/
-│   └── styles/
-│       ├── Colors.tsx              # Definisi token warna (roleColors, neutral, surface, overlay)
-│       └── GlobalStyle.tsx         # Objek utilitas StyleSheet (Gs.h1, Gs.flexRow, Gs.cornerMD)
-├── docs/                           # Dokumentasi SDLC, SRS, Architecture, & index.html portal
-├── supabase/
-│   ├── functions/admin-create-user # Edge function pendaftaran user via Service Role Key
-│   └── migrations/                 # Migrasi SQL RLS, index, dan storage bucket
-├── __tests__/                      # 15 Test Suite Jest (Domain, Services, Utils, Integration)
-├── src/
-│   ├── components/
-│   │   ├── common/ScreenHeader.tsx # Header bersama dengan gradient dinamis per-role
-│   │   ├── common/SupportCard.tsx  # Kartu kontak bantuan (telepon & situs GSI)
-│   │   └── ErrorBoundary/          # Komponen penangkap crash render tree
-│   ├── config/
-│   │   └── supabase.ts             # Client SDK dan konfigurasi Supabase
-│   ├── domain/
-│   │   ├── entities/               # ProjectEntity.ts & SurveyRequestEntity.ts
-│   │   └── enums/                  # UserRole.ts & ProjectStatus.ts
-│   ├── hooks/
-│   │   ├── useProjectDetail.ts     # Pengelola state & data tahapan proyek
-│   │   ├── useSurveyRequests.ts    # Pengelola data survey & status klaim
-│   │   ├── useProjectRealtime.ts   # Listener WebSocket Supabase
-│   │   └── useRoleTheme.ts         # Hook resolusi tema warna aktif
-│   ├── navigation/
-│   │   └── AuthenticatedTabs.tsx   # Tab navigator bawah untuk Dashboard, Proyek, & Profil
-│   ├── screens/
-│   │   ├── Dashboard/              # Router dashboard peran & implementasi 4 role
-│   │   ├── Projects/               # ProjectList, ProjectDetail, CreateProject, & Modals
-│   │   ├── BookSurvey/             # Formulir reservasi survey & SurveyRequestsScreen
-│   │   ├── Services/               # Katalog 6 layanan resmi GSI & LayananDetailScreen
-│   │   └── Profile/                # Layar profil pengguna & edit profil
-│   ├── services/
-│   │   ├── repositories/           # SupabaseProjectRepository & sub-repositories
-│   │   ├── storageService.ts       # Generator signed URL berkas privat
-│   │   └── notificationService.ts  # Layanan pagination & update status notifikasi
-│   ├── store/
-│   │   ├── authStore.ts            # State sesi pengguna & caching AsyncStorage
-│   │   ├── projectStore.ts         # State daftar proyek & selector granular
-│   │   └── notificationStore.ts    # State notifikasi & optimistic mutation
-│   └── utils/
-│       ├── formatters.ts           # Format tanggal (formatDateDisplay) & rupiah (formatCurrency)
-│       ├── responsive.ts           # Scaling responsive UI (scale, fontScale, wp, hp)
-│       └── errorHelpers.ts         # Normalisasi pesan error terpusat (getErrorMessage)
-├── App.tsx                         # Entry point aplikasi mobile & Root Stack
-├── CODEBASE_MAP.md                 # Dokumentasi navigasi detail per berkas
-├── HANDOVER.md                     # Ringkasan operasional serah terima
-└── package.json                    # Manifes paket & script npm
-```
+Peta direktori terkini terdapat di [CODEBASE_MAP.md](CODEBASE_MAP.md). Kontrak repository berada di `src/domain/repositories/`, implementasi di `src/infrastructure/supabase/`, dan design token di `src/theme/`. Hook khusus fitur tetap berdekatan dengan screen-nya; mock pengujian berada di `test/mocks/`.
 
 ---
 
@@ -264,27 +213,29 @@ Untuk mempertahankan integritas kode dan kualitas lulusan CI/CD:
 2. **Gunakan Helper Terpusat**:
    - Format Tanggal & Mata Uang: Gunakan fungsi `formatDateDisplay()`, `formatDateDb()`, atau `formatCurrency()` dari [src/utils/formatters.ts](src/utils/formatters.ts).
    - Penanganan Error: Bungkus pesan error catch block dengan `getErrorMessage(error, 'Pesan default')` dari [src/utils/errorHelpers.ts](src/utils/errorHelpers.ts).
-   - Dimensi Responsif: Gunakan `scale()`, `fontScale()`, `wp()`, dan `hp()` dari [src/utils/responsive.ts](src/utils/responsive.ts).
+   - Dimensi Responsif: Gunakan `scale()`, `fontScale()`, serta token layout dari [src/utils/responsive.ts](src/utils/responsive.ts).
 3. **Konsistensi Tema Role**:
    - Selalu ambil warna tema menggunakan hook `useRoleTheme()` dari [src/theme/roleTheme.ts](src/theme/roleTheme.ts) agar elemen UI otomatis mengikuti role pengguna aktif.
 4. **Isolasi Repository**:
-   - Dilarang keras menuliskan query PostgREST `supabase.from(...)` di file UI screen/komponen. Logika data wajib ditempatkan di [src/services/repositories/](src/services/repositories).
+   - Dilarang keras menuliskan query PostgREST `supabase.from(...)` di file UI screen/komponen. Logika data wajib ditempatkan di [src/infrastructure/supabase/](src/infrastructure/supabase/).
 
 ---
 
 ## 6. Pengujian & Penjaminan Kualitas (Quality Assurance)
 
-Seluruh test suite Jest telah diuji dan terverifikasi **100% lulus (74 tests passed)**:
+Jalankan `npm run check` untuk hasil terkini. Suite menggunakan mock terkontrol; integration test Jest bukan bukti eksekusi CRUD pada Supabase produksi:
 
 | Test Suite | File | Cakupan Pengujian |
 | :--- | :--- | :--- |
 | **User Role & Enums** | `UserRole.test.ts` | Validasi peran, konversi string, dan guard |
 | **Storage Service** | `storageService.test.ts` | Validasi signed URL generation & fallback |
-| **Entity OOP** | `ProjectEntity.test.ts`, `SurveyRequestEntity.test.ts` | Validasi persentase progres, budget, dan claim WA |
+| **Domain** | `projectHelpers.test.ts`, `SurveyRequestEntity.test.ts` | Kalkulasi progres serta status dan URL kontak survei |
 | **Mappers & DTO** | `projectMapper.test.ts` | Pemetaan eksplisit field Supabase row ke model proyek |
 | **Formatters & Utils** | `formatters.test.ts`, `responsive.test.ts`, `errorHelpers.test.ts` | Format rupiah, tanggal, scaling, dan parsing error |
 | **Notification Service**| `notificationService.test.ts` | Validasi pagination, deteksi RLS error, dan rollback |
 | **Project Integration** | `projectFlow.test.ts`, `projectPagination.test.ts`, `rlsMatrix.test.ts` | Simulasi end-to-end integrasi data proyek dan pagination |
+| **Konkurensi sesi** | `authSessionRace.test.ts`, `projectMutationRace.test.ts`, `notificationConcurrency.test.ts` | Respons terlambat, pergantian akun, antrean write, dan rollback |
+| **Survei** | `useSurveyRequests.test.tsx` | Penolakan ID tidak valid dan penyimpanan klaim sebelum sukses |
 | **Root Application** | `App.test.tsx` | Verifikasi render awal root component |
 
 ---
@@ -319,7 +270,7 @@ Seluruh test suite Jest telah diuji dan terverifikasi **100% lulus (74 tests pas
 ## 8. Panduan Menjalankan Lingkungan Pengembangan (Developer Quickstart)
 
 ### 8.1 Prasyarat Perangkat Lunak
-- **Node.js**: Versi `20.x` LTS atau lebih baru
+- **Node.js**: Versi `24.x` (lihat `.nvmrc`); minimum 22.15.0
 - **JDK**: OpenJDK 17
 - **Android Studio**: Android SDK Platform 36, Build-Tools 36.0.0, NDK 27.1.12297006 (sesuai `android/build.gradle`)
 - **Package Manager**: npm v10+
@@ -350,12 +301,8 @@ npm run web
 
 ### 8.4 Quality Gate Check (Wajib sebelum Commit)
 ```powershell
-# Validasi Tipe Data TypeScript (Wajib 0 error)
-npm run typecheck
-
-# Validasi Linter ESLint
-npm run lint
-
-# Menjalankan Seluruh Unit & Integration Test
-npm test
+# Architecture, TypeScript, lint, format, dan Jest
+npm run check
+npm audit --audit-level=moderate
+npm run build:web
 ```

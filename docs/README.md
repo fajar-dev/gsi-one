@@ -4,6 +4,16 @@ Selamat datang di pusat dokumentasi resmi pengembangan aplikasi **GSI One Mobile
 
 ---
 
+## Membuka Portal HTML
+
+Source dokumentasi disimpan sebagai Markdown. Sebelum membuka `docs/index.html`, jalankan dari root proyek:
+
+```bash
+node docs/generate_docs.js
+```
+
+HTML hasil generator dan `docs/docs_data.js` disimpan lokal serta diabaikan Git. Jalankan generator ini juga sebelum memublikasikan portal dokumentasi.
+
 ## Navigasi Dokumentasi Terpusat
 
 ### 1. Spesifikasi Persyaratan & Alur Aplikasi
