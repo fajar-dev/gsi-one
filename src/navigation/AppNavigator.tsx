@@ -69,11 +69,30 @@ export function AppNavigator(): React.ReactElement {
         <Stack.Screen name="StructureDetail" component={StructureDetail} />
         <Stack.Screen name="InsightDetail" component={InsightDetail} />
 
-        <Stack.Screen name="AuthenticatedTabs" component={AuthenticatedTabs} />
-        <Stack.Screen name="ProjectDetail" component={ProjectDetailScreen} />
-        <Stack.Screen name="CreateProject" component={CreateProjectScreen} />
-        <Stack.Screen name="SurveyRequests" component={SurveyRequestsScreen} />
-        <Stack.Screen name="Notifications" component={NotificationsScreen} />
+        {user && !isPasswordRecovery && (
+          <>
+            <Stack.Screen
+              name="AuthenticatedTabs"
+              component={AuthenticatedTabs}
+            />
+            <Stack.Screen
+              name="ProjectDetail"
+              component={ProjectDetailScreen}
+            />
+            <Stack.Screen
+              name="CreateProject"
+              component={CreateProjectScreen}
+            />
+            <Stack.Screen
+              name="SurveyRequests"
+              component={SurveyRequestsScreen}
+            />
+            <Stack.Screen
+              name="Notifications"
+              component={NotificationsScreen}
+            />
+          </>
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );

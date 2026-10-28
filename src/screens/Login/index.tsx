@@ -57,8 +57,9 @@ function Login(): React.ReactElement {
 
     try {
       await setRememberSession(rememberMe);
-      await login(email, password);
-      navigation.reset({ index: 0, routes: [{ name: 'AuthenticatedTabs' }] });
+      await login(email.trim(), password);
+      // The authenticated-user effect is the sole navigation owner. A stale
+      // login finishing after logout must never reopen the private screens.
     } catch (error: unknown) {
       const message =
         error instanceof Error

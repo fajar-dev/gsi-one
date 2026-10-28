@@ -21,7 +21,7 @@ export function useCreateProjectForm(
   const currentYear = new Date().getFullYear();
   const projectCodePrefix = `GSI-${currentYear}-`;
 
-  const { createProject, fetchProjects } = useProjectStore();
+  const { createProject } = useProjectStore();
   const [isLoading, setIsLoading] = useState(false);
 
   const [projectCodeSuffix, setProjectCodeSuffix] = useState('');
@@ -58,6 +58,7 @@ export function useCreateProjectForm(
   }>({ visible: false, type: '', title: '', data: [] });
 
   useEffect(() => {
+    let active = true;
     const fetchLists = async () => {
       setIsLoadingLists(true);
       try {
@@ -66,6 +67,7 @@ export function useCreateProjectForm(
           projectService.getUsersByRole('marketing'),
           projectService.getUsersByRole('engineer'),
         ]);
+        if (!active) return;
         setClientsList(clients);
         setMarketingsList(marketings);
         setEngineersList(engineers);
@@ -88,16 +90,20 @@ export function useCreateProjectForm(
           }
         }
       } catch (err: unknown) {
+        if (!active) return;
         Alert.alert(
           'Error',
           getErrorMessage(err, 'Gagal memuat daftar Klien/Staff'),
         );
       } finally {
-        setIsLoadingLists(false);
+        if (active) setIsLoadingLists(false);
       }
     };
 
     fetchLists();
+    return () => {
+      active = false;
+    };
   }, [initialValues?.initialClientName]);
 
   const resetForm = () => {
@@ -231,7 +237,6 @@ export function useCreateProjectForm(
         }
       }
 
-      await fetchProjects();
       Alert.alert(
         'Sukses',
         `Proyek baru (${fullProjectCode}) berhasil didaftarkan!`,

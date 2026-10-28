@@ -8,9 +8,9 @@ import EngineerDashboard from './EngineerDashboard';
 import ClientDashboard from './ClientDashboard';
 
 function DashboardScreen(): React.ReactElement {
-  const { user, isLoading } = useAuthStore();
+  const user = useAuthStore(state => state.user);
 
-  if (isLoading || !user) {
+  if (!user) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.secondary || '#0B7552'} />

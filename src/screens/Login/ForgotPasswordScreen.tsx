@@ -29,7 +29,8 @@ import { scale } from '../../utils/responsive';
 function ForgotPasswordScreen(): React.ReactElement {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const { sendPasswordReset, isLoading } = useAuthStore();
+  const { sendPasswordReset, isSendingPasswordReset: isLoading } =
+    useAuthStore();
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
 

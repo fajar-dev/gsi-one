@@ -51,8 +51,9 @@ export function useProfile() {
           text: 'Keluar (Logout)',
           style: 'destructive',
           onPress: () => {
+            const cleanup = logout();
             navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
-            logout().catch(() => {});
+            cleanup.catch(() => {});
           },
         },
       ],

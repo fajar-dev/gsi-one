@@ -3,8 +3,10 @@ import { createClient } from '@supabase/supabase-js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '@env';
 import { AppState, Platform } from 'react-native';
 import { authStorage } from './authPersistence';
+import { createFetchWithTimeout } from '../utils/fetchWithTimeout';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  global: { fetch: createFetchWithTimeout((...args) => fetch(...args)) },
   auth: {
     storage: authStorage,
     persistSession: true,

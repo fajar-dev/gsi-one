@@ -1,3 +1,4 @@
+import { ErrorNotice } from '../../components/common/ErrorNotice';
 import { ActionButton } from '../../components/ui/ActionButton';
 import { styles } from './ProjectDetailScreen.styles';
 import { palette } from '../../theme/tokens';
@@ -128,20 +129,22 @@ function ProjectDetailScreen(): JSX.Element {
         </Text>
       </LinearGradient>
 
-      {isLoadingDetail ? (
+      {isLoadingDetail && !project ? (
         <ActivityIndicator color={palette.brand} style={styles.loader} />
       ) : !project || String(project.id) !== String(projectId) ? (
         <View style={styles.errorState}>
           <Icon name="alert-circle" size={40} color="#BDBDBD" />
-          <Text style={styles.errorText}>
-            {error || 'Proyek tidak ditemukan.'}
-          </Text>
+          <ErrorNotice
+            message={error || 'Proyek tidak ditemukan.'}
+            onRetry={refetch}
+          />
         </View>
       ) : (
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
+          <ErrorNotice message={error} onRetry={refetch} />
           <View
             style={[
               styles.infoCard,

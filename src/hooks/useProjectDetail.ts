@@ -1,3 +1,4 @@
+import { useIsFocused } from '@react-navigation/native';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Alert, Animated } from 'react-native';
 import { useAuthStore } from '../store/authStore';
@@ -36,6 +37,7 @@ export type EditStageModalState = {
 };
 
 export function useProjectDetail(projectId: string) {
+  const isFocused = useIsFocused();
   const { user } = useAuthStore();
   const isMarketing = user?.role === 'marketing';
   const isClient = user?.role === 'client';
@@ -83,8 +85,8 @@ export function useProjectDetail(projectId: string) {
   const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    fetchProjectDetail(projectId);
-  }, [fetchProjectDetail, projectId]);
+    if (isFocused) fetchProjectDetail(projectId);
+  }, [fetchProjectDetail, projectId, isFocused]);
 
   useEffect(
     () => () => {
@@ -92,7 +94,7 @@ export function useProjectDetail(projectId: string) {
         clearTimeout(refreshTimeoutRef.current);
       }
     },
-    [],
+    [projectId, isFocused],
   );
 
   const handleRealtimeUpdate = useCallback(() => {
@@ -122,7 +124,7 @@ export function useProjectDetail(projectId: string) {
     projectId,
     onStageUpdate: handleRealtimeUpdate,
     onProjectUpdate: handleRealtimeUpdate,
-    enabled: true,
+    enabled: isFocused && !!user,
   });
 
   const handleUpdateStatus = async (newStatus: ProjectStageStatus) => {
@@ -143,7 +145,6 @@ export function useProjectDetail(projectId: string) {
 
   const handleAddNote = async (desc: string, progressStr: string) => {
     const stageId = noteModal.stageId;
-    setNoteModal(prev => ({ ...prev, visible: false }));
     setIsSaving(true);
     try {
       const parsedProg = progressStr.trim()
@@ -153,6 +154,7 @@ export function useProjectDetail(projectId: string) {
         ? 0
         : Math.min(100, Math.max(0, parsedProg));
       await addStageUpdate(stageId, desc.trim(), prog);
+      setNoteModal(prev => ({ ...prev, visible: false }));
     } catch (err: unknown) {
       Alert.alert(
         'Gagal Tambah Catatan',
@@ -169,10 +171,10 @@ export function useProjectDetail(projectId: string) {
     fileUri?: string,
   ) => {
     const stageId = fileModal.stageId || null;
-    setFileModal(prev => ({ ...prev, visible: false }));
     setIsSaving(true);
     try {
       await uploadFile(projectId, stageId, name.trim(), type, fileUri);
+      setFileModal(prev => ({ ...prev, visible: false }));
       Alert.alert('Berhasil', `Berkas "${name}" berhasil diunggah.`);
     } catch (err: unknown) {
       Alert.alert(
@@ -185,10 +187,10 @@ export function useProjectDetail(projectId: string) {
   };
 
   const handleCreateStage = async (title: string, desc: string) => {
-    setCreateStageModal(false);
     setIsSaving(true);
     try {
       await createProjectStage(projectId, title.trim(), desc.trim());
+      setCreateStageModal(false);
       Alert.alert('Berhasil', `Tahapan "${title}" berhasil ditambahkan.`);
     } catch (err: unknown) {
       Alert.alert(

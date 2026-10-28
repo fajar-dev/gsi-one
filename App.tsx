@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, ActivityIndicator, Platform, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { AlertHost } from './src/components/common/AlertHost';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { useAppSession } from './src/hooks/useAppSession';
 import { AppNavigator } from './src/navigation/AppNavigator';
@@ -31,6 +32,7 @@ export default function App(): React.ReactElement {
     <ErrorBoundary>
       <SafeAreaProvider>
         <Application />
+        <AlertHost />
       </SafeAreaProvider>
     </ErrorBoundary>
   );

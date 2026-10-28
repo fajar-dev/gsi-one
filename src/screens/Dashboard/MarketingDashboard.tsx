@@ -1,3 +1,4 @@
+import { ErrorNotice } from '../../components/common/ErrorNotice';
 import { palette, spacing, typography } from '../../theme/tokens';
 import { JSX, useCallback } from 'react';
 import {
@@ -23,7 +24,7 @@ import { SupportCard } from '../../components/common/SupportCard';
 function MarketingDashboard(): JSX.Element {
   const navigation = useNavigation<AuthenticatedNavigationProp>();
   const { user } = useAuthStore();
-  const { projects, isLoading, fetchProjects } = useProjectStore();
+  const { projects, isLoading, fetchProjects, error } = useProjectStore();
 
   useFocusEffect(
     useCallback(() => {
@@ -59,6 +60,7 @@ function MarketingDashboard(): JSX.Element {
 
   return (
     <View style={styles.container}>
+      <ErrorNotice message={error} onRetry={fetchProjects} />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={

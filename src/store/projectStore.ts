@@ -170,7 +170,10 @@ export const useProjectStore = create<ProjectState>((set, get) => {
       const userId = useAuthStore.getState().user?.id;
       set({
         isLoadingDetail: true,
-        selectedProject: null,
+        selectedProject:
+          get().selectedProject?.id === projectId
+            ? get().selectedProject
+            : null,
         error: null,
         detailRequestId: requestId,
       });
@@ -192,7 +195,6 @@ export const useProjectStore = create<ProjectState>((set, get) => {
           useAuthStore.getState().user?.id === userId
         ) {
           set({
-            selectedProject: null,
             error: getErrorMessage(err),
             isLoadingDetail: false,
           });

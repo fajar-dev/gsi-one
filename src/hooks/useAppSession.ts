@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { acceptRecoveryLink } from '../services/passwordRecoveryService';
 import { supabase } from '../config/supabase';
 import { useAuthStore, invalidateAuthInitialization } from '../store/authStore';
+import { useAlertStore } from '../store/alertStore';
 import { useProjectStore } from '../store/projectStore';
 import { useNotificationStore } from '../store/notificationStore';
 import { navigationRef } from '../navigation/navigationRef';
@@ -13,8 +14,11 @@ export function useAppSession(): void {
   const user = useAuthStore(state => state.user);
   const isPasswordRecovery = useAuthStore(state => state.isPasswordRecovery);
   useEffect(() => {
+    let active = true;
+    let deferredInitialization: ReturnType<typeof setTimeout> | undefined;
     const clearPrivateState = useAuthStore.subscribe((state, previous) => {
       if (state.user?.id !== previous.user?.id) {
+        useAlertStore.getState().clear();
         useProjectStore.getState().resetForSession();
         useNotificationStore.getState().resetForSession();
       }
@@ -22,18 +26,25 @@ export function useAppSession(): void {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
+      const state = useAuthStore.getState();
+      // Our explicit logout owns cleanup and may be followed by a queued login.
+      if (state.isLoggingOut) return;
       if (event === 'SIGNED_OUT') {
+        clearTimeout(deferredInitialization);
         invalidateAuthInitialization();
         useAuthStore.setState({
           user: null,
           token: null,
           isPasswordRecovery: false,
           isInitialized: true,
+          isLoading: false,
+          isSendingPasswordReset: false,
         });
         AsyncStorage.removeItem('auth_user').catch(() => {});
         AsyncStorage.removeItem('auth_password_recovery').catch(() => {});
       } else if (session) {
-        useAuthStore.setState({ token: session.access_token });
+        if (!state.isLoading && state.user?.id === session.user.id)
+          useAuthStore.setState({ token: session.access_token });
         if (event === 'PASSWORD_RECOVERY') {
           AsyncStorage.setItem('auth_password_recovery', 'true').catch(
             () => {},
@@ -42,13 +53,24 @@ export function useAppSession(): void {
         }
         if (
           event === 'SIGNED_IN' &&
+          state.isInitialized &&
+          !state.isLoading &&
           useAuthStore.getState().user?.id !== session.user.id
         ) {
-          setTimeout(() => initialize(), 0);
+          clearTimeout(deferredInitialization);
+          deferredInitialization = setTimeout(() => {
+            const current = useAuthStore.getState();
+            if (
+              active &&
+              !current.isLoading &&
+              !current.isLoggingOut &&
+              current.user?.id !== session.user.id
+            )
+              initialize();
+          }, 0);
         }
       }
     });
-    let active = true;
     const handleUrl = async (url: string) => {
       try {
         if (await acceptRecoveryLink(url)) {
@@ -91,6 +113,7 @@ export function useAppSession(): void {
     initialize();
     return () => {
       active = false;
+      clearTimeout(deferredInitialization);
       subscription.unsubscribe();
       linking.remove();
       clearPrivateState();
@@ -102,13 +125,15 @@ export function useAppSession(): void {
       navigationRef.navigate('ResetPassword');
   }, [isPasswordRecovery]);
 
+  const userId = user?.id;
+  const role = user?.role;
   useEffect(() => {
-    if (!user) return;
+    if (!userId) return;
     const fetchNotifications = () =>
-      useNotificationStore.getState().fetchNotifications(user.id, user.role);
+      useNotificationStore.getState().fetchNotifications(userId, role);
     fetchNotifications();
     const channel = supabase
-      .channel(`user-notifications-${user.id}`)
+      .channel(`user-notifications-${userId}`)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'notifications' },
@@ -118,5 +143,5 @@ export function useAppSession(): void {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [userId, role]);
 }

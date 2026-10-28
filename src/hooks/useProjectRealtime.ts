@@ -38,6 +38,7 @@ function useProjectRealtime({
   useEffect(() => {
     if (!enabled || !projectId) return;
 
+    let active = true;
     const channelName = `project-realtime-${projectId}`;
 
     const channel = supabase
@@ -51,7 +52,7 @@ function useProjectRealtime({
           filter: `project_id=eq.${projectId}`,
         },
         (payload: RealtimePayload) => {
-          onStageUpdateRef.current?.(payload);
+          if (active) onStageUpdateRef.current?.(payload);
         },
       )
       .on(
@@ -63,7 +64,7 @@ function useProjectRealtime({
           filter: `project_id=eq.${projectId}`,
         },
         (payload: RealtimePayload) => {
-          onStageUpdateRef.current?.(payload);
+          if (active) onStageUpdateRef.current?.(payload);
         },
       )
       .on(
@@ -75,7 +76,7 @@ function useProjectRealtime({
           filter: `project_id=eq.${projectId}`,
         },
         (payload: RealtimePayload) => {
-          onStageUpdateRef.current?.(payload);
+          if (active) onStageUpdateRef.current?.(payload);
         },
       )
       .on(
@@ -87,7 +88,7 @@ function useProjectRealtime({
           filter: `id=eq.${projectId}`,
         },
         (payload: RealtimePayload) => {
-          onProjectUpdateRef.current?.(payload);
+          if (active) onProjectUpdateRef.current?.(payload);
         },
       )
       .subscribe(status => {
@@ -101,6 +102,7 @@ function useProjectRealtime({
     channelRef.current = channel;
 
     return () => {
+      active = false;
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;

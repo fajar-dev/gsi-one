@@ -77,3 +77,25 @@ describe('auth initialization race protection', () => {
     expect(useAuthStore.getState().user).toBeNull();
   });
 });
+
+it('finishes initialization even when clearing an invalid cached session fails', async () => {
+  invalidateAuthInitialization();
+  useAuthStore.setState({
+    user: null,
+    token: null,
+    isInitialized: false,
+    isLoading: false,
+    isLoggingOut: false,
+  });
+  jest
+    .mocked(authService.restoreSession)
+    .mockRejectedValueOnce(new Error('Session unavailable'));
+  jest
+    .mocked(AsyncStorage.removeItem)
+    .mockRejectedValueOnce(new Error('Storage unavailable'));
+  await expect(useAuthStore.getState().initialize()).resolves.toBeUndefined();
+  expect(useAuthStore.getState()).toMatchObject({
+    user: null,
+    isInitialized: true,
+  });
+});

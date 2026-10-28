@@ -101,15 +101,15 @@ function MiniDonutChart({ stats }: { stats: ProjectStatistics }) {
 
   return (
     <View style={donutStyles.wrapper}>
-      <View style={[donutStyles.ringWrap, { width: size, height: size }]}>
-        <Svg
-          width={size}
-          height={size}
-          accessible
-          accessibilityLabel={`${total} proyek: ${segments
-            .map(segment => `${segment.label} ${segment.value}`)
-            .join(', ')}`}
-        >
+      <View
+        style={[donutStyles.ringWrap, { width: size, height: size }]}
+        accessible
+        accessibilityRole="image"
+        accessibilityLabel={`${total} proyek: ${segments
+          .map(segment => `${segment.label} ${segment.value}`)
+          .join(', ')}`}
+      >
+        <Svg width={size} height={size}>
           {segments.map(segment => {
             const length = (segment.value / total) * circumference;
             const startOffset = offset;
@@ -125,8 +125,7 @@ function MiniDonutChart({ stats }: { stats: ProjectStatistics }) {
                 strokeWidth={strokeWidth}
                 strokeDasharray={[length, circumference - length]}
                 strokeDashoffset={-startOffset}
-                rotation={-90}
-                origin={`${size / 2}, ${size / 2}`}
+                transform={`rotate(-90 ${size / 2} ${size / 2})`}
               />
             );
           })}

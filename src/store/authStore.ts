@@ -4,6 +4,7 @@ import {
   AuthUser,
   normalizeAuthRole,
   CreateUserRole,
+  LoginResult,
 } from '../domain/models/auth';
 import { authService } from '../services/authService';
 
@@ -11,6 +12,9 @@ import { getErrorMessage } from '../utils/errorHelpers';
 
 const USER_KEY = 'auth_user';
 let authVersion = 0;
+let passwordResetVersion = 0;
+let pendingLogout: Promise<void> | null = null;
+const pendingLogins = new Set<Promise<LoginResult>>();
 
 export function invalidateAuthInitialization(): void {
   ++authVersion;
@@ -19,7 +23,10 @@ export function invalidateAuthInitialization(): void {
 interface AuthState {
   user: AuthUser | null;
   token: string | null;
+  /** Busy state for credential login only; other actions must not block it. */
   isLoading: boolean;
+  isLoggingOut: boolean;
+  isSendingPasswordReset: boolean;
   isInitialized: boolean;
   isPasswordRecovery: boolean;
   error: string | null;
@@ -57,6 +64,8 @@ export const useAuthStore = create<AuthState>(set => ({
   user: null,
   token: null,
   isLoading: false,
+  isLoggingOut: false,
+  isSendingPasswordReset: false,
   isInitialized: false,
   isPasswordRecovery: false,
   error: null,
@@ -81,6 +90,12 @@ export const useAuthStore = create<AuthState>(set => ({
     await useAuthStore.getState().logout();
   },
   initialize: async () => {
+    // SIGNED_IN also fires inside signInWithPassword. Do not supersede that login.
+    if (
+      useAuthStore.getState().isLoading ||
+      useAuthStore.getState().isLoggingOut
+    )
+      return;
     const version = ++authVersion;
     try {
       const session = await authService.restoreSession();
@@ -101,23 +116,26 @@ export const useAuthStore = create<AuthState>(set => ({
         if (version !== authVersion) return;
         await AsyncStorage.setItem(USER_KEY, JSON.stringify(user));
         const isPasswordRecovery =
-          (await AsyncStorage.getItem('auth_password_recovery')) === 'true';
+          (await AsyncStorage.getItem('auth_password_recovery').catch(
+            () => null,
+          )) === 'true';
         if (version !== authVersion) return;
         set({
           user,
           token: session.token,
           isInitialized: true,
+          isLoading: false,
           isPasswordRecovery,
         });
       } else {
         if (version !== authVersion) return;
-        await AsyncStorage.removeItem(USER_KEY);
+        await AsyncStorage.removeItem(USER_KEY).catch(() => {});
         if (version !== authVersion) return;
         set({ user: null, token: null, isInitialized: true });
       }
     } catch {
       if (version !== authVersion) return;
-      await AsyncStorage.removeItem(USER_KEY);
+      await AsyncStorage.removeItem(USER_KEY).catch(() => {});
       if (version !== authVersion) return;
       set({ user: null, token: null, isInitialized: true });
     }
@@ -133,7 +151,18 @@ export const useAuthStore = create<AuthState>(set => ({
       isPasswordRecovery: false,
     });
     try {
-      const result = await authService.login({ email, password });
+      // The SDK removes its persisted session at the end of signOut. Starting
+      // another sign-in earlier can let the previous signOut erase it.
+      if (pendingLogout) await pendingLogout;
+      if (version !== authVersion) return;
+      const request = authService.login({ email, password });
+      pendingLogins.add(request);
+      let result: LoginResult;
+      try {
+        result = await request;
+      } finally {
+        pendingLogins.delete(request);
+      }
       if (version !== authVersion) return;
       await AsyncStorage.setItem(USER_KEY, JSON.stringify(result.user));
       if (version !== authVersion) return;
@@ -150,44 +179,62 @@ export const useAuthStore = create<AuthState>(set => ({
     }
   },
 
-  logout: async () => {
-    const version = ++authVersion;
+  logout: () => {
+    if (pendingLogout) return pendingLogout;
+    ++authVersion;
+    ++passwordResetVersion;
     set({
       user: null,
       token: null,
-      isLoading: true,
+      isLoading: false,
+      isLoggingOut: true,
+      isSendingPasswordReset: false,
+      isInitialized: true,
       error: null,
       isPasswordRecovery: false,
     });
-    await Promise.all([
-      AsyncStorage.removeItem(USER_KEY).catch(() => {}),
-      AsyncStorage.removeItem('auth_password_recovery').catch(() => {}),
-    ]);
-    if (version !== authVersion) return;
-    try {
+    const operation = (async () => {
+      await Promise.all([
+        AsyncStorage.removeItem(USER_KEY).catch(() => {}),
+        AsyncStorage.removeItem('auth_password_recovery').catch(() => {}),
+      ]);
+      // An older sign-in can still persist its SDK session after the UI has
+      // signed out. Drain it before removing the SDK session permanently.
+      await Promise.allSettled([...pendingLogins]);
       await authService.logout();
-    } finally {
-      if (version === authVersion) set({ isLoading: false });
-    }
+    })().finally(() => {
+      if (pendingLogout === operation) {
+        pendingLogout = null;
+        set({ isLoggingOut: false });
+      }
+    });
+    pendingLogout = operation;
+    return operation;
   },
 
   sendPasswordReset: async email => {
-    set({ isLoading: true, error: null });
+    const request = ++passwordResetVersion;
+    const version = authVersion;
+    set({ isSendingPasswordReset: true, error: null });
     try {
       await authService.sendPasswordResetEmail(email);
-      set({ isLoading: false });
     } catch (err: unknown) {
-      set({ error: getErrorMessage(err), isLoading: false });
+      if (request === passwordResetVersion && version === authVersion)
+        set({ error: getErrorMessage(err) });
       throw err;
+    } finally {
+      if (request === passwordResetVersion)
+        set({ isSendingPasswordReset: false });
     }
   },
 
   adminCreateUser: async (name, email, password, role) => {
-    const { token } = useAuthStore.getState();
+    const { token, user } = useAuthStore.getState();
+    const version = authVersion;
     if (!token) {
       throw new Error('Sesi admin tidak ditemukan. Silakan login kembali.');
     }
-    set({ isLoading: true, error: null });
+    set({ error: null });
     try {
       const createdUser = await authService.adminCreateUser(
         name,
@@ -195,10 +242,14 @@ export const useAuthStore = create<AuthState>(set => ({
         password,
         role,
       );
-      set({ isLoading: false });
+      if (
+        version !== authVersion ||
+        useAuthStore.getState().user?.id !== user?.id
+      )
+        throw new Error('Sesi telah berubah. Silakan masuk kembali.');
       return createdUser;
     } catch (err: unknown) {
-      set({ error: getErrorMessage(err), isLoading: false });
+      if (version === authVersion) set({ error: getErrorMessage(err) });
       throw err;
     }
   },

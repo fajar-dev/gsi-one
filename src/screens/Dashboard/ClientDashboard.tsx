@@ -45,11 +45,11 @@ const BridgeSvgIcon = ({ color }: { color: string }) => (
 function ClientDashboard(): JSX.Element {
   const navigation = useNavigation<AuthenticatedNavigationProp>();
   const { user } = useAuthStore();
-  const { projects, isLoading, fetchProjects } = useProjectStore();
+  const { projects, isLoading, fetchProjects, error } = useProjectStore();
   const [projectDetailsMap, setProjectDetailsMap] = useState<
     Record<string, ProjectDetail>
   >({});
-  const [_isLoadingDetail, setIsLoadingDetail] = useState(false);
+  const [isLoadingDetail, setIsLoadingDetail] = useState(false);
   const [detailError, setDetailError] = useState<string | null>(null);
 
   useFocusEffect(
@@ -98,6 +98,7 @@ function ClientDashboard(): JSX.Element {
     } else {
       setProjectDetailsMap({});
       setDetailError(null);
+      setIsLoadingDetail(false);
     }
     return () => {
       active = false;
@@ -128,7 +129,9 @@ function ClientDashboard(): JSX.Element {
     inProgress: inProgressStages,
     active: activeStageObj,
   } = summarizeStages(primaryDetail?.stages);
-  const currentStageTitle = activeStageObj?.title || 'Tahapan belum ditentukan';
+  const currentStageTitle =
+    activeStageObj?.title ||
+    (isLoadingDetail ? 'Memuat tahapan…' : 'Tahapan belum ditentukan');
 
   const getLatestUpdates = () => {
     const items: Array<{
@@ -237,7 +240,7 @@ function ClientDashboard(): JSX.Element {
 
   return (
     <View style={styles.container}>
-      <ErrorNotice message={detailError} onRetry={fetchProjects} />
+      <ErrorNotice message={error || detailError} onRetry={fetchProjects} />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={

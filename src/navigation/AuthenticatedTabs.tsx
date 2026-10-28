@@ -1,12 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import {
-  AuthenticatedTabParamList,
-  RootStackParamList,
-} from '../types/navigation';
+import { AuthenticatedTabParamList } from '../types/navigation';
 import { colors } from '../theme/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../store/authStore';
@@ -49,15 +44,7 @@ const ProfileIcon = ({ focused }: { focused: boolean }) => (
 
 function AuthenticatedTabs(): React.ReactElement {
   const insets = useSafeAreaInsets();
-  const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const { user, isInitialized } = useAuthStore();
-
-  useEffect(() => {
-    if (isInitialized && !user) {
-      navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
-    }
-  }, [isInitialized, navigation, user]);
+  const user = useAuthStore(state => state.user);
 
   if (!user) return <View />;
 

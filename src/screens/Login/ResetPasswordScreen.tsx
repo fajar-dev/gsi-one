@@ -33,12 +33,20 @@ export default function ResetPasswordScreen(): React.ReactElement {
   const [done, setDone] = useState(false);
   useEffect(() => {
     let mounted = true;
-    authService.hasValidSession().then(valid => {
-      if (!mounted) return;
-      if (!valid)
-        setError('Sesi reset tidak valid. Silakan minta tautan baru.');
-      else setReady(true);
-    });
+    authService
+      .hasValidSession()
+      .then(valid => {
+        if (!mounted) return;
+        if (!valid)
+          setError('Sesi reset tidak valid. Silakan minta tautan baru.');
+        else setReady(true);
+      })
+      .catch(() => {
+        if (mounted)
+          setError(
+            'Tidak dapat memeriksa sesi. Periksa koneksi lalu buka kembali tautan reset.',
+          );
+      });
     return () => {
       mounted = false;
     };

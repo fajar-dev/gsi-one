@@ -1,3 +1,4 @@
+import { ErrorNotice } from '../../components/common/ErrorNotice';
 import { ActionButton } from '../../components/ui/ActionButton';
 import { palette, touchTarget, spacing, typography } from '../../theme/tokens';
 import { JSX, useCallback } from 'react';
@@ -32,7 +33,8 @@ const ENGINEER_STAT_COLORS = {
 function EngineerDashboard(): JSX.Element {
   const navigation = useNavigation<AuthenticatedNavigationProp>();
   const { user } = useAuthStore();
-  const { projects, stats, isLoading, fetchProjects } = useProjectStore();
+  const { projects, stats, isLoading, fetchProjects, error } =
+    useProjectStore();
 
   useFocusEffect(
     useCallback(() => {
@@ -44,6 +46,7 @@ function EngineerDashboard(): JSX.Element {
 
   return (
     <View style={styles.container}>
+      <ErrorNotice message={error} onRetry={fetchProjects} />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={

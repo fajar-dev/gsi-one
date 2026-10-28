@@ -141,7 +141,12 @@ export const authRepository = {
       });
 
     if (authError) {
-      throw new Error('Nomor Tiket / Email atau kata sandi salah');
+      if (authError.code === 'invalid_credentials')
+        throw new Error('Nomor Tiket / Email atau kata sandi salah');
+      throw new Error(
+        authError.message ||
+          'Tidak dapat masuk. Periksa koneksi lalu coba lagi.',
+      );
     }
 
     if (!authData.session || !authData.user) {

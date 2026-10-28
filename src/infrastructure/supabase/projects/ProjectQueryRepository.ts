@@ -71,27 +71,17 @@ export class ProjectQueryRepository {
         'id, project_name, client_name, start_date, estimated_finish, status, created_by, created_at';
     }
 
-    const { data: projectData, error: projectError } = await supabase
-      .from('projects_with_budget')
-      .select(selectFields)
-      .eq('id', projectId)
-      .single();
-
-    if (projectError || !projectData) {
-      throw new Error(projectError?.message || 'Proyek tidak ditemukan');
-    }
-
-    const { data: stagesData, error: stagesError } = await supabase
-      .from('project_stages')
-      .select('*')
-      .eq('project_id', projectId)
-      .order('sequence', { ascending: true });
-
-    if (stagesError) {
-      throw new Error(stagesError.message || 'Gagal memuat tahapan proyek');
-    }
-
-    const [updatesRes, filesRes] = await Promise.all([
+    const [projectRes, stagesRes, updatesRes, filesRes] = await Promise.all([
+      supabase
+        .from('projects_with_budget')
+        .select(selectFields)
+        .eq('id', projectId)
+        .single(),
+      supabase
+        .from('project_stages')
+        .select('*')
+        .eq('project_id', projectId)
+        .order('sequence', { ascending: true }),
       supabase
         .from('stage_updates')
         .select('*')
@@ -103,6 +93,12 @@ export class ProjectQueryRepository {
         .eq('project_id', projectId)
         .order('created_at', { ascending: false }),
     ]);
+    const { data: projectData, error: projectError } = projectRes;
+    const { data: stagesData, error: stagesError } = stagesRes;
+    if (projectError || !projectData)
+      throw new Error(projectError?.message || 'Proyek tidak ditemukan');
+    if (stagesError)
+      throw new Error(stagesError.message || 'Gagal memuat tahapan proyek');
     if (updatesRes.error) throw new Error(updatesRes.error.message);
     if (filesRes.error) throw new Error(filesRes.error.message);
     const updates = ((updatesRes.data || []) as StageUpdateRow[]).map(

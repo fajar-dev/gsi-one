@@ -68,6 +68,7 @@ export function useEditProjectForm({
   }>({ visible: false, type: '', title: '', data: [] });
 
   useEffect(() => {
+    let active = true;
     if (visible && project) {
       setProjectCode(project.project_code || '');
       setProjectName(project.project_name || '');
@@ -91,6 +92,7 @@ export function useEditProjectForm({
             projectService.getUsersByRole('marketing'),
             projectService.getUsersByRole('engineer'),
           ]);
+          if (!active) return;
           setClientsList(clients);
           setMarketingsList(marketings);
           setEngineersList(engineers);
@@ -112,17 +114,21 @@ export function useEditProjectForm({
           const engineer = engineers.find(e => e.id === project.engineer_id);
           if (engineer) setSelectedEngineer(engineer);
         } catch (err: unknown) {
+          if (!active) return;
           Alert.alert(
             'Error',
             getErrorMessage(err, 'Gagal memuat daftar Klien/Staff'),
           );
         } finally {
-          setIsLoadingLists(false);
+          if (active) setIsLoadingLists(false);
         }
       };
 
       fetchLists();
     }
+    return () => {
+      active = false;
+    };
   }, [visible, project]);
 
   const handleDelete = () => {

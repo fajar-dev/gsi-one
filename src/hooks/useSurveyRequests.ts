@@ -20,11 +20,19 @@ export function useSurveyRequests() {
   const [search, setSearch] = useState('');
   const [activeFilter, setActiveFilter] = useState<SurveyFilterType>('all');
   const [isLoading, setIsLoading] = useState(false);
+  const [isMutating, setIsMutating] = useState(false);
+  const pendingMutations = useRef(new Set<number>());
   const [error, setError] = useState<string | null>(null);
   const requestId = useRef({ id: 0 });
 
   const fetchRequests = useCallback(async () => {
     const request = ++requestId.current.id;
+    if (!canViewSurveysRole(user?.role)) {
+      setEntities([]);
+      setIsLoading(false);
+      setError(null);
+      return;
+    }
     setError(null);
     setIsLoading(true);
     try {
@@ -36,7 +44,7 @@ export function useSurveyRequests() {
     } finally {
       if (request === requestId.current.id) setIsLoading(false);
     }
-  }, []);
+  }, [user?.role]);
 
   useEffect(() => {
     setEntities([]);
@@ -79,7 +87,9 @@ export function useSurveyRequests() {
         {
           text: 'Ya, Ambil',
           onPress: async () => {
-            setIsLoading(true);
+            if (pendingMutations.current.has(id)) return;
+            pendingMutations.current.add(id);
+            setIsMutating(true);
             try {
               await surveyService.claimBooking(id, {
                 status: 'claimed',
@@ -101,7 +111,8 @@ export function useSurveyRequests() {
               );
               await fetchRequests();
             } finally {
-              setIsLoading(false);
+              pendingMutations.current.delete(id);
+              setIsMutating(pendingMutations.current.size > 0);
             }
           },
         },
@@ -195,7 +206,7 @@ export function useSurveyRequests() {
     setSearch,
     activeFilter,
     setActiveFilter,
-    isLoading,
+    isLoading: isLoading || isMutating,
     error,
     refreshRequests: fetchRequests,
     filteredRequests,

@@ -14,6 +14,8 @@ it('renders exact, consecutive proportions for project statuses', () => {
   });
   const circles = view.root.findAllByType(Circle);
   expect(circles).toHaveLength(2);
+  expect(circles[0].props.transform).toBe('rotate(-90 55 55)');
+  expect(circles[0].props.origin).toBeUndefined();
   const [firstLength, firstGap] = circles[0].props.strokeDasharray;
   const [secondLength] = circles[1].props.strokeDasharray;
   expect(firstLength / (firstLength + firstGap)).toBeCloseTo(2 / 3);

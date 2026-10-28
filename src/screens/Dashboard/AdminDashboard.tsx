@@ -1,3 +1,4 @@
+import { ErrorNotice } from '../../components/common/ErrorNotice';
 import { palette, spacing, typography } from '../../theme/tokens';
 import { JSX, useState, useCallback } from 'react';
 import {
@@ -25,7 +26,8 @@ import { SupportCard } from '../../components/common/SupportCard';
 function AdminDashboard(): JSX.Element {
   const navigation = useNavigation<AuthenticatedNavigationProp>();
   const { user } = useAuthStore();
-  const { projects, stats, isLoading, fetchProjects } = useProjectStore();
+  const { projects, stats, isLoading, fetchProjects, error } =
+    useProjectStore();
   const [showRegisterModal, setShowRegisterModal] = useState(false);
 
   useFocusEffect(
@@ -68,6 +70,7 @@ function AdminDashboard(): JSX.Element {
 
   return (
     <View style={styles.container}>
+      <ErrorNotice message={error} onRetry={fetchProjects} />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={

@@ -1,3 +1,4 @@
+import { deferred } from '../../test/helpers/deferred';
 import TestRenderer, { act } from 'react-test-renderer';
 import { Alert } from 'react-native';
 import { useSurveyRequests } from '../../src/hooks/useSurveyRequests';
@@ -94,5 +95,39 @@ it('uses the persisted claim and reloads the server result', async () => {
     1,
     expect.objectContaining({ status: 'claimed', claimed_by: 'Admin (Admin)' }),
   );
+  expect(api.claimedCount).toBe(1);
+});
+
+it('keeps a newer refresh busy when an older claim refresh finishes first', async () => {
+  const claimRefresh = deferred<SurveyRequestData[]>();
+  const newerRefresh = deferred<SurveyRequestData[]>();
+  jest.mocked(surveyService.claimBooking).mockResolvedValue();
+  jest
+    .mocked(surveyService.getBookings)
+    .mockReturnValueOnce(claimRefresh.promise)
+    .mockReturnValueOnce(newerRefresh.promise);
+  act(() => api.handleClaim(new SurveyRequestEntity(booking)));
+  const confirm = jest
+    .mocked(Alert.alert)
+    .mock.calls[0][2]?.find(button => button.text === 'Ya, Ambil')?.onPress;
+  let claiming: unknown;
+  await act(async () => {
+    claiming = confirm?.();
+    await Promise.resolve();
+  });
+  let refreshing!: Promise<void>;
+  act(() => {
+    refreshing = api.refreshRequests();
+  });
+  await act(async () => {
+    claimRefresh.resolve([{ ...booking, status: 'claimed' }]);
+    await claiming;
+  });
+  expect(api.isLoading).toBe(true);
+  await act(async () => {
+    newerRefresh.resolve([{ ...booking, status: 'claimed' }]);
+    await refreshing;
+  });
+  expect(api.isLoading).toBe(false);
   expect(api.claimedCount).toBe(1);
 });
