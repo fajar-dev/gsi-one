@@ -28,7 +28,7 @@ export const insightsData: InsightArticle[] = [
     title: '5 Tanda Struktur Perlu Dilakukan Assessment',
     shortDesc:
       'Kerusakan struktur sering kali tidak terjadi secara tiba-tiba. Ketahui 5 tanda awal sebelum kondisi menjadi serius.',
-    image: require('../../assets/images/insight/5_tanda_assessment.png'),
+    image: require('../../assets/images/insight/5_tanda_assessment.jpg'),
     date: '27 Juli 2026',
     readTime: '3 min baca',
     intro: [
@@ -88,7 +88,7 @@ export const insightsData: InsightArticle[] = [
     title: 'Jangan Tambah Lantai Sebelum Memeriksa 8 Hal Ini!',
     shortDesc:
       'Menambah lantai meningkatkan beban struktur bangunan. Pastikan memeriksa 8 poin krusial ini sebelum renovasi.',
-    image: require('../../assets/images/insight/jangan_tambah_lantai.png'),
+    image: require('../../assets/images/insight/jangan_tambah_lantai.jpg'),
     date: '27 Juli 2026',
     readTime: '6 min baca',
     intro: [
@@ -203,7 +203,7 @@ export const insightsData: InsightArticle[] = [
     title: 'Bangunan Pabrik Terasa Bergetar? Jangan Anggap Selalu Normal.',
     shortDesc:
       'Getaran mesin produksi pada bangunan industri dapat memengaruhi keselamatan struktur dan keandalan mesin jika diabaikan.',
-    image: require('../../assets/images/insight/bangunan_pabrik_bergetar.png'),
+    image: require('../../assets/images/insight/bangunan_pabrik_bergetar.jpg'),
     date: '27 Juli 2026',
     readTime: '8 min baca',
     intro: [

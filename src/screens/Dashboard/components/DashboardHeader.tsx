@@ -54,7 +54,7 @@ function DashboardHeader({
   return (
     <View style={styles.headerWrapper}>
       <Image
-        source={require('../../../../assets/images/beranda_depan.png')}
+        source={require('../../../../assets/images/beranda_depan.jpg')}
         style={styles.headerBackgroundImage}
         resizeMode="cover"
       />

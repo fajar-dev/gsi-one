@@ -16,9 +16,11 @@
     "format": "prettier --write \"src/**/*.{ts,tsx}\" \"test/**/*.{ts,tsx}\" \"__tests__/**/*.{ts,tsx}\" \"scripts/*.{js,cjs}\" App.tsx \"*.js\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx}\" \"test/**/*.{ts,tsx}\" \"__tests__/**/*.{ts,tsx}\" \"scripts/*.{js,cjs}\" App.tsx \"*.js\"",
     "audit:architecture": "node scripts/audit_architecture.cjs",
-    "check": "npm run audit:architecture && npm run audit:modules && npm run typecheck && npm run lint && npm run format:check && npm run test:ci",
+    "check": "npm run audit:architecture && npm run audit:modules && npm run audit:assets && npm run typecheck && npm run lint && npm run format:check && npm run test:ci",
     "build:web": "webpack --mode production",
-    "audit:modules": "node scripts/audit_modules.cjs"
+    "audit:modules": "node scripts/audit_modules.cjs",
+    "audit:assets": "node scripts/audit_assets.cjs",
+    "seed:prepare-reset": "node scripts/prepare_reset_seed.cjs"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^3.1.1",

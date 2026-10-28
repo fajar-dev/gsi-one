@@ -93,6 +93,10 @@ module.exports = (_env, argv = {}) => {
       path: path.resolve(appDirectory, 'dist'),
       filename: 'bundle.js',
       publicPath: '/',
+      clean: {
+        // Keep release packages while clearing obsolete web assets.
+        keep: /^v\d+\.\d+\.\d+-build\d+(?:\/|$)/,
+      },
     },
 
     module: {

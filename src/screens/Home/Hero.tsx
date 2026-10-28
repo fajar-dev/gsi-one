@@ -29,7 +29,7 @@ const Hero = memo(() => {
 
           <View style={styles.rightColumn}>
             <Image
-              source={require('../../../assets/images/engineer_female.png')}
+              source={require('../../../assets/images/engineer_female.jpg')}
               style={styles.engineerImage}
               resizeMode="contain"
             />

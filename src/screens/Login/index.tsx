@@ -90,7 +90,7 @@ function Login(): React.ReactElement {
       >
         <View style={styles.headerContainer}>
           <Image
-            source={require('../../../assets/images/beranda_depan.png')}
+            source={require('../../../assets/images/beranda_depan.jpg')}
             style={styles.headerBackgroundImage}
             resizeMode="cover"
           />

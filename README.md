@@ -1,15 +1,15 @@
 # GSI One Mobile Application
 
-Aplikasi Mobile Resmi **PT Graha Survei Indonesia (GSI)** untuk pemantauan proyek survei & penilaian forensic struktur bangunan (*Structural Health Monitoring System & Forensic Engineering*).
+Aplikasi Mobile Resmi **PT Graha Survei Indonesia (GSI)** untuk pemantauan proyek survei & penilaian forensic struktur bangunan (_Structural Health Monitoring System & Forensic Engineering_).
 
 ---
 
 ## Ikhtisar Aplikasi
 
-**GSI One** dikembangkan menggunakan React Native dan TypeScript dengan arsitektur berlapis (*Clean Architecture, Repository Pattern, & Domain-Driven Design*), Zustand state management, serta integrasi real-time Supabase PostgreSQL. Aplikasi ini mendukung **4 Peran Pengguna (User Roles)** dengan hak akses dan antarmuka khusus:
+**GSI One** dikembangkan menggunakan React Native dan TypeScript dengan arsitektur berlapis (_Clean Architecture, Repository Pattern, & Domain-Driven Design_), Zustand state management, serta integrasi real-time Supabase PostgreSQL. Aplikasi ini mendukung **4 Peran Pengguna (User Roles)** dengan hak akses dan antarmuka khusus:
 
 1. **System Administrator (`admin`)**: Pendaftaran user baru dengan role khusus, pembuatan proyek master, pengaturan tahapan timeline, dan pengawasan operasional sistem.
-2. **Marketing & Business Development (`marketing`)**: Pengelolaan reservasi survey ("Daftar Survey"), *claim status* pengajuan calon klien, dan portofolio layanan.
+2. **Marketing & Business Development (`marketing`)**: Pengelolaan reservasi survey ("Daftar Survey"), _claim status_ pengajuan calon klien, dan portofolio layanan.
 3. **Field Engineer (`engineer`)**: Pembaruan progres harian di lapangan, penambahan catatan log harian, dan pengunggahan hasil pengujian NDT/dokumen teknis.
 4. **Client / Klien (`client`)**: Pemantauan real-time progres jembatan/gedung, status tahapan inspeksi visual/sensor, dan pengunduhan laporan.
 
@@ -17,7 +17,7 @@ Aplikasi Mobile Resmi **PT Graha Survei Indonesia (GSI)** untuk pemantauan proye
 
 ## Maintainability & Kualitas Codebase
 
-Quality gate lokal memeriksa batas arsitektur, modul tidak terjangkau dan siklus impor, strict TypeScript, ESLint tanpa warning, format Prettier, serta unit dan integration test. Jalankan `npm run check` sebelum commit. Hasil pengujian lokal tidak menggantikan pengujian perangkat atau hasil CI GitHub.
+Quality gate lokal memeriksa batas arsitektur, modul tidak terjangkau dan siklus impor, aset hilang/tidak terpakai, strict TypeScript, ESLint tanpa warning, format Prettier, serta unit dan integration test. Jalankan `npm run check` sebelum commit. Hasil pengujian lokal tidak menggantikan pengujian perangkat atau hasil CI GitHub.
 
 - Model, validasi, dan kontrak repository berada di `src/domain/`.
 - Implementasi query, mapper, profil, dan Storage berada di `src/infrastructure/supabase/`.
@@ -29,7 +29,7 @@ Quality gate lokal memeriksa batas arsitektur, modul tidak terjangkau dan siklus
 
 ## Teknologi Utama
 
-- **Framework**: React Native 0.83+ (CLI) & TypeScript (*Strict Mode*)
+- **Framework**: React Native 0.83+ (CLI) & TypeScript (_Strict Mode_)
 - **Arsitektur**: Clean Architecture, OOP Domain Entities, Repository Pattern, Custom Hooks
 - **State Management**: Zustand Stores (`authStore.ts`, `projectStore.ts`)
 - **Custom Hooks**: `useCreateProjectForm`, `useProjectDetail`, `useSurveyRequests`, `useEditProjectForm`, `useStructureDetail`, `useProfile`, `useProjectRealtime`
@@ -77,18 +77,22 @@ gsi-one/
 ## Panduan Pengoperasian & Verifikasi
 
 ### 1. Persiapan Environment (.env)
+
 Gunakan Node.js 24 (`.nvmrc`), JDK 17, dan Android SDK sesuai `android/build.gradle`. Instal dependensi dengan `npm ci`.
 Salin berkas `.env.example` menjadi `.env` pada folder root:
+
 ```bash
 cp .env.example .env
 ```
 
 ### 2. Menjalankan Aplikasi Mobile (Android)
+
 ```bash
 npm run android
 ```
 
 ### 3. Pengecekan Kualitas Kode & Tipe Data
+
 ```bash
 # Verifikasi TypeScript Type Checking
 npm run typecheck
@@ -98,6 +102,7 @@ npm run lint
 ```
 
 ### 4. Menjalankan Unit Test (Jest)
+
 ```bash
 npm run test:ci
 ```
@@ -127,6 +132,7 @@ cd android
 # 4. Build APK Produksi (Distribusi Direct)
 ./gradlew assembleRelease
 ```
+
 Berkas AAB tersimpan di `android/app/build/outputs/bundle/release/app-release.aab`.
 Panduan deployment lengkap dari SDLC hingga Play Console rilis dapat dibaca di **[docs/07_Deployment/Deployment_Guide.md](docs/07_Deployment/Deployment_Guide.md)**.
 
@@ -142,3 +148,9 @@ Panduan deployment lengkap dari SDLC hingga Play Console rilis dapat dibaca di *
 - **[Peta Codebase Proyek](CODEBASE_MAP.md)**
 - **[ADR 0001: Skalabilitas & Keamanan](docs/03_Architecture_Design/ADR/0001-scalability-and-security-architecture.md)**
 - **[SLO Baseline](docs/05_Quality_Assurance/SLO/SLO_BASELINE.md)**
+
+### Reset data dan seed demo
+
+`supabase/seed.sql` membuat atau memperbarui akun/proyek demo. Akun klien demo adalah Reviewer; password eksplisitnya ada pada data akun di file seed. Akun demo lain memakai `password123` saat dibuat.
+
+Untuk menghapus seluruh data aplikasi dan akun Auth sebelum seed, kosongkan objek pada seluruh bucket melalui Storage API, lalu jalankan `npm run seed:prepare-reset`. Salin seluruh isi `audit/reset-and-seed.sql` ke Supabase SQL Editor dan jalankan sebagai satu query. Skrip menolak berjalan jika Storage belum kosong; reset dan seed berada dalam satu transaksi. Counter ID dipertahankan agar tidak mengubah sequence internal Supabase Auth. Skema, RLS, bucket, dan konfigurasi layanan tetap dipertahankan. Setelah berhasil, jalankan `npm run seed:storage` untuk mengunggah dan memverifikasi foto demo privat.

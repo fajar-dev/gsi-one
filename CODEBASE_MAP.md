@@ -64,6 +64,8 @@ npm run android
 
 Jika ADB tersambung ulang, jalankan `adb devices -l` dan `adb reverse tcp:8081 tcp:8081`. APK debug memerlukan Metro. Build native: `cd android` lalu `./gradlew :app:assembleDebug -PreactNativeArchitectures=arm64-v8a --max-workers=2`.
 
+`npm run audit:assets` memeriksa referensi gambar/font/media, termasuk fixture yang dipakai skrip seed, serta menolak aset tanpa pemakai. Build web membersihkan file dengan hash lama dan mempertahankan folder paket rilis.
+
 `npm run audit:modules` memeriksa modul aplikasi yang tidak terjangkau dan siklus impor, termasuk adapter platform. TypeScript menolak local/parameter yang tidak digunakan. Tes konkurensi mencakup login/logout, mutasi proyek, dan antrean notifikasi; reset sesi membatalkan penerapan respons lama.
 
 Quality gate lokal tidak membuktikan seluruh perangkat/platform atau jaringan bebas masalah. Laporan JSON di `audit/` menyimpan hasil dan keterbatasan tiap pengujian; laporan lama tetap menjadi bukti historis.

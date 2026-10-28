@@ -3,7 +3,8 @@
 -- Jalankan setelah seluruh migration, melalui Supabase SQL Editor.
 -- Setelah SQL selesai, jalankan npm run seed:storage untuk mengunggah foto demo privat.
 -- Supabase CLI juga memuatnya saat reset database lokal (lihat config.toml).
--- Akun BARU memakai password demo: password123. Password akun lama dipertahankan.
+-- Akun baru memakai password pada data akun, atau password123 jika tidak diisi.
+-- Password akun lama dipertahankan kecuali data akun menyebut password eksplisit.
 -- Tidak menghapus data. Pengulangan memperbarui akun/proyek/tahapan demo yang sama.
 -- URL foto merupakan contoh dari sumber, bukan unggahan ke Supabase Storage.
 
@@ -22,6 +23,7 @@ DECLARE
   v_user_id uuid;
   v_user_ids jsonb := '{}'::jsonb;
   v_ticket text;
+  v_ticket_sequence integer;
   v_project_id bigint;
   v_stage_id bigint;
   v_matches integer;
@@ -33,7 +35,7 @@ BEGIN
     {"email":"admin@grahasurvei.com","name":"Admin GSI","role":"admin"},
     {"email":"marketing@grahasurvei.com","name":"Rian Marketing","role":"marketing"},
     {"email":"engineer@grahasurvei.com","name":"Heri Engineer","role":"engineer"},
-    {"email":"client@client.com","name":"Budi Klien","role":"client"}
+    {"email":"reviewer.gsi@gmail.com","name":"Reviewer","role":"client","password":"ReviewGSI2025!"}
   ]$users$::jsonb)
   LOOP
     SELECT count(*) INTO v_matches FROM auth.users
@@ -48,7 +50,15 @@ BEGIN
     v_ticket := NULL;
     IF v_user->>'role' = 'client' THEN
       SELECT ticket_number INTO v_ticket FROM public.users WHERE id = v_user_id;
-      v_ticket := COALESCE(NULLIF(v_ticket, ''), 'GSI-2026-000001');
+      IF NULLIF(v_ticket, '') IS NULL THEN
+        -- Jangan mengambil tiket yang sudah dimiliki akun lain saat seed diulang.
+        v_ticket_sequence := 1;
+        LOOP
+          v_ticket := 'GSI-2026-' || lpad(v_ticket_sequence::text, 6, '0');
+          EXIT WHEN NOT EXISTS (SELECT 1 FROM public.users WHERE ticket_number = v_ticket);
+          v_ticket_sequence := v_ticket_sequence + 1;
+        END LOOP;
+      END IF;
     END IF;
 
     IF v_user_id IS NULL THEN
@@ -61,7 +71,7 @@ BEGIN
       ) VALUES (
         '00000000-0000-0000-0000-000000000000', v_user_id,
         'authenticated', 'authenticated', v_user->>'email',
-        crypt('password123', gen_salt('bf')), now(),
+        crypt(COALESCE(v_user->>'password', 'password123'), gen_salt('bf')), now(),
         '{"provider":"email","providers":["email"]}'::jsonb,
         jsonb_build_object('full_name', v_user->>'name', 'role', v_user->>'role')
           || CASE WHEN v_ticket IS NULL THEN '{}'::jsonb
@@ -69,8 +79,11 @@ BEGIN
         now(), now(), '', '', '', ''
       );
     ELSE
-      -- Jangan mereset password maupun status konfirmasi akun yang sudah ada.
+      -- Hanya password eksplisit pada data akun yang diperbarui.
       UPDATE auth.users SET
+        encrypted_password = CASE WHEN v_user ? 'password'
+          THEN crypt(v_user->>'password', gen_salt('bf'))
+          ELSE encrypted_password END,
         raw_user_meta_data = COALESCE(raw_user_meta_data, '{}'::jsonb)
           || jsonb_build_object('full_name', v_user->>'name', 'role', v_user->>'role')
           || CASE WHEN v_ticket IS NULL THEN '{}'::jsonb
@@ -90,13 +103,16 @@ BEGIN
       SELECT 1 FROM auth.identities WHERE user_id = v_user_id AND provider = 'email'
     );
 
-    INSERT INTO public.users (id, name, email, role, ticket_number)
-    VALUES (v_user_id, v_user->>'name', v_user->>'email', v_user->>'role', v_ticket)
-    ON CONFLICT (id) DO UPDATE SET
-      name = EXCLUDED.name,
-      email = EXCLUDED.email,
-      role = EXCLUDED.role,
-      ticket_number = COALESCE(EXCLUDED.ticket_number, public.users.ticket_number);
+    -- Trigger Auth biasanya sudah membuat profil. Perbarui langsung agar tidak
+    -- menjalankan trigger BEFORE INSERT profil untuk akun yang sudah ada.
+    UPDATE public.users SET
+      name = v_user->>'name', email = v_user->>'email', role = v_user->>'role',
+      ticket_number = COALESCE(v_ticket, ticket_number)
+    WHERE id = v_user_id;
+    IF NOT FOUND THEN
+      INSERT INTO public.users (id, name, email, role, ticket_number)
+      VALUES (v_user_id, v_user->>'name', v_user->>'email', v_user->>'role', v_ticket);
+    END IF;
 
     v_user_ids := v_user_ids || jsonb_build_object(v_user->>'role', v_user_id::text);
   END LOOP;
@@ -105,7 +121,7 @@ BEGIN
     {
       "project_code":"PRJ-NDT-001",
       "project_name":"Non-Destructive Testing Ruko 3 Lantai",
-      "client_name":"Budi Klien (PT Mulia Jaya)",
+      "client_name":"Reviewer (PT Mulia Jaya)",
       "budget":85000000,"start_date":"2026-07-01","estimated_finish":"2026-07-25",
       "status":"on_progress","created_by_role":"marketing",
       "stages":[
@@ -119,7 +135,7 @@ BEGIN
     {
       "project_code":"PRJ-SHMS-002",
       "project_name":"Structural Health Monitoring System Jembatan Baja",
-      "client_name":"Budi Klien (Dinas Pekerjaan Umum)",
+      "client_name":"Reviewer (Dinas Pekerjaan Umum)",
       "budget":420000000,"start_date":"2026-06-15","estimated_finish":"2026-08-15",
       "status":"on_progress","created_by_role":"admin",
       "stages":[
