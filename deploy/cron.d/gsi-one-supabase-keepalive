@@ -1,0 +1,5 @@
+SHELL=/bin/sh
+PATH=/usr/bin:/bin
+
+# Daily at 03:00 in the cron daemon's timezone.
+0 3 * * * root /bin/sh /usr/local/libexec/gsi-one/supabase-keepalive.sh
